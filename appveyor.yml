@@ -3,7 +3,7 @@ shallow_clone:
 
 environment:
   matrix:
-    - nodejs_version: "10"
+    - nodejs_version: "8"
 
 branches:
   only:
@@ -17,6 +17,7 @@ cache:
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
+  - ps: npm install -g node-gyp
   - ps: npm install --global --production windows-build-tools
 
 before_build:
