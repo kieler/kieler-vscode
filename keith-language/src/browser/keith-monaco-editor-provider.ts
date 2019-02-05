@@ -24,6 +24,7 @@ import { MonacoWorkspace } from "@theia/monaco/lib/browser/monaco-workspace";
 import { MonacoCommandServiceFactory } from "@theia/monaco/lib/browser/monaco-command-service";
 import { MonacoQuickOpenService } from '@theia/monaco/lib/browser/monaco-quick-open-service';
 import { MonacoDiffNavigatorFactory } from '@theia/monaco/lib/browser/monaco-diff-navigator-factory';
+import { ApplicationServer } from '@theia/core/lib/common/application-protocol';
 
 @injectable()
 export class KeithMonacoEditorProvider extends MonacoEditorProvider {
@@ -38,11 +39,12 @@ export class KeithMonacoEditorProvider extends MonacoEditorProvider {
         @inject(MonacoCommandServiceFactory) protected readonly commandServiceFactory: MonacoCommandServiceFactory,
         @inject(EditorPreferences) protected readonly editorPreferences: EditorPreferences,
         @inject(MonacoQuickOpenService) protected readonly quickOpenService: MonacoQuickOpenService,
-        @inject(MonacoDiffNavigatorFactory) protected readonly diffNavigatorFactory: MonacoDiffNavigatorFactory
+        @inject(MonacoDiffNavigatorFactory) protected readonly diffNavigatorFactory: MonacoDiffNavigatorFactory,
+        @inject(ApplicationServer) protected readonly applicationServer: ApplicationServer,
     ) {
         super(editorService, monacoModelResolver, contextMenuService, m2p, p2m,
             workspace, commandServiceFactory, editorPreferences, quickOpenService,
-            diffNavigatorFactory);
+            diffNavigatorFactory, applicationServer);
     }
 
     protected createMonacoEditorOptions(model: MonacoEditorModel): MonacoEditor.IOptions {

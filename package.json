@@ -26,7 +26,6 @@
     "package:win": "yarn run build && electron-builder --win --x64",
     "package:linux": "yarn run build && electron-builder --linux --x64",
     "package:mac": "yarn run build && electron-builder --mac --x64",
-    "postinstall": "electron-builder install-app-deps",
     "prepare": "lerna run prepare",
     "rebuild:browser": "theia rebuild:browser",
     "rebuild:electron": "theia rebuild:electron",
@@ -65,11 +64,7 @@
     "keith-sprotty": "0.1.0",
     "monaco-editor-core": "^0.14.6",
     "sprotty": "0.4.2",
-    "theia-sprotty": "0.1.20",
-    "vscode-jsonrpc": "^3.6.2",
-    "vscode-nsfw": "^1.0.17",
-    "xterm": "^2.9.2",
-    "yargs": "^9.0.1"
+    "theia-sprotty": "0.1.20"
   },
   "devDependencies": {
     "@theia/cli": "latest",
@@ -94,6 +89,7 @@
     "keith-diagram",
     "keith-diagram-options",
     "keith-app",
+    "keith-app-electron",
     "keith-language",
     "keith-sprotty",
     "keith-kicool"
