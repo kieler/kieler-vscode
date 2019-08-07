@@ -10,6 +10,7 @@ export function getLayerOfNode(node: KNode, nodes: KNode[]): number {
     // TODO: doesn't work properly when the layerCons of some nodes are greater than their layerId
     let layers = getLayers(nodes)
     let curX = node.position.x + node.size.width / 2
+
     // check for all layers if the node is in the layer
     for (let i = 0; i < layers.length; i++) {
         let layer = layers[i]
@@ -24,8 +25,70 @@ export function getLayerOfNode(node: KNode, nodes: KNode[]): number {
         // node is in last layer
         return layers.length - 1
     }
+
     // node is in a new last layer
     return layers.length
+}
+
+/**
+ * Adjusts the layer constraint value for a node in case that the target layer's id was boosted by an user defined constraint.
+ * @param node the node that was moved
+ * @param nodes all nodes
+ * @param layerCandidate the current candidate value for the new layer constraint
+ */
+export function getActualLayer(node: KNode, nodes: KNode[], layerCandidate: number) {
+
+    // Examine all nodes that have a layer Id left or equal to the layerCandidate and that have a layerCons > their layerId
+    let layerConsLeftofCandidate = nodes.filter(n => n.layerId <= layerCandidate && n.layerCons > n.layerId)
+
+    // In case that there are no such nodes return the layerCandidate
+    if (layerConsLeftofCandidate.length === 0) {
+        return layerCandidate
+    }
+
+    // Search the highest layer constraint among those nodes
+    // You can't just look to the left layer or the layer left of the next layer since their could have been an arbitrary numbers
+    // of shifts
+    let nodeWithMaxCons = null
+    let maxCons = -1
+    for (let n of layerConsLeftofCandidate) {
+        if (n.layerCons > maxCons) {
+            nodeWithMaxCons = n
+            maxCons = n.layerCons
+        }
+    }
+
+    if (nodeWithMaxCons !== null) {
+        let idDiff = layerCandidate - nodeWithMaxCons.layerId
+        return maxCons + idDiff
+    }
+
+    return layerCandidate
+}
+
+/**
+ * Adjusts the target index of a node in the case that the node above it has a position constraint > count of nodes in the layer.
+ * @param targetIndex the current candidate target index
+ * @param alreadyInLayer signals whether the node already was in the layer before it was moved.
+ * @param layerNodes all nodes of the target layer
+ */
+export function getActualTargetIndex(targetIndex: number, alreadyInLayer: boolean, layerNodes: KNode[]) {
+    let localTargetIndex = targetIndex
+    if (localTargetIndex > 0) {
+        // Check whether there is an user defined pos constraint on the upper neighbour that is higher
+        // than its position ID
+        let upperIndex = localTargetIndex - 1
+        let upperNeighbour = layerNodes[upperIndex]
+        let posConsOfUpper = upperNeighbour.posCons
+        if (posConsOfUpper > upperIndex) {
+            if (alreadyInLayer && upperNeighbour.posId === localTargetIndex) {
+                localTargetIndex = posConsOfUpper
+            } else {
+                localTargetIndex = posConsOfUpper + 1
+            }
+        }
+    }
+    return localTargetIndex
 }
 
 /**
