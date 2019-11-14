@@ -159,6 +159,24 @@ export class DiagramOptionsViewWidget extends ReactWidget {
             }
         })
         // Render all top level options.
+        children.push(...this.renderOptions(optionsToRender))
+        if (children.length === 0) {
+            return undefined
+        } else {
+            return <div key='synthesisOptions'>
+                <p className='diagram-option seperator'>{'Diagram Options'}</p>
+                {...children}
+            </div>
+        }
+    }
+
+    /**
+     * Renders the given options, assuming that the categoryMap is already set up.
+     *
+     * @param optionsToRender The options that should be rendered now.
+     */
+    private renderOptions(optionsToRender: SynthesisOption[]): JSX.Element[] {
+        const children: JSX.Element[] = []
         optionsToRender.forEach(option => {
             switch (option.type) {
                 case TransformationOptionType.CHECK: {
@@ -171,6 +189,10 @@ export class DiagramOptionsViewWidget extends ReactWidget {
                 }
                 case TransformationOptionType.RANGE: {
                     children.push(this.renderRange(option as RangeOption))
+                    break
+                }
+                case TransformationOptionType.TEXT: {
+                    children.push(this.renderText(option))
                     break
                 }
                 case TransformationOptionType.SEPARATOR: {
@@ -186,14 +208,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
                 }
             }
         })
-        if (children.length === 0) {
-            return undefined
-        } else {
-            return <div key='synthesisOptions'>
-                <p className='diagram-option seperator'>{'Diagram Options'}</p>
-                {...children}
-            </div>
-        }
+        return children
     }
 
     /**
@@ -304,6 +319,35 @@ export class DiagramOptionsViewWidget extends ReactWidget {
     }
 
     /**
+     * Renders a text SynthesisOption as an HTML input with a text.
+     *
+     * @param option The text option to render.
+     */
+    private renderText(option: SynthesisOption): JSX.Element {
+        return <div key={option.sourceHash} className='diagram-option-text'>
+            <label htmlFor={option.name}>{option.name}:</label>
+            <input
+                type='text'
+                id={option.name}
+                name={option.name}
+                value={option.currentValue}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.onText(event, option)}
+            />
+        </div>
+    }
+
+    /**
+     * Called whenever a text option input field has been modified. Updates the option that belongs to this text field.
+     * @param event The input event that updated the text field.
+     * @param option The synthesis option connected to the text field.
+     */
+    private onText(event: React.ChangeEvent<HTMLInputElement>, option: SynthesisOption) {
+        option.currentValue = event.currentTarget.value
+        this.update()
+        this.sendNewSynthesisOption(option)
+    }
+
+    /**
      * Renders a separator SynthesisOption as an HTML label.
      *
      * @param option The separator option to render.
@@ -353,33 +397,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
      */
     private renderCategoryOptions(options: SynthesisOption[]): JSX.Element {
         let children: JSX.Element[] = []
-        options.forEach(option => {
-            switch (option.type) {
-                case TransformationOptionType.CHECK: {
-                    children.push(this.renderCheck(option))
-                    break
-                }
-                case TransformationOptionType.CHOICE: {
-                    children.push(this.renderChoice(option))
-                    break
-                }
-                case TransformationOptionType.RANGE: {
-                    children.push(this.renderRange(option as RangeOption))
-                    break
-                }
-                case TransformationOptionType.SEPARATOR: {
-                    children.push(this.renderSeperator(option))
-                    break
-                }
-                case TransformationOptionType.CATEGORY: {
-                    const list = this.categoryMap.get(option.name)
-                    if (list) {
-                        children.push(this.renderCategory(option, list))
-                    }
-                    break
-                }
-            }
-        })
+        children.push(...this.renderOptions(options))
         return <div className='category-options'>{...children}</div>
     }
 
@@ -413,7 +431,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
                 return this.renderNumber(layoutOptionUIData)
             }
             case Type.BOOLEAN: {
-                return <p>{'Unimplemented layout option type!'}</p>
+                return this.renderBoolean(layoutOptionUIData)
             }
             case Type.ENUM: {
                 return this.renderEnum(layoutOptionUIData)
@@ -455,6 +473,32 @@ export class DiagramOptionsViewWidget extends ReactWidget {
     }
 
     /**
+     * Renders a layout option for BOOLEAN type as an HTML checkbox.
+     * @param option The layout option to render.
+     */
+    private renderBoolean(option: LayoutOptionUIData): JSX.Element {
+        if (option.currentValue === undefined) {
+            option.currentValue = option.defaultValue.k
+        }
+        return <div key={option.optionId} title={option.description} className='diagram-option'>
+            <label htmlFor={option.name}>
+                <input
+                    className='diagram-inputbox'
+                    type='checkbox'
+                    id={option.optionId}
+                    name={option.name}
+                    defaultChecked={option.currentValue}
+                    onClick={(event: React.MouseEvent<HTMLInputElement>) => {
+                        option.currentValue = event.currentTarget.checked
+                        this.onLayoutOption(option.optionId, option.currentValue)
+                    }}
+                />
+                {option.name}
+            </label>
+        </div>
+    }
+
+    /**
      * Renders an enum layout option as an HTML fieldset with multiple radio buttons.
      * @param option The enum layout option to render.
      */
@@ -468,7 +512,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
             children.push(this.renderEnumValue(value, readableValue, initialValue === readableValue, option))
         });
         return <div key={option.optionId} title={option.description} className='diagram-option-choice'>
-            <legend>{option.name}</legend>
+            <legend className='diagram-option'>{option.name}</legend>
             {...children}
         </div>
     }
@@ -481,7 +525,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
      * @param option The option this radio button belongs to.
      */
     private renderEnumValue(value: number, readableValue: string, initialValue: boolean, option: LayoutOptionUIData): JSX.Element {
-        return <div key={option.optionId + value}>
+        return <div key={option.optionId + value} className='diagram-option'>
             <label htmlFor={readableValue}>
                 <input
                     type='radio'
