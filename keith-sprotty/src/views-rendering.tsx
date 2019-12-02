@@ -168,10 +168,12 @@ export function renderRectangularShape(rendering: KContainerRendering, parent: S
                             'stroke-linejoin': lineStyles.lineJoin,
                             'stroke-width': lineStyles.lineWidth,
                             'stroke-dasharray': lineStyles.dashArray,
-                            'stroke-miterlimit': lineStyles.miterLimit
+                            'stroke-miterlimit': lineStyles.miterLimit,
+                            'stroke-opacity': colorStyles.foreground.opacity,
+                            'fill-opacity': colorStyles.background.opacity
                         } as React.CSSProperties}
-                        stroke={colorStyles.foreground}
-                        fill={colorStyles.background}
+                        stroke={colorStyles.foreground.color}
+                        fill={colorStyles.background.color}
                         filter={shadowStyles}
                     />
                     {renderChildRenderings(rendering, parent, stylesToPropagate, context)}
@@ -193,10 +195,12 @@ export function renderRectangularShape(rendering: KContainerRendering, parent: S
                         'stroke-linejoin': lineStyles.lineJoin,
                         'stroke-width': lineStyles.lineWidth,
                         'stroke-dasharray': lineStyles.dashArray,
-                        'stroke-miterlimit': lineStyles.miterLimit
+                        'stroke-miterlimit': lineStyles.miterLimit,
+                        'stroke-opacity': colorStyles.foreground.opacity,
+                        'fill-opacity': colorStyles.background.opacity
                     } as React.CSSProperties}
-                    stroke={colorStyles.foreground}
-                    fill={colorStyles.background}
+                    stroke={colorStyles.foreground.color}
+                    fill={colorStyles.background.color}
                     filter={shadowStyles}
                 />
                 {renderChildRenderings(rendering, parent, stylesToPropagate, context)}
@@ -223,10 +227,12 @@ export function renderRectangularShape(rendering: KContainerRendering, parent: S
                         'stroke-linejoin': lineStyles.lineJoin,
                         'stroke-width': lineStyles.lineWidth,
                         'stroke-dasharray': lineStyles.dashArray,
-                        'stroke-miterlimit': lineStyles.miterLimit
+                        'stroke-miterlimit': lineStyles.miterLimit,
+                        'stroke-opacity': colorStyles.foreground.opacity,
+                        'fill-opacity': colorStyles.background.opacity
                     } as React.CSSProperties}
-                    stroke={colorStyles.foreground}
-                    fill={colorStyles.background}
+                    stroke={colorStyles.foreground.color}
+                    fill={colorStyles.background.color}
                     filter={shadowStyles}
                 />
                 {renderChildRenderings(rendering, parent, stylesToPropagate, context)}
@@ -396,10 +402,12 @@ export function renderLine(rendering: KPolyline, parent: SKGraphElement | SKEdge
                 'stroke-linejoin': lineStyles.lineJoin,
                 'stroke-width': lineStyles.lineWidth,
                 'stroke-dasharray': lineStyles.dashArray,
-                'stroke-miterlimit': lineStyles.miterLimit
+                'stroke-miterlimit': lineStyles.miterLimit,
+                'stroke-opacity': colorStyles.foreground.opacity,
+                'fill-opacity': colorStyles.background.opacity
             } as React.CSSProperties}
-            stroke={colorStyles.foreground}
-            fill={colorStyles.background}
+            stroke={colorStyles.foreground.color}
+            fill={colorStyles.background.color}
             filter={shadowStyles}
         />
         {renderChildRenderings(rendering, parent, stylesToPropagate, context)}
@@ -463,7 +471,8 @@ export function renderKText(rendering: KText, parent: SKGraphElement | SKLabel, 
         ...{ 'font-style': textStyles.fontStyle },
         ...{ 'font-weight': textStyles.fontWeight },
         ...{ 'text-decoration-line': textStyles.textDecorationLine },
-        ...{ 'text-decoration-style': textStyles.textDecorationStyle }
+        ...{ 'text-decoration-style': textStyles.textDecorationStyle },
+        ...(colorStyle ? {'fill-opacity': colorStyle.opacity } : {})
     }
 
     // The children to be contained in the returned text node.
@@ -471,53 +480,68 @@ export function renderKText(rendering: KText, parent: SKGraphElement | SKLabel, 
 
     // The attributes to be contained in the returned text node.
     let attrs = {
+        x: boundsAndTransformation.bounds.x,
         style: style,
-        ...(boundsAndTransformation.bounds.y ? { y: boundsAndTransformation.bounds.y } : {}),
-        fill: colorStyle,
+        ...(colorStyle ? {fill: colorStyle.color} : {}),
         filter: shadowStyles,
         ...{ 'xml:space': 'preserve' } // This attribute makes the text size estimation include any trailing white spaces.
     } as any
 
+    let elements: VNode[]
     if (lines.length === 1) {
         // If the text has only one line, just put the text in the text node directly.
-        attrs.x = boundsAndTransformation.bounds.x;
-        children = [lines[0]]
+        attrs.y = boundsAndTransformation.bounds.y;
+        // Render a space character for size estimation if the string is empty
+        let line = lines[0]
+        if (line === '') {
+            line = ' '
+        }
+
+        children = [line]
+        // Force any SVG renderer rendering this text to use the exact width calculated by this renderer.
+        // This avoids overlapping texts or too big gaps at the cost of slightly bigger/tighter glyph spacings
+        // when viewed in a different SVG viewer after exporting.
+        if (rendering.calculatedTextLineWidths) {
+            attrs.textLength = rendering.calculatedTextLineWidths[0]
+            attrs.lengthAdjust = 'spacingAndGlyphs'
+        }
+        elements = [
+            <text {...attrs}>
+                {...children}
+            </text>
+        ]
     } else {
-        // Otherwise, put each line of text in a separate <tspan> element.
-        let dy: string | undefined = undefined
-        children = []
-        lines.forEach(line => {
+        // Otherwise, put each line of text in a separate <text> element.
+        const calculatedTextLineWidths = rendering.calculatedTextLineWidths
+        const calculatedTextLineHeights = rendering.calculatedTextLineHeights
+        let currentY = boundsAndTransformation.bounds.y ? boundsAndTransformation.bounds.y : 0
+        if (rendering.calculatedTextLineWidths) {
+            attrs.lengthAdjust = 'spacingAndGlyphs'
+        }
+
+        elements = []
+        lines.forEach((line, index) => {
             // If the line is just a blank line, add a dummy space character so the size estimation will
             // include this character without rendering anything further visible to the screen.
             // Also, the <tspan> attribute dy needs at least one character per text so the offset is correctly applied.
             if (line === '') {
                 line = ' '
             }
-            children.push(
-                <tspan
-                    x={boundsAndTransformation.bounds.x}
-                    {...(dy ? { dy: dy } : {})}
-                >{line}</tspan>
-            )
-            dy = '1.1em' // Have a distance of 1.1em for every new line after the first one.
+            const currentElement = <text
+                {...attrs}
+                y = {currentY}
+                {...(calculatedTextLineWidths ? { textLength: calculatedTextLineWidths[index] } : {})}
+            >{line}</text>
+
+            elements.push(currentElement)
+            currentY = calculatedTextLineHeights ? currentY + calculatedTextLineHeights[index] : currentY
         });
     }
 
     // build the element from the above defined attributes and children
-    let element
-    if (gAttrs.transform === undefined) {
-        element = <text id={rendering.id} {...attrs}>
-            {...children}
-        </text>
-    } else {
-        element = <g id={rendering.id} {...gAttrs}>
-            <text {...attrs}>
-                {...children}
-            </text>
-        </g>
-    }
-
-    return element
+    return <g id={rendering.id} {...gAttrs}>
+        {...elements}
+    </g>
 }
 
 /**
