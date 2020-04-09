@@ -19,7 +19,7 @@ import { injectable } from 'inversify';
 import { LSTheiaDiagramServer } from 'sprotty-theia/lib';
 import {
     Action, ActionHandlerRegistry, ActionMessage, BringToFrontAction, ComputedBoundsAction, findElement, FitToScreenAction, ICommand, RequestPopupModelAction, SetModelCommand,
-    SetPopupModelAction, SwitchEditModeAction
+    SetPopupModelAction, SwitchEditModeAction, RequestModelAction
 } from 'sprotty/lib';
 import { isNullOrUndefined } from 'util';
 import { KeithDiagramWidget } from './keith-diagram-widget';
@@ -77,6 +77,11 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             || action.kind === SwitchEditModeAction.KIND
             || action.kind === BringToFrontAction.KIND) {
             // Ignore these ones
+        } else if (action.kind === RequestModelAction.KIND) {
+            console.log("Requesting model.")
+            let dateTime = Date.now()
+            console.log("starting at " + dateTime)
+            super.handle(action)
         } else {
             super.handle(action)
         }

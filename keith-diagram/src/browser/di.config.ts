@@ -17,9 +17,21 @@ import {
     CompletionLabelEditor, DeleteWithWorkspaceEditCommand, DiagramConfiguration, EditDiagramLocker, IRootPopupModelProvider, LSTheiaDiagramServer, LSTheiaDiagramServerProvider,
     RenameLabelEditor, TheiaDiagramServer, TheiaKeyTool, WorkspaceEditCommand
 } from 'sprotty-theia/lib';
-import { configureCommand, KeyTool, TYPES } from 'sprotty/lib';
+import { configureCommand, KeyTool, TYPES, IVNodePostprocessor } from 'sprotty/lib';
 import { KeithDiagramServer } from './keith-diagram-server';
 import { PopupModelProvider } from './popup';
+
+@injectable()
+export class TimePostprocessor implements IVNodePostprocessor {
+    decorate(vnode: import("snabbdom/vnode").VNode, element: import("sprotty").SModelElement): import("snabbdom/vnode").VNode {
+        return vnode;
+    }
+    postUpdate(cause?: import("sprotty").Action | undefined): void {
+        console.log("update done.")
+        let dateTime = Date.now()
+        console.log("ending at " + dateTime)
+    }
+}
 
 /**
  * Dependency injection container for KEITH diagram configuration.
@@ -53,6 +65,9 @@ export class KeithDiagramConfiguration implements DiagramConfiguration {
 
         container.bind(CompletionLabelEditor).toSelf().inSingletonScope();
         container.bind(RenameLabelEditor).toSelf().inSingletonScope();
+
+        container.bind(TimePostprocessor).toSelf().inSingletonScope();
+        container.bind(TYPES.IVNodePostprocessor).toService(TimePostprocessor);
 
         return container
     }
