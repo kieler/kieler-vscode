@@ -18,7 +18,8 @@ import {
 } from '@kieler/keith-interactive/lib/layered/actions';
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
-    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, PerformActionAction, RequestTextBoundsCommand, SetSynthesesAction, SetSynthesisAction, StoreImagesAction
+    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, PerformActionAction, RefreshLayoutAction, RequestTextBoundsCommand,
+    SetSynthesesAction, SetSynthesisAction, StoreImagesAction
 } from '@kieler/keith-sprotty/lib/actions/actions';
 import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
 import { injectable } from 'inversify';
@@ -48,9 +49,11 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             const diagramWidget = this.getWidget()
             if (diagramWidget instanceof KeithDiagramWidget) {
                 diagramWidget.modelUpdated()
+                if (diagramWidget.resizeToFit) {
+                    // Fit the received model to the widget size.
+                    this.actionDispatcher.dispatch(new FitToScreenAction([], undefined, undefined, false))
+                }
             }
-            // Fit the received model to the widget size.
-            this.actionDispatcher.dispatch(new FitToScreenAction([], undefined, undefined, false))
         }
     }
 
@@ -149,6 +152,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(RectPackSetPositionConstraintAction.KIND, this)
         registry.register(RectPackDeletePositionConstraintAction.KIND, this)
         registry.register(RefreshDiagramAction.KIND, this)
+        registry.register(RefreshLayoutAction.KIND, this)
         registry.register(RequestKeithPopupModelAction.KIND, this)
         registry.register(RequestTextBoundsCommand.KIND, this)
         registry.register(SetAspectRatioAction.KIND, this)
