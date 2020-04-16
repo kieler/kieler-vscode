@@ -17,6 +17,7 @@ import { KNode } from './constraint-classes';
 import { filterKNodes } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
+import { renderHierarchyLevel as renderHierarchyLevelTree, renderTreeConstraint } from './tree/tree-interactive-view';
 import { isUndefined } from 'util';
 
 /**
@@ -31,6 +32,8 @@ export function renderInteractiveLayout(root: KNode): VNode {
         result = renderHierarchyLevelLayered(nodes, root)
     } else if (root.properties.algorithm.endsWith('rectpacking')) {
         result = renderHierarchyLevelRectPacking(nodes, root)
+    } else if (root.properties.algorithm.endsWith('tree')) {
+        result = renderHierarchyLevelTree(nodes, root)
     } else {
         // Not supported
     }
@@ -49,10 +52,12 @@ export function renderConstraints(node: KNode): VNode {
     const algorithm = (node.parent as KNode).properties.algorithm
     if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
         result = renderLayeredConstraint(node)
-    } else if (algorithm.endsWith( 'rectpacking')) {
+    } else if (algorithm.endsWith('rectpacking')) {
         if (node.properties.desiredPosition !== -1) {
             result = renderRectPackConstraint(node)
         }
+    } else if (algorithm.endsWith('tree')) {
+        result = renderTreeConstraint(node)
     } else {
         // Not supported
     }

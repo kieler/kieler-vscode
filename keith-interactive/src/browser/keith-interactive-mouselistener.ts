@@ -97,6 +97,8 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                     this.data.set('layered', getLayers(this.nodes, this.target.direction))
                 } else if (algorithm.endsWith('rectpacking')) {
                     // Do nothing
+                } else if (algorithm.endsWith('tree')) {
+                    // TODO: Init tree dataset?
                 }
 
                 this.target.selected = true
@@ -113,6 +115,8 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                         return [new RectPackDeletePositionConstraintAction({
                             id: this.target.id
                         })]
+                    } else if (algorithm.endsWith('tree')) {
+                        // TODO: Delete Positions
                     }
                 }
                 return super.mouseDown(this.target as SModelElement, event)
@@ -141,6 +145,8 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
             } else if (algorithm.endsWith('rectpacking')) {
                 const parent = this.nodes[0] ? this.nodes[0].parent as KNode : undefined
                 result = [setGenerateRectPackAction(this.nodes, this.target, parent, event)].concat(super.mouseUp(this.target, event));
+            } else if (algorithm.endsWith('tree')) {
+                // TODO: Add node move events
             } else {
                 // Algorithm not supported
             }
