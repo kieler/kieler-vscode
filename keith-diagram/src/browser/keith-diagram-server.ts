@@ -11,8 +11,15 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
+import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import {
-    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, PerformActionAction, RequestTextBoundsCommand, SetSynthesesAction, SetSynthesisAction, StoreImagesAction
+    DeleteLayerConstraintAction, DeletePositionConstraintAction, DeleteStaticConstraintAction,
+    SetPositionConstraintAction, SetLayerConstraintAction, SetStaticConstraintAction
+} from '@kieler/keith-interactive/lib/layered/actions';
+import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
+import {
+    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, PerformActionAction, RefreshLayoutAction, RequestTextBoundsCommand,
+    SetSynthesesAction, SetSynthesisAction, StoreImagesAction
 } from '@kieler/keith-sprotty/lib/actions/actions';
 import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
 import { injectable } from 'inversify';
@@ -141,9 +148,20 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(CheckImagesAction.KIND, this)
         registry.register(CheckedImagesAction.KIND, this)
         registry.register(ComputedTextBoundsAction.KIND, this)
+        registry.register(DeleteLayerConstraintAction.KIND, this)
+        registry.register(DeletePositionConstraintAction.KIND, this)
+        registry.register(DeleteStaticConstraintAction.KIND, this)
         registry.register(PerformActionAction.KIND, this)
+        registry.register(RectPackSetPositionConstraintAction.KIND, this)
+        registry.register(RectPackDeletePositionConstraintAction.KIND, this)
+        registry.register(RefreshDiagramAction.KIND, this)
+        registry.register(RefreshLayoutAction.KIND, this)
         registry.register(RequestKeithPopupModelAction.KIND, this)
         registry.register(RequestTextBoundsCommand.KIND, this)
+        registry.register(SetAspectRatioAction.KIND, this)
+        registry.register(SetLayerConstraintAction.KIND, this)
+        registry.register(SetPositionConstraintAction.KIND, this)
+        registry.register(SetStaticConstraintAction.KIND, this)
         registry.register(SetSynthesesAction.KIND, this)
         registry.register(SetSynthesisAction.KIND, this)
         registry.register(StoreImagesAction.KIND, this)

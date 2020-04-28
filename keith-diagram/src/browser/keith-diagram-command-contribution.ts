@@ -11,13 +11,15 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { injectable, inject } from "inversify";
-import { CommandRegistry, CommandContribution, Command } from "@theia/core/lib/common";
-import { CenterAction, FitToScreenAction } from "sprotty";
-import { SynthesisRegistry } from "@kieler/keith-sprotty/lib/syntheses/synthesis-registry";
-import { KeithDiagramServer } from "./keith-diagram-server";
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from "@theia/core/lib/browser/shell/tab-bar-toolbar";
-import { KeithDiagramWidget } from "./keith-diagram-widget";
+import { injectable, inject } from 'inversify';
+import { CommandRegistry, CommandContribution, Command } from '@theia/core/lib/common';
+import { CenterAction, FitToScreenAction } from 'sprotty';
+import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
+import { RefreshLayoutAction } from '@kieler/keith-sprotty/lib/actions/actions';
+import { SynthesisRegistry } from '@kieler/keith-sprotty/lib/syntheses/synthesis-registry';
+import { KeithDiagramServer } from './keith-diagram-server';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { KeithDiagramWidget } from './keith-diagram-widget';
 
 export const centerCommand: Command = {
     id: 'keith:diagram:center',
@@ -30,6 +32,20 @@ export const fitCommand: Command = {
     id: 'keith:diagram:fit',
     label: 'Fit to screen',
     iconClass: 'fa fa-expand',
+    category: 'Diagram'
+}
+
+export const refreshDiagramCommand: Command = {
+    id: 'keith:diagram:refresh-diagram',
+    label: 'Refresh diagram',
+    iconClass: 'fa fa-refresh',
+    category: 'Diagram'
+}
+
+export const refreshLayoutCommand: Command = {
+    id: 'keith:diagram:refresh-layout',
+    label: 'Refresh layout',
+    iconClass: 'fa fa-window-restore',
     category: 'Diagram'
 }
 
@@ -63,6 +79,30 @@ export class KeithDiagramCommandContribution implements CommandContribution, Tab
                 return widget !== undefined && widget instanceof KeithDiagramWidget
             }
         });
+        registry.registerCommand(refreshDiagramCommand, {
+            isEnabled: () => true,
+            execute: () => {
+                const widget = (this.synthesisRegistry.getProvidingDiagramServer() as KeithDiagramServer).getWidget()
+                if (widget) {
+                    widget.actionDispatcher.dispatch(new RefreshDiagramAction())
+                }
+            },
+            isVisible: widget => {
+                return widget !== undefined && widget instanceof KeithDiagramWidget
+            }
+        });
+        registry.registerCommand(refreshLayoutCommand, {
+            isEnabled: () => true,
+            execute: () => {
+                const widget = (this.synthesisRegistry.getProvidingDiagramServer() as KeithDiagramServer).getWidget()
+                if (widget) {
+                    widget.actionDispatcher.dispatch(new RefreshLayoutAction())
+                }
+            },
+            isVisible: widget => {
+                return widget !== undefined && widget instanceof KeithDiagramWidget
+            }
+        });
     }
 
     registerToolbarItems(registry: TabBarToolbarRegistry): void {
@@ -75,6 +115,16 @@ export class KeithDiagramCommandContribution implements CommandContribution, Tab
             id: fitCommand.id,
             command: fitCommand.id,
             tooltip: fitCommand.label
+        });
+        registry.registerItem({
+            id: refreshDiagramCommand.id,
+            command: refreshDiagramCommand.id,
+            tooltip: refreshDiagramCommand.label
+        });
+        registry.registerItem({
+            id: refreshLayoutCommand.id,
+            command: refreshLayoutCommand.id,
+            tooltip: refreshLayoutCommand.label
         });
     }
 }
