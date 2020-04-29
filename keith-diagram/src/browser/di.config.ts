@@ -27,9 +27,7 @@ export class TimePostprocessor implements IVNodePostprocessor {
         return vnode;
     }
     postUpdate(cause?: import("sprotty").Action | undefined): void {
-        console.log("update done.")
-        let dateTime = Date.now()
-        console.log("ending at " + dateTime)
+        console.log(Date.now() + ": IVNodePostprocessor: postUpdate")
     }
 }
 

@@ -35,7 +35,10 @@ export class SKGraphView extends SGraphView {
         // TODO: 'as any' is not very nice, but SKGraphRenderingContext cannot be used here (two undefined members)
         const ctx = context as any as SKGraphRenderingContext
         ctx.renderingDefs = new Map
-        return super.render(model, context)
+        console.log(Date.now() + ": SKGraphView: render called")
+        const ret = super.render(model, context)
+        console.log(Date.now() + ": SKGraphView: render done")
+        return ret
     }
 }
 

@@ -59,6 +59,7 @@ export class HiddenTextBoundsUpdater implements IVNodePostprocessor {
     }
 
     postUpdate(cause?: Action) {
+        console.log(Date.now() + ": Client: starting to calculate text bounds.")
         if (cause === undefined || cause.kind !== RequestTextBoundsAction.KIND) {
             return;
         }
@@ -86,6 +87,7 @@ export class HiddenTextBoundsUpdater implements IVNodePostprocessor {
             })
         this.actionDispatcher.dispatch(new ComputedTextBoundsAction(resizes, request.requestId))
         this.element2boundsData.clear()
+        console.log(Date.now() + ": Client: finished to calculate text bounds.")
     }
 
     protected getBoundsFromDOM() {

@@ -42,6 +42,17 @@ export type KeithDiagramServerProvider = () => Promise<KeithDiagramServer>;
 @injectable()
 export class KeithDiagramServer extends LSTheiaDiagramServer {
     messageReceived(message: ActionMessage) {
+        const messageKind = message.action.kind
+        switch (messageKind) {
+            case SetModelCommand.KIND: {
+                console.log(Date.now() + ": Client: received SetModel.")
+                break
+            }
+            case RequestTextBoundsCommand.KIND: {
+                console.log(Date.now() + ": Client: received RequestTextBounds.")
+            }
+        }
+
         super.messageReceived(message)
         // Special handling for the SetModel action.
         if (message.action.kind === SetModelCommand.KIND) {
@@ -52,6 +63,16 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             }
             // Fit the received model to the widget size.
             this.actionDispatcher.dispatch(new FitToScreenAction([], undefined, undefined, false))
+        }
+
+        switch (messageKind) {
+            case SetModelCommand.KIND: {
+                console.log(Date.now() + ": Client: finished handling SetModel.")
+                break
+            }
+            case RequestTextBoundsCommand.KIND: {
+                console.log(Date.now() + ": Client: finished handling RequestTextBounds.")
+            }
         }
     }
 
@@ -85,9 +106,10 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             || action.kind === BringToFrontAction.KIND) {
             // Ignore these ones
         } else if (action.kind === RequestModelAction.KIND) {
-            console.log("Requesting model.")
-            let dateTime = Date.now()
-            console.log("starting at " + dateTime)
+            console.log(Date.now() + ": Client: model requested.")
+            super.handle(action)
+        } else if (action.kind === ComputedTextBoundsAction.KIND) {
+            console.log(Date.now() + ": Client: text bounds computed.")
             super.handle(action)
         } else {
             super.handle(action)
