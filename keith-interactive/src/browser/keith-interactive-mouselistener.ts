@@ -22,6 +22,8 @@ import { DeleteStaticConstraintAction } from './layered/actions';
 import { getLayers, setProperty } from './layered/constraint-utils';
 import { RectPackDeletePositionConstraintAction } from './rect-packing/actions';
 import { setGenerateRectPackAction } from './rect-packing/constraint-util';
+import { setTreeProperties } from './tree/constraint-util';
+import { TreeDeletePositionConstraintAction } from './tree/actions';
 
 @injectable()
 export class KeithInteractiveMouseListener extends MoveMouseListener {
@@ -98,7 +100,8 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 } else if (algorithm.endsWith('rectpacking')) {
                     // Do nothing
                 } else if (algorithm.endsWith('tree')) {
-                    // TODO: Init tree dataset?
+                    // TODO TREE: Init tree dataset
+
                 }
 
                 this.target.selected = true
@@ -116,7 +119,9 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                             id: this.target.id
                         })]
                     } else if (algorithm.endsWith('tree')) {
-                        // TODO: Delete Positions
+                        return [new TreeDeletePositionConstraintAction({
+                            id: this.target.id
+                        })]
                     }
                 }
                 return super.mouseDown(this.target as SModelElement, event)
@@ -146,7 +151,7 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 const parent = this.nodes[0] ? this.nodes[0].parent as KNode : undefined
                 result = [setGenerateRectPackAction(this.nodes, this.target, parent, event)].concat(super.mouseUp(this.target, event));
             } else if (algorithm.endsWith('tree')) {
-                // TODO: Add node move events
+                result = [setTreeProperties(this.nodes, this.data, event)].concat(super.mouseUp(this.target, event));
             } else {
                 // Algorithm not supported
             }

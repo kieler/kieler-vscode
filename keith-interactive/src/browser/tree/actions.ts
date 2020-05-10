@@ -14,18 +14,7 @@
 import {
     Action
 } from 'sprotty/lib';
-import { AspectRatio, TreeDeletePositionConstraint, TreeSetPositionConstraint } from './constraint-types';
-
-/**
- * Send from client to server to set the aspect ratio.
- */
-export class SetAspectRatioAction implements Action {
-    static readonly KIND: string = 'setAspectRatio'
-    readonly kind = SetAspectRatioAction.KIND
-
-    constructor(public readonly constraint: AspectRatio) {
-    }
-}
+import { TreeDeletePositionConstraint, TreeSetPositionConstraint } from './constraint-types';
 
 /**
  * Send from client to server to delete an position constraint on a node.

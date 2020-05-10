@@ -11,14 +11,6 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
- /**
-  * An aspect ratio constraint data class.
-  */
-export class AspectRatio {
-    id: string
-    aspectRatio: number
-}
-
 /**
  * A deletion constraint data class.
  */
