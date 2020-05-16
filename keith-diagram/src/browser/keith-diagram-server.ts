@@ -31,6 +31,7 @@ import {
 import { isNullOrUndefined } from 'util';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
+import { TreeSetPositionConstraintAction } from '@kieler/keith-interactive/lib/tree/actions';
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -163,6 +164,9 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(SetSynthesisAction.KIND, this)
         registry.register(StoreImagesAction.KIND, this)
         registry.register(SwitchEditModeAction.KIND, this)
+        registry.register(TreeSetPositionConstraintAction.KIND, this)
+
+        // TODO TREE: Add actions
     }
 
     handleComputedBounds(_action: ComputedBoundsAction): boolean {

@@ -11,11 +11,37 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { getAbsoluteBounds, translate } from 'sprotty';
-import { TreeSetPositionConstraintAction } from './actions';
+import { SModelElement } from 'sprotty';
 import { RefreshDiagramAction } from '../actions';
-import { KNode } from '../constraint-classes';
+import { KNode, KEdge } from '../constraint-classes';
+import { TreeSetPositionConstraintAction } from './actions';
 
-export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent) {
+export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 
+    const targetNode: KNode = target as KNode;
+    const incomers = targetNode.incomingEdges as any as KEdge[];
+    if (incomers.length == 0)
+        return new RefreshDiagramAction();
+    const parent = incomers[0].source;
+
+    //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
+    var siblings : KNode[] = [];
+    nodes.forEach(x => {
+        (x.incomingEdges as any as KEdge[]).forEach(y => {
+            if (y.source === parent) {
+                siblings.push(x);
+            }
+        });
+    });
+    siblings.sort((x,y) => x.position.x - y.position.x);
+
+    const positionOfTarget = siblings.indexOf(targetNode);
+    if (targetNode.properties.positionId !== positionOfTarget || true) {
+        // set the position Constraint
+        return new TreeSetPositionConstraintAction({
+            id: targetNode.id,
+            position: positionOfTarget
+        })
+    }
+
     return new RefreshDiagramAction()
 }

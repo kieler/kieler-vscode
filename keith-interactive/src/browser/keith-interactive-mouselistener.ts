@@ -16,7 +16,7 @@ import { Action, MoveMouseListener, SEdge, SLabel, SModelElement, SNode } from '
 import { LSTheiaDiagramServer } from 'sprotty-theia/lib/sprotty/languageserver/ls-theia-diagram-server';
 import { isUndefined } from 'util';
 import { RefreshDiagramAction } from './actions';
-import { KNode } from './constraint-classes';
+import { KNode, KEdge } from './constraint-classes';
 import { filterKNodes } from './helper-methods';
 import { DeleteStaticConstraintAction } from './layered/actions';
 import { getLayers, setProperty } from './layered/constraint-utils';
@@ -24,9 +24,12 @@ import { RectPackDeletePositionConstraintAction } from './rect-packing/actions';
 import { setGenerateRectPackAction } from './rect-packing/constraint-util';
 import { setTreeProperties } from './tree/constraint-util';
 import { TreeDeletePositionConstraintAction } from './tree/actions';
+import { ILogger, TYPES } from 'sprotty/lib';
 
 @injectable()
 export class KeithInteractiveMouseListener extends MoveMouseListener {
+
+    @inject(TYPES.ILogger) public logger: ILogger;
 
     /**
      * Map to holds algorithm specific data generated on mouse down.
@@ -100,8 +103,17 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 } else if (algorithm.endsWith('rectpacking')) {
                     // Do nothing
                 } else if (algorithm.endsWith('tree')) {
-                    // TODO TREE: Init tree dataset
-
+                    // TODO TREE: Init tree dataset, if needed
+                    const parent = (targetNode.incomingEdges as any as KEdge[])[0].source;
+                    var siblings : KNode[] = [];
+                    this.nodes.forEach(x => {
+                        (x.incomingEdges as any as KEdge[]).forEach(y => {
+                            if (y.source === parent) {
+                                siblings.push(x);
+                            }
+                        });
+                    });
+                    this.logger.warn(this, "OwO!", siblings)
                 }
 
                 this.target.selected = true
@@ -151,7 +163,7 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 const parent = this.nodes[0] ? this.nodes[0].parent as KNode : undefined
                 result = [setGenerateRectPackAction(this.nodes, this.target, parent, event)].concat(super.mouseUp(this.target, event));
             } else if (algorithm.endsWith('tree')) {
-                result = [setTreeProperties(this.nodes, this.data, event)].concat(super.mouseUp(this.target, event));
+                result = [setTreeProperties(this.nodes, this.data, event, this.target)].concat(super.mouseUp(this.target, event));
             } else {
                 // Algorithm not supported
             }

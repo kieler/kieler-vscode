@@ -75,7 +75,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
             return <g>{result}{renderPositions(currentLayer, nodes, layers, forbidden, direction)}</g>
         } else {
             // Add available positions
-    // @ts-ignore
+            // @ts-ignore
             return result
         }
     }

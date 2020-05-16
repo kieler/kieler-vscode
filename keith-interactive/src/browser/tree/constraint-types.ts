@@ -11,6 +11,38 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
+import { Direction } from "../constraint-classes"
+
+ /**
+ * A tree level visualization data class for the interactive tree approach.
+ */
+export class Level {
+    begin: number
+    end: number
+    mid: number
+    /**
+     * Where up is, is determined by the direction
+     */
+    topBorder: number
+
+    /**
+     * Where low is, is determined by the direction
+     */
+    bottomBorder: number
+    /**
+     * 0: UNDEFINED, 1: RIGHT, 2: LEFT, 3: DOWN, 4: UP
+     */
+    direction: Direction
+
+    constructor(leftX: number, rightX: number, mid: number, direction: Direction) {
+        this.begin = leftX
+        this.end = rightX
+        this.mid = mid
+        this.direction = direction
+    }
+
+}
+
 /**
  * A deletion constraint data class.
  */
@@ -23,5 +55,5 @@ export class TreeDeletePositionConstraint {
  */
 export class TreeSetPositionConstraint {
     id: string
-    order: number
+    position: number
 }
