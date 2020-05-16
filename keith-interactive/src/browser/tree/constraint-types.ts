@@ -56,4 +56,5 @@ export class TreeDeletePositionConstraint {
 export class TreeSetPositionConstraint {
     id: string
     position: number
+    posCons: number
 }

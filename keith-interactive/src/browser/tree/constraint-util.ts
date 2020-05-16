@@ -35,11 +35,12 @@ export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event:
     siblings.sort((x,y) => x.position.x - y.position.x);
 
     const positionOfTarget = siblings.indexOf(targetNode);
-    if (targetNode.properties.positionId !== positionOfTarget || true) {
+    if (targetNode.properties.positionId !== positionOfTarget) {
         // set the position Constraint
         return new TreeSetPositionConstraintAction({
             id: targetNode.id,
-            position: positionOfTarget
+            position: positionOfTarget,
+            posCons: positionOfTarget
         })
     }
 
