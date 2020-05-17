@@ -63,7 +63,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
     if (selectedNode) {
         var selectedSiblings = getSiblings(nodes, selectedNode);
         selectedSiblings.sort((x,y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
-        var highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) <= (selectedNode as KNode).position.x)
+        var highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) >= (selectedNode as KNode).position.x)
         for (var i = 0; i < selectedSiblings.length - 1; i++) {
             var x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
             var y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
@@ -80,13 +80,13 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 result = <g>{result}{renderCircle(i == highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
             }
 
-            result = <g>{result}{renderCircle(i == highlightedIndex + 1, middleX, middleY, false)}</g>;
+            result = <g>{result}{renderCircle(i == highlightedIndex - 1, middleX, middleY, false)}</g>;
             
             if (i == selectedSiblings.length - 2) {
                 var deltaX = middleX - x1;
                 var deltaY = middleY - y1;
 
-                result = <g>{result}{renderCircle(i == highlightedIndex + 1, x2 + deltaX, y2 + deltaY, false)}</g>;
+                result = <g>{result}{renderCircle(highlightedIndex == -1, x2 + deltaX, y2 + deltaY, false)}</g>;
             }
         }
     }
