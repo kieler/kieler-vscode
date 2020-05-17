@@ -29,8 +29,6 @@ import { ILogger, TYPES } from 'sprotty/lib';
 @injectable()
 export class KeithInteractiveMouseListener extends MoveMouseListener {
 
-    @inject(TYPES.ILogger) public logger: ILogger;
-
     /**
      * Map to holds algorithm specific data generated on mouse down.
      */
@@ -50,6 +48,11 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
      * The diagram server.
      */
     @inject(LSTheiaDiagramServer) protected readonly dserver: LSTheiaDiagramServer
+
+    /**
+     * A logger.
+     */
+    @inject(TYPES.ILogger) public logger: ILogger
 
     /**
      * Does not use super implementation, since it calls mouseUp

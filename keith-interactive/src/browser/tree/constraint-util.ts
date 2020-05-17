@@ -16,11 +16,10 @@ import { RefreshDiagramAction } from '../actions';
 import { KNode, KEdge } from '../constraint-classes';
 import { TreeSetPositionConstraintAction } from './actions';
 
-export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 
-    const targetNode: KNode = target as KNode;
+export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
     const incomers = targetNode.incomingEdges as any as KEdge[];
     if (incomers.length == 0)
-        return new RefreshDiagramAction();
+        return [];
     const parent = incomers[0].source;
 
     //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
@@ -32,7 +31,18 @@ export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event:
             }
         });
     });
+    return siblings;
+}
+
+export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 
+    const targetNode: KNode = target as KNode;
+    
+    //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
+    var siblings : KNode[] = getSiblings(nodes, targetNode);
     siblings.sort((x,y) => x.position.x - y.position.x);
+
+    if (siblings.length == 0)
+        return new RefreshDiagramAction();
 
     const positionOfTarget = siblings.indexOf(targetNode);
     if (targetNode.properties.positionId !== positionOfTarget) {

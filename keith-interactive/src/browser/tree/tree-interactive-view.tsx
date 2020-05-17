@@ -13,10 +13,10 @@
 /** @jsx svg */
 import { svg } from 'snabbdom-jsx';
 import { KNode } from '../constraint-classes';
-import { renderLock } from '../interactive-view-objects';
+import { renderCircle } from '../interactive-view-objects';
+import { getSiblings } from './constraint-util';
 
 const boundingBoxMargin = 5
-const lockOffset = 7
 
  /**
  * Visualize the layer the selected node is in as a rectangle and all other layers as a vertical line.
@@ -25,18 +25,20 @@ const lockOffset = 7
  * @param root Root of the hierarchical level.
  */
 export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
-    // Draw rect around all child nodes
+    let result = <g></g>
+
+    // Draw rect around all nodes
     let color = 'grey'
-    let x: number = Number.MAX_VALUE
-    let y: number = Number.MAX_VALUE
+    let minX: number = Number.MAX_VALUE
+    let minY: number = Number.MAX_VALUE
     let maxX: number = Number.MIN_VALUE
     let maxY: number = Number.MIN_VALUE
     nodes.forEach(node => {
-        if (node.position.x < x) {
-            x = node.position.x
+        if (node.position.x < minX) {
+            minX = node.position.x
         }
-        if (node.position.y < y) {
-            y = node.position.y
+        if (node.position.y < minY) {
+            minY = node.position.y
         }
         if (node.position.x + node.size.width > maxX) {
             maxX = node.position.x + node.size.width
@@ -45,16 +47,58 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             maxY = node.position.y + node.size.height
         }
     })
-    return <g><rect
-        x={x - boundingBoxMargin}
-        y={y - boundingBoxMargin}
-        width={maxX - x + 2 * boundingBoxMargin}
-        height={maxY - y + 2 * boundingBoxMargin}
+    result = <g>{result}<rect
+        x={minX - boundingBoxMargin}
+        y={minY - boundingBoxMargin}
+        width={maxX - minX + 2 * boundingBoxMargin}
+        height={maxY - minY + 2 * boundingBoxMargin}
         stroke={color}
         fill= 'rgba(0,0,0,0)'
         strokeWidth={2 * boundingBoxMargin}
         style={{ 'stroke-dasharray': 4 } as React.CSSProperties}>
     </rect></g>
+
+    // Render Valid locations
+    var selectedNode = nodes.find(x => x.selected);
+    if (selectedNode) {
+        var selectedSiblings = getSiblings(nodes, selectedNode);
+        selectedSiblings.sort((x,y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
+        var highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) <= (selectedNode as KNode).position.x)
+        for (var i = 0; i < selectedSiblings.length - 1; i++) {
+            var x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
+            var y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
+            var x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
+            var y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
+
+            var middleX = (x1 + x2) / 2;
+            var middleY = (y1 + y2) / 2;
+
+            if (i == 0) {
+                var deltaX = middleX - x1;
+                var deltaY = middleY - y1;
+                
+                result = <g>{result}{renderCircle(i == highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
+            }
+
+            result = <g>{result}{renderCircle(i == highlightedIndex + 1, middleX, middleY, false)}</g>;
+            
+            if (i == selectedSiblings.length - 2) {
+                var deltaX = middleX - x1;
+                var deltaY = middleY - y1;
+
+                result = <g>{result}{renderCircle(i == highlightedIndex + 1, x2 + deltaX, y2 + deltaY, false)}</g>;
+            }
+        }
+    }
+
+    return result
+}
+
+function getOriginalNodePositionX(node: KNode) {
+    return (node.shadow ? node.shadowX : node.position.x);
+}
+function getOriginalNodePositionY(node: KNode) {
+    return (node.shadow ? node.shadowY : node.position.y);
 }
 
 /**
@@ -62,5 +106,5 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
  * @param node The node with the constraint set.
  */
 export function renderTreeConstraint(node: KNode) {
-    return <g>{renderLock(node.size.width - lockOffset, lockOffset)}</g>
+    return <g></g>
 }
