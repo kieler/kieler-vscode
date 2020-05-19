@@ -16,6 +16,24 @@ import { RefreshDiagramAction } from '../actions';
 import { KNode, KEdge, Direction } from '../constraint-classes';
 import { TreeSetPositionConstraintAction } from './actions';
 
+export function dotProduct(vec1: [number, number], vec2: [number, number]): number {
+    return vec1[0] * vec2[0] + vec1[1] * vec2[1]
+}
+
+export function getDirectionVector(node: KNode): [number, number] {
+    const direction = node.direction
+    if (!direction || direction == Direction.DOWN) 
+        return [0,1]
+    else if (direction == Direction.LEFT)
+        return [-1,0]
+    else if (direction == Direction.RIGHT)
+        return [1,0]
+    else if (direction == Direction.UP)
+        return [0,-1]
+    else
+        return [0,1]
+}
+
 export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
     const incomers = targetNode.incomingEdges as any as KEdge[];
     if (incomers.length == 0)

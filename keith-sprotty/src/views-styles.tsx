@@ -530,7 +530,14 @@ export function getSvgColorStyles(styles: KStyles, context: SKGraphRenderingCont
             opacity: parent.opacity
         }
     }
-    if (parent instanceof SKEdge) {
+    else if (parent instanceof SKEdge && parent.cycleInducing) {
+        return {
+            foreground: {color: 'orange', opacity: '255'},
+            background: background === undefined ? DEFAULT_FILL : {color: 'orange', opacity: '255'},
+            opacity: parent.opacity
+        }
+    }    
+    else if (parent instanceof SKEdge) {
         return {
             foreground: grayedOutColor,
             background: background === undefined ? DEFAULT_FILL : grayedOutColor,

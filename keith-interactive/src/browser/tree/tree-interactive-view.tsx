@@ -12,9 +12,9 @@
  */
 /** @jsx svg */
 import { svg } from 'snabbdom-jsx';
-import { KNode, Direction } from '../constraint-classes';
+import { KNode, Direction, KEdge } from '../constraint-classes';
 import { renderCircle } from '../interactive-view-objects';
-import { getSiblings } from './constraint-util';
+import { getSiblings, getDirectionVector, dotProduct } from './constraint-util';
 
 const boundingBoxMargin = 5
 
@@ -97,6 +97,15 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             }
         }
     }
+
+    // Mark edges that make the graph cyclic
+    const dirVec = getDirectionVector(nodes[0])
+    nodes.forEach(n => { 
+        n.outgoingEdges.forEach(e => {
+            (e as KEdge).cycleInducing = e.target !== undefined && e.source !== undefined && 
+                dotProduct(dirVec, [e.target.position.x - e.source.position.x, e.target.position.y - e.source.position.y]) <= 0;
+        })
+    })
 
     return result
 }

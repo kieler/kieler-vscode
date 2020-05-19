@@ -99,4 +99,5 @@ export class KEdge extends SEdge implements KGraphElement {
     }
 
     moved: boolean
+    cycleInducing: boolean = false
 }
