@@ -12,7 +12,7 @@
  */
 /** @jsx svg */
 import { svg } from 'snabbdom-jsx';
-import { KNode } from '../constraint-classes';
+import { KNode, Direction } from '../constraint-classes';
 import { renderCircle } from '../interactive-view-objects';
 import { getSiblings } from './constraint-util';
 
@@ -25,6 +25,7 @@ const boundingBoxMargin = 5
  * @param root Root of the hierarchical level.
  */
 export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
+    const direction = nodes[0].direction
     let result = <g></g>
 
     // Draw rect around all nodes
@@ -62,8 +63,14 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
     var selectedNode = nodes.find(x => x.selected);
     if (selectedNode) {
         var selectedSiblings = getSiblings(nodes, selectedNode);
-        selectedSiblings.sort((x,y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
-        var highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) >= (selectedNode as KNode).position.x)
+        var highlightedIndex
+        if (direction == Direction.LEFT || direction == Direction.RIGHT) {
+            selectedSiblings.sort((x,y) => getOriginalNodePositionY(x) - getOriginalNodePositionY(y));
+            highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionY(x) >= (selectedNode as KNode).position.y);
+        } else {
+            selectedSiblings.sort((x,y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
+            highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) >= (selectedNode as KNode).position.x);
+        }
         for (var i = 0; i < selectedSiblings.length - 1; i++) {
             var x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
             var y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;

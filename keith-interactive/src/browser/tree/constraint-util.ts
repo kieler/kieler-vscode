@@ -13,7 +13,7 @@
 
 import { SModelElement } from 'sprotty';
 import { RefreshDiagramAction } from '../actions';
-import { KNode, KEdge } from '../constraint-classes';
+import { KNode, KEdge, Direction } from '../constraint-classes';
 import { TreeSetPositionConstraintAction } from './actions';
 
 export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
@@ -36,10 +36,14 @@ export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
 
 export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 
     const targetNode: KNode = target as KNode;
+    const direction = nodes[0].direction
     
     //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
     var siblings : KNode[] = getSiblings(nodes, targetNode);
-    siblings.sort((x,y) => x.position.x - y.position.x);
+    if (direction == Direction.LEFT || direction == Direction.RIGHT)
+        siblings.sort((x,y) => x.position.y - y.position.y);
+    else
+        siblings.sort((x,y) => x.position.x - y.position.x);
 
     if (siblings.length == 0)
         return new RefreshDiagramAction();
