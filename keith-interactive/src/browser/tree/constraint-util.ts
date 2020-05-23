@@ -34,6 +34,29 @@ export function getDirectionVector(node: KNode): [number, number] {
         return [0,1]
 }
 
+export function getRoot(nodes: KNode[], targetNode: KNode) : KNode[] {
+    var re: KNode[] = [];
+    nodes.forEach(x => {
+        if ((x.outgoingEdges as any as KEdge[]).length == 0) 
+            re.push(x);
+    })
+    return re;
+}
+
+export function rootDistance(n: KNode, root: KNode[]): number {
+    if (root.some(x => x.id == n.id)) return 0;
+    var p: KNode = (n.incomingEdges as any as KEdge[])[0].source as KNode;
+    return rootDistance(p, root) + 1;
+}
+
+export function getChildren(n: KNode): KNode[] {
+    var re: KNode[] = [];
+    (n.outgoingEdges as any as KEdge[]).forEach(x => {
+        re.push(x.target as KNode);
+    });
+    return re;
+}
+ 
 export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
     const incomers = targetNode.incomingEdges as any as KEdge[];
     if (incomers.length == 0)
