@@ -14,7 +14,7 @@
 import { svg } from 'snabbdom-jsx';
 import { KNode, Direction, KEdge } from '../constraint-classes';
 import { renderCircle } from '../interactive-view-objects';
-import { getSiblings, getDirectionVector, dotProduct } from './constraint-util';
+import { getSiblings, getDirectionVector, dotProduct, getOriginalNodePositionX, getOriginalNodePositionY } from './constraint-util';
 
 const boundingBoxMargin = 5
 
@@ -108,13 +108,6 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
     })
 
     return result
-}
-
-function getOriginalNodePositionX(node: KNode) {
-    return (node.shadow ? node.shadowX : node.position.x);
-}
-function getOriginalNodePositionY(node: KNode) {
-    return (node.shadow ? node.shadowY : node.position.y);
 }
 
 /**

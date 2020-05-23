@@ -34,18 +34,20 @@ export function getDirectionVector(node: KNode): [number, number] {
         return [0,1]
 }
 
-export function getRoot(nodes: KNode[], targetNode: KNode) : KNode[] {
+export function getRoot(nodes: KNode[]) : KNode[] {
     var re: KNode[] = [];
     nodes.forEach(x => {
-        if ((x.outgoingEdges as any as KEdge[]).length == 0) 
+        if ((x.incomingEdges as any as KEdge[]).length == 0 || x.position.y == 40) 
             re.push(x);
     })
     return re;
 }
 
-export function rootDistance(n: KNode, root: KNode[]): number {
-    if (root.some(x => x.id == n.id)) return 0;
-    var p: KNode = (n.incomingEdges as any as KEdge[])[0].source as KNode;
+export function rootDistance(n: KNode, root: KNode): number {
+    if (root.id == n.id) return 0;
+    const edges: KEdge[] = n.incomingEdges as any as KEdge[];
+    if (edges.length == 0) return 0;
+    var p: KNode = edges[0].source as KNode;
     return rootDistance(p, root) + 1;
 }
 
@@ -56,14 +58,45 @@ export function getChildren(n: KNode): KNode[] {
     });
     return re;
 }
+
+export function getLevels(nodes: KNode[]): KNode[][] {
+    var re: KNode[][] = [getRoot(nodes)];
+    nodes.forEach(x => x.properties.treeLevel = -1);
+
+    var newNode = true;
+    var curLevel: KNode[] = [];
+    re[0].forEach(x => {
+        curLevel.push(x);
+        x.properties.treeLevel = 0;
+    });
+    re[0].forEach(x => x.properties.treeLevel = 0)
+    for (var i = 1; newNode; i++) {
+        newNode = false;
+        curLevel = curLevel.map(x => getChildren(x)).reduce((x, y) => x.concat(y), []);
+        re[i] = [];
+        curLevel.forEach(x => {
+            if (x.properties.treeLevel == -1) {
+                newNode = true;
+            }
+            if (x.properties.treeLevel != 0) {
+                x.properties.treeLevel = i;
+            }
+            re[i].push(x);
+        });
+    }
+
+    return re;
+}
  
 export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
-    const incomers = targetNode.incomingEdges as any as KEdge[];
+    const incomers = targetNode.incomingEdges as KEdge[];
     if (incomers.length == 0)
         return [];
-    const parent = incomers[0].source;
+    const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel == targetNode.properties.treeLevel - 1);
+    if (toParent === undefined)
+        return [];
+    const parent = toParent.source;
 
-    //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
     var siblings : KNode[] = [];
     nodes.forEach(x => {
         (x.incomingEdges as any as KEdge[]).forEach(y => {
@@ -73,6 +106,13 @@ export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
         });
     });
     return siblings;
+}
+
+export function getOriginalNodePositionX(node: KNode) {
+    return (node.shadow ? node.shadowX : node.position.x);
+}
+export function getOriginalNodePositionY(node: KNode) {
+    return (node.shadow ? node.shadowY : node.position.y);
 }
 
 export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 

@@ -75,6 +75,7 @@ export class NodeProperties {
     layerId: number
     positionConstraint: number
     positionId: number
+    treeLevel: number
 }
 
 /**

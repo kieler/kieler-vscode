@@ -22,7 +22,7 @@ import { DeleteStaticConstraintAction } from './layered/actions';
 import { getLayers, setProperty } from './layered/constraint-utils';
 import { RectPackDeletePositionConstraintAction } from './rect-packing/actions';
 import { setGenerateRectPackAction } from './rect-packing/constraint-util';
-import { setTreeProperties } from './tree/constraint-util';
+import { setTreeProperties, getLevels } from './tree/constraint-util';
 import { TreeDeletePositionConstraintAction } from './tree/actions';
 import { ILogger, TYPES } from 'sprotty/lib';
 
@@ -107,7 +107,10 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                     // Do nothing
                 } else if (algorithm.endsWith('tree')) {
                     // TODO TREE: Init tree dataset, if needed
-                    //this.logger.warn(this, "OwO!", (targetNode.incomingEdges as any as KEdge[])[0].source)
+                    // this.logger.warn(this, "Roots!", getRoot(this.nodes));
+                    getLevels(this.nodes) 
+                    this.logger.warn(this, "Nodes!", this.nodes);
+                    // this.logger.warn(this, "Levels!", getLevels(getRoot(this.nodes)));
                 }
 
                 this.target.selected = true
