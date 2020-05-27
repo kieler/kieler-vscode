@@ -60,49 +60,49 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
     </rect></g>
 
     // Render Valid locations
-    var selectedNode = nodes.find(x => x.selected);
+    let selectedNode = nodes.find(x => x.selected);
     if (selectedNode) {
-        var selectedSiblings = getSiblings(nodes, selectedNode);
-        var highlightedIndex
-        if (direction == Direction.LEFT || direction == Direction.RIGHT) {
-            selectedSiblings.sort((x,y) => getOriginalNodePositionY(x) - getOriginalNodePositionY(y));
+        const selectedSiblings = getSiblings(nodes, selectedNode);
+        let highlightedIndex
+        if (direction === Direction.LEFT || direction === Direction.RIGHT) {
+            selectedSiblings.sort((x, y) => getOriginalNodePositionY(x) - getOriginalNodePositionY(y));
             highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionY(x) >= (selectedNode as KNode).position.y);
         } else {
-            selectedSiblings.sort((x,y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
+            selectedSiblings.sort((x, y) => getOriginalNodePositionX(x) - getOriginalNodePositionX(y));
             highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) >= (selectedNode as KNode).position.x);
         }
-        for (var i = 0; i < selectedSiblings.length - 1; i++) {
-            var x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
-            var y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
-            var x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
-            var y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
+        for (let i = 0; i < selectedSiblings.length - 1; i++) {
+            const x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
+            const y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
+            const x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
+            const y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
 
-            var middleX = (x1 + x2) / 2;
-            var middleY = (y1 + y2) / 2;
+            const middleX = (x1 + x2) / 2;
+            const middleY = (y1 + y2) / 2;
 
-            if (i == 0) {
-                var deltaX = middleX - x1;
-                var deltaY = middleY - y1;
-                
-                result = <g>{result}{renderCircle(i == highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
+            if (i === 0) {
+                const deltaX = middleX - x1;
+                const deltaY = middleY - y1;
+
+                result = <g>{result}{renderCircle(i === highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
             }
 
-            result = <g>{result}{renderCircle(i == highlightedIndex - 1, middleX, middleY, false)}</g>;
-            
-            if (i == selectedSiblings.length - 2) {
-                var deltaX = middleX - x1;
-                var deltaY = middleY - y1;
+            result = <g>{result}{renderCircle(i === highlightedIndex - 1, middleX, middleY, false)}</g>;
 
-                result = <g>{result}{renderCircle(highlightedIndex == -1, x2 + deltaX, y2 + deltaY, false)}</g>;
+            if (i === selectedSiblings.length - 2) {
+                const deltaX = middleX - x1;
+                const deltaY = middleY - y1;
+
+                result = <g>{result}{renderCircle(highlightedIndex === -1, x2 + deltaX, y2 + deltaY, false)}</g>;
             }
         }
     }
 
     // Mark edges that make the graph cyclic
     const dirVec = getDirectionVector(nodes[0])
-    nodes.forEach(n => { 
+    nodes.forEach(n => {
         n.outgoingEdges.forEach(e => {
-            (e as KEdge).cycleInducing = e.target !== undefined && e.source !== undefined && 
+            (e as KEdge).cycleInducing = e.target !== undefined && e.source !== undefined &&
                 dotProduct(dirVec, [e.target.position.x - e.source.position.x, e.target.position.y - e.source.position.y]) <= 0;
         })
     })

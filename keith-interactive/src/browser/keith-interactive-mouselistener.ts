@@ -108,7 +108,7 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 } else if (algorithm.endsWith('tree')) {
                     // TODO TREE: Init tree dataset, if needed
                     // this.logger.warn(this, "Roots!", getRoot(this.nodes));
-                    getLevels(this.nodes) 
+                    getLevels(this.nodes)
                     this.logger.warn(this, "Nodes!", this.nodes);
                     // this.logger.warn(this, "Levels!", getLevels(getRoot(this.nodes)));
                 }

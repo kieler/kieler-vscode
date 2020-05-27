@@ -22,37 +22,37 @@ export function dotProduct(vec1: [number, number], vec2: [number, number]): numb
 
 export function getDirectionVector(node: KNode): [number, number] {
     const direction = node.direction
-    if (!direction || direction == Direction.DOWN) 
-        return [0,1]
-    else if (direction == Direction.LEFT)
-        return [-1,0]
-    else if (direction == Direction.RIGHT)
-        return [1,0]
-    else if (direction == Direction.UP)
-        return [0,-1]
+    if (!direction || direction === Direction.DOWN)
+        return [0, 1]
+    else if (direction === Direction.LEFT)
+        return [-1, 0]
+    else if (direction === Direction.RIGHT)
+        return [1, 0]
+    else if (direction === Direction.UP)
+        return [0, -1]
     else
-        return [0,1]
+        return [0, 1]
 }
 
-export function getRoot(nodes: KNode[]) : KNode[] {
-    var re: KNode[] = [];
+export function getRoot(nodes: KNode[]): KNode[] {
+    const re: KNode[] = [];
     nodes.forEach(x => {
-        if ((x.incomingEdges as any as KEdge[]).length == 0 || x.position.y == 40) 
+        if ((x.incomingEdges as any as KEdge[]).length === 0 || x.position.y === 40)
             re.push(x);
     })
     return re;
 }
 
 export function rootDistance(n: KNode, root: KNode): number {
-    if (root.id == n.id) return 0;
+    if (root.id === n.id) return 0;
     const edges: KEdge[] = n.incomingEdges as any as KEdge[];
-    if (edges.length == 0) return 0;
-    var p: KNode = edges[0].source as KNode;
+    if (edges.length === 0) return 0;
+    const p: KNode = edges[0].source as KNode;
     return rootDistance(p, root) + 1;
 }
 
 export function getChildren(n: KNode): KNode[] {
-    var re: KNode[] = [];
+    const re: KNode[] = [];
     (n.outgoingEdges as any as KEdge[]).forEach(x => {
         re.push(x.target as KNode);
     });
@@ -60,25 +60,25 @@ export function getChildren(n: KNode): KNode[] {
 }
 
 export function getLevels(nodes: KNode[]): KNode[][] {
-    var re: KNode[][] = [getRoot(nodes)];
+    const re: KNode[][] = [getRoot(nodes)];
     nodes.forEach(x => x.properties.treeLevel = -1);
 
-    var newNode = true;
-    var curLevel: KNode[] = [];
+    let newNode = true;
+    let curLevel: KNode[] = [];
     re[0].forEach(x => {
         curLevel.push(x);
         x.properties.treeLevel = 0;
     });
     re[0].forEach(x => x.properties.treeLevel = 0)
-    for (var i = 1; newNode; i++) {
+    for (let i = 1; newNode; i++) {
         newNode = false;
         curLevel = curLevel.map(x => getChildren(x)).reduce((x, y) => x.concat(y), []);
         re[i] = [];
         curLevel.forEach(x => {
-            if (x.properties.treeLevel == -1) {
+            if (x.properties.treeLevel === -1) {
                 newNode = true;
             }
-            if (x.properties.treeLevel != 0) {
+            if (x.properties.treeLevel !== 0) {
                 x.properties.treeLevel = i;
             }
             re[i].push(x);
@@ -87,17 +87,17 @@ export function getLevels(nodes: KNode[]): KNode[][] {
 
     return re;
 }
- 
-export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
+
+export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
     const incomers = targetNode.incomingEdges as KEdge[];
-    if (incomers.length == 0)
+    if (incomers.length === 0)
         return [];
-    const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel == targetNode.properties.treeLevel - 1);
+    const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel === targetNode.properties.treeLevel - 1);
     if (toParent === undefined)
         return [];
     const parent = toParent.source;
 
-    var siblings : KNode[] = [];
+    const siblings: KNode[] = [];
     nodes.forEach(x => {
         (x.incomingEdges as any as KEdge[]).forEach(y => {
             if (y.source === parent) {
@@ -115,18 +115,17 @@ export function getOriginalNodePositionY(node: KNode) {
     return (node.shadow ? node.shadowY : node.position.y);
 }
 
-export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) { 
+export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event: MouseEvent, target: SModelElement) {
     const targetNode: KNode = target as KNode;
     const direction = nodes[0].direction
-    
-    //const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
-    var siblings : KNode[] = getSiblings(nodes, targetNode);
-    if (direction == Direction.LEFT || direction == Direction.RIGHT)
-        siblings.sort((x,y) => x.position.y - y.position.y);
+    // const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
+    const siblings: KNode[] = getSiblings(nodes, targetNode);
+    if (direction === Direction.LEFT || direction === Direction.RIGHT)
+        siblings.sort((x, y) => x.position.y - y.position.y);
     else
-        siblings.sort((x,y) => x.position.x - y.position.x);
+        siblings.sort((x, y) => x.position.x - y.position.x);
 
-    if (siblings.length == 0)
+    if (siblings.length === 0)
         return new RefreshDiagramAction();
 
     const positionOfTarget = siblings.indexOf(targetNode);
