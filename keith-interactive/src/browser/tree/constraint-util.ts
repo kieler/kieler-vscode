@@ -88,20 +88,29 @@ export function getLevels(nodes: KNode[]): KNode[][] {
     return re;
 }
 
-export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
+export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
     const incomers = targetNode.incomingEdges as KEdge[];
-    if (incomers.length === 0)
+    if (incomers.length == 0)
         return [];
     const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel === targetNode.properties.treeLevel - 1);
     if (toParent === undefined)
         return [];
-    const parent = toParent.source;
+    //const parent = toParent.source;
+    const targetPosX = getOriginalNodePositionX(targetNode);
+    const targetPosY = getOriginalNodePositionY(targetNode);
 
-    const siblings: KNode[] = [];
+    var siblings : KNode[] = [];
     nodes.forEach(x => {
         (x.incomingEdges as any as KEdge[]).forEach(y => {
-            if (y.source === parent) {
-                siblings.push(x);
+            const xPosX = getOriginalNodePositionX(x);
+            const xPosY = getOriginalNodePositionY(x);
+            if (nodes[0].direction === Direction.LEFT || nodes[0].direction === Direction.RIGHT) {
+                if (incomers.some(x => x.source === y.source) && xPosX + 15 > targetPosX && xPosX - 15 < targetPosX)
+                    siblings.push(x);
+            }
+            else {
+                if (incomers.some(x => x.source === y.source) && xPosY + 15 > targetPosY && xPosY - 15 < targetPosY)
+                    siblings.push(x);
             }
         });
     });
