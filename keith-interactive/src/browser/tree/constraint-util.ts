@@ -88,18 +88,18 @@ export function getLevels(nodes: KNode[]): KNode[][] {
     return re;
 }
 
-export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
+export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
     const incomers = targetNode.incomingEdges as KEdge[];
-    if (incomers.length == 0)
+    if (incomers.length === 0)
         return [];
     const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel === targetNode.properties.treeLevel - 1);
     if (toParent === undefined)
         return [];
-    //const parent = toParent.source;
+    // const parent = toParent.source;
     const targetPosX = getOriginalNodePositionX(targetNode);
     const targetPosY = getOriginalNodePositionY(targetNode);
 
-    var siblings : KNode[] = [];
+    const siblings: KNode[] = [];
     nodes.forEach(x => {
         (x.incomingEdges as any as KEdge[]).forEach(y => {
             const xPosX = getOriginalNodePositionX(x);
@@ -107,8 +107,7 @@ export function getSiblings(nodes: KNode[], targetNode: KNode) : KNode[] {
             if (nodes[0].direction === Direction.LEFT || nodes[0].direction === Direction.RIGHT) {
                 if (incomers.some(x => x.source === y.source) && xPosX + 15 > targetPosX && xPosX - 15 < targetPosX)
                     siblings.push(x);
-            }
-            else {
+            } else {
                 if (incomers.some(x => x.source === y.source) && xPosY + 15 > targetPosY && xPosY - 15 < targetPosY)
                     siblings.push(x);
             }
