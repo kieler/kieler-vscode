@@ -92,10 +92,6 @@ export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
     const incomers = targetNode.incomingEdges as KEdge[];
     if (incomers.length === 0)
         return [];
-    const toParent = incomers.find(x => (x.source as KNode).properties.treeLevel === targetNode.properties.treeLevel - 1);
-    if (toParent === undefined)
-        return [];
-    // const parent = toParent.source;
     const targetPosX = getOriginalNodePositionX(targetNode);
     const targetPosY = getOriginalNodePositionY(targetNode);
 
