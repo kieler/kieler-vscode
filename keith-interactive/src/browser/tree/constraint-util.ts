@@ -97,9 +97,6 @@ export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
 }
 
 function getLowestParent(nodes: KNode[], targetNode: KNode): KNode | undefined {
-    if (targetNode.id === "$root$Nn11")
-        targetNode.incomingEdges;
-
     const dirVec = getDirectionVector(nodes[0])
     const incomers = targetNode.incomingEdges as KEdge[];
     if (incomers.length === 0)
