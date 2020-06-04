@@ -98,7 +98,13 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
         }
     }
 
-    // Mark edges that make the graph cyclic
+    return result
+}
+
+/**
+ * Mark edges that make the graph cyclic
+ */
+export function markCycleInducingEdges(nodes: KNode[]) {
     const dirVec = getDirectionVector(nodes[0])
     nodes.forEach(n => {
         n.outgoingEdges.forEach(e => {
@@ -106,8 +112,6 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 dotProduct(dirVec, [e.target.position.x - e.source.position.x, e.target.position.y - e.source.position.y]) <= 0;
         })
     })
-
-    return result
 }
 
 /**
