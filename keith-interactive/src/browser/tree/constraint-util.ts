@@ -89,27 +89,28 @@ export function getLevels(nodes: KNode[]): KNode[][] {
 }
 
 export function getSiblings(nodes: KNode[], targetNode: KNode): KNode[] {
+    const lowestParent = getLowestParent(nodes, targetNode);
+    if (!lowestParent)
+        return [];
+    const siblings = nodes.filter(x => lowestParent === getLowestParent(nodes, x))
+    return siblings
+}
+
+function getLowestParent(nodes: KNode[], targetNode: KNode): KNode | undefined {
+    if (targetNode.id === "$root$Nn11")
+        targetNode.incomingEdges;
+
+    const dirVec = getDirectionVector(nodes[0])
     const incomers = targetNode.incomingEdges as KEdge[];
     if (incomers.length === 0)
-        return [];
-    const targetPosX = getOriginalNodePositionX(targetNode);
-    const targetPosY = getOriginalNodePositionY(targetNode);
+        return undefined;
+    const parents = incomers.map(x => x.source)
+    const lowestParentPos = Math.max(...parents.
+        map(x => x === undefined ? 0 : dotProduct([x.position.x, x.position.y], dirVec)))
+    const lowestParent = parents.find(x => (x === undefined ? 
+        0 : dotProduct([x.position.x, x.position.y], dirVec)) === lowestParentPos)
 
-    const siblings: KNode[] = [];
-    nodes.forEach(x => {
-        (x.incomingEdges as any as KEdge[]).forEach(y => {
-            const xPosX = getOriginalNodePositionX(x);
-            const xPosY = getOriginalNodePositionY(x);
-            if (nodes[0].direction === Direction.LEFT || nodes[0].direction === Direction.RIGHT) {
-                if (incomers.some(x => x.source === y.source) && xPosX + 15 > targetPosX && xPosX - 15 < targetPosX)
-                    siblings.push(x);
-            } else {
-                if (incomers.some(x => x.source === y.source) && xPosY + 15 > targetPosY && xPosY - 15 < targetPosY)
-                    siblings.push(x);
-            }
-        });
-    });
-    return siblings;
+    return lowestParent as KNode;
 }
 
 export function getOriginalNodePositionX(node: KNode) {
