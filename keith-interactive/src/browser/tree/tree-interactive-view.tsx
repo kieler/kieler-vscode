@@ -72,17 +72,31 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             highlightedIndex = selectedSiblings.findIndex(x => getOriginalNodePositionX(x) >= (selectedNode as KNode).position.x);
         }
         for (let i = 0; i < selectedSiblings.length - 1; i++) {
-            const x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
-            const y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
-            const x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
-            const y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
+            var x1, y1, x2, y2;
+            if (direction === Direction.LEFT || direction === Direction.RIGHT) {
+                x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
+                y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height;
+                x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
+                y2 = getOriginalNodePositionY(selectedSiblings[i + 1]);
+            } else {
+                x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width;
+                y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
+                x2 = getOriginalNodePositionX(selectedSiblings[i + 1]);
+                y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
+            }
 
             const middleX = (x1 + x2) / 2;
             const middleY = (y1 + y2) / 2;
 
             if (i === 0) {
-                const deltaX = middleX - x1;
-                const deltaY = middleY - y1;
+                var deltaX = middleX - x1;
+                var deltaY = middleY - y1;
+
+                if (direction === Direction.LEFT || direction === Direction.RIGHT) {
+                    deltaY += selectedSiblings[i].size.height
+                } else {
+                    deltaX += selectedSiblings[i].size.width
+                }
 
                 result = <g>{result}{renderCircle(i === highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
             }
@@ -90,8 +104,14 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             result = <g>{result}{renderCircle(i === highlightedIndex - 1, middleX, middleY, false)}</g>;
 
             if (i === selectedSiblings.length - 2) {
-                const deltaX = middleX - x1;
-                const deltaY = middleY - y1;
+                var deltaX = middleX - x1;
+                var deltaY = middleY - y1;
+
+                if (direction === Direction.LEFT || direction === Direction.RIGHT) {
+                    deltaY += selectedSiblings[i + 1].size.height
+                } else {
+                    deltaX += selectedSiblings[i + 1].size.width
+                }
 
                 result = <g>{result}{renderCircle(highlightedIndex === -1, x2 + deltaX, y2 + deltaY, false)}</g>;
             }
