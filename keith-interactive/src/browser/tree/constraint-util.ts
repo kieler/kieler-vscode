@@ -103,9 +103,9 @@ function getLowestParent(nodes: KNode[], targetNode: KNode): KNode | undefined {
         return undefined;
     const parents = incomers.map(x => x.source)
     const lowestParentPos = Math.max(...parents.
-        map(x => x === undefined ? 0 : dotProduct([x.position.x, x.position.y], dirVec)))
+        map(x => x === undefined ? 0 : dotProduct([x.position.x + x.size.width / 2, x.position.y + x.size.height / 2], dirVec)))
     const lowestParent = parents.find(x => (x === undefined ?
-        0 : dotProduct([x.position.x, x.position.y], dirVec)) === lowestParentPos)
+        0 : dotProduct([x.position.x + x.size.width / 2, x.position.y + x.size.height / 2], dirVec)) === lowestParentPos)
 
     return lowestParent as KNode;
 }
