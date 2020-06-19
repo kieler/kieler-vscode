@@ -88,7 +88,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             const middleX = (x1 + x2) / 2;
             const middleY = (y1 + y2) / 2;
 
-            if (i === 0) {
+            if (i === 0 && selectedSiblings[i].id !== selectedNode.id) {
                 let deltaX = middleX - x1;
                 let deltaY = middleY - y1;
 
@@ -101,9 +101,11 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 result = <g>{result}{renderCircle(i === highlightedIndex, x1 - deltaX, y1 - deltaY, false)}</g>;
             }
 
-            result = <g>{result}{renderCircle(i === highlightedIndex - 1, middleX, middleY, false)}</g>;
+            if (selectedSiblings[i].id !== selectedNode.id && 
+                selectedSiblings[i + 1].id !== selectedNode.id)
+                result = <g>{result}{renderCircle(i === highlightedIndex - 1, middleX, middleY, false)}</g>;
 
-            if (i === selectedSiblings.length - 2) {
+            if (i === selectedSiblings.length - 2 && selectedSiblings[i + 1].id !== selectedNode.id) {
                 let deltaX = middleX - x1;
                 let deltaY = middleY - y1;
 
