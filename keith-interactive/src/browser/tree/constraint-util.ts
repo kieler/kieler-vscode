@@ -123,9 +123,9 @@ export function setTreeProperties(nodes: KNode[], data: Map<string, any>, event:
     // const siblings = nodes.filter(x => (x.incomingEdges as any as KEdge[])[0].source?.id == parent?.id);  Das mag der yarn watcher irgendwie nicht :C
     const siblings: KNode[] = getSiblings(nodes, targetNode);
     if (direction === Direction.LEFT || direction === Direction.RIGHT)
-        siblings.sort((x, y) => x.position.y - y.position.y);
+        siblings.sort((x, y) => x.position.y + x.size.height / 2 - y.position.y - y.size.height / 2);
     else
-        siblings.sort((x, y) => x.position.x - y.position.x);
+        siblings.sort((x, y) => x.position.x + x.size.width / 2 - y.position.x - y.size.width / 2);
 
     if (siblings.length === 0)
         return new RefreshDiagramAction();
