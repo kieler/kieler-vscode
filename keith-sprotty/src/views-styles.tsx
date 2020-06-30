@@ -24,6 +24,7 @@ import {
     camelToKebab, fillSingleColor, isSingleColor, lineCapText, lineJoinText, lineStyleText,
     SKGraphRenderingContext, textDecorationStyleText, verticalAlignmentText
 } from './views-common';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 
 
 // ----------------------------- type string definitions for all styles ------------------------------------- //
@@ -520,40 +521,65 @@ export function getSvgShadowStyles(styles: KStyles, context: SKGraphRenderingCon
 export function getSvgColorStyles(styles: KStyles, context: SKGraphRenderingContext, parent: SKGraphElement | SKEdge): ColorStyles {
     const foreground = getSvgColorStyle(styles.kForeground as KForeground, context)
     const background = getSvgColorStyle(styles.kBackground as KBackground, context)
+    const theme = ThemeService.get().getCurrentTheme().id;
     const grayedOutColor = {color: 'gray', opacity: '255'}
 
-    if (parent instanceof SKEdge && parent.moved) {
-        // edge should be greyed out
-        return {
-            foreground: grayedOutColor,
-            background: background === undefined ? DEFAULT_FILL : {color: 'black', opacity: '155'},
-            opacity: parent.opacity
+    // Dark theme specific color sceme
+    if (theme === 'dark')
+    {
+        if (parent instanceof SKEdge) {
+            if (parent.moved) {
+                // edge should be greyed out
+                return {
+                    foreground: grayedOutColor,
+                    background: background === undefined ? DEFAULT_FILL : {color: 'black', opacity: '155'},
+                    opacity: parent.opacity
+                }
+            }
+            else if (parent.cycleInducing) {
+                return {
+                    foreground: {color: 'orange', opacity: '255'},
+                    background: background === undefined ? DEFAULT_FILL : {color: 'orange', opacity: '255'},
+                    opacity: parent.opacity
+                }
+            }    
+            else {
+                return {
+                    foreground: grayedOutColor,
+                    background: background === undefined ? DEFAULT_FILL : grayedOutColor,
+                    opacity: parent.opacity
+                }
+            }
         }
-    }
-    else if (parent instanceof SKEdge && parent.cycleInducing) {
-        return {
-            foreground: {color: 'orange', opacity: '255'},
-            background: background === undefined ? DEFAULT_FILL : {color: 'orange', opacity: '255'},
-            opacity: parent.opacity
-        }
-    }    
-    else if (parent instanceof SKEdge) {
-        return {
-            foreground: grayedOutColor,
-            background: background === undefined ? DEFAULT_FILL : grayedOutColor,
-            opacity: parent.opacity
-        }
-    }
 
-    if (parent instanceof SKNode && parent.shadow) {
-        // colors of the shadow node
-        return {
-            foreground: grayedOutColor,
-            background: background === undefined ? DEFAULT_FILL : {color: 'black', opacity: '155'},
-            opacity: parent.opacity
+        if (parent instanceof SKNode && parent.shadow) {
+            // colors of the shadow node
+            return {
+                foreground: grayedOutColor,
+                background: background === undefined ? DEFAULT_FILL : {color: 'black', opacity: '155'},
+                opacity: parent.opacity
+            }
+        }
+    } else {
+        if (parent instanceof SKEdge && parent.moved) {
+            // edge should be greyed out
+            return {
+                foreground: grayedOutColor,
+                background: background === undefined ? DEFAULT_FILL : grayedOutColor,
+                opacity: parent.opacity
+            }
+        }
+    
+        if (parent instanceof SKNode && parent.shadow) {
+            // colors of the shadow node
+            return {
+                foreground: grayedOutColor,
+                background: background === undefined ? DEFAULT_FILL : {color: 'gainsboro', opacity: '255'},
+                opacity: parent.opacity
+            }
         }
     }
-
+    
     return {
         foreground: foreground === undefined ? DEFAULT_FOREGROUND : foreground,
         background: background === undefined ? DEFAULT_FILL : background,
