@@ -158,8 +158,7 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 const parent = this.nodes[0] ? this.nodes[0].parent as KNode : undefined
                 result = [setGenerateRectPackAction(this.nodes, this.target, parent, event)].concat(super.mouseUp(this.target, event));
             } else if (algorithm.endsWith('tree')) {
-                result = [setTreeProperties(this.nodes, this.data, event, this.target)].concat(super.mouseUp(this.target, event)).
-                concat([new RefreshDiagramAction()]);
+                result = [setTreeProperties(this.nodes, this.data, event, this.target)].concat(super.mouseUp(this.target, event));
             } else {
                 // Algorithm not supported
             }
