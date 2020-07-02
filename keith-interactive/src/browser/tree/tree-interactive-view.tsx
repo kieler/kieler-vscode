@@ -81,10 +81,10 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
         for (let i = 0; i < selectedSiblings.length - 1; i++) {
             let dist
             if (direction === Direction.LEFT || direction === Direction.RIGHT)
-                dist = getOriginalNodePositionY(selectedSiblings[i + 1]) 
+                dist = getOriginalNodePositionY(selectedSiblings[i + 1])
                     - getOriginalNodePositionY(selectedSiblings[i]) - selectedSiblings[i].size.height
-            else 
-                dist = getOriginalNodePositionX(selectedSiblings[i + 1]) 
+            else
+                dist = getOriginalNodePositionX(selectedSiblings[i + 1])
                     - getOriginalNodePositionX(selectedSiblings[i]) - selectedSiblings[i].size.width
 
             if (approxNodeSpacing > dist)
@@ -131,7 +131,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
             }
 
             // Intermediate points
-            if (selectedSiblings[i].id !== selectedNode.id && 
+            if (selectedSiblings[i].id !== selectedNode.id &&
                 selectedSiblings[i + 1].id !== selectedNode.id)
                 result = <g>{result}{renderCircle(i === highlightedIndex - 1, middleX, middleY, false)}</g>;
 
