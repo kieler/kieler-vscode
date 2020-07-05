@@ -92,27 +92,39 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
         }
 
         for (let i = 0; i < selectedSiblings.length - 1; i++) {
-            let x1, y1, x2, y2;
+            let x1, y1, x2, y2, thisCircleCoord: number;
             if (direction === Direction.LEFT || direction === Direction.RIGHT) {
                 x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width / 2;
                 y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height;
                 x2 = getOriginalNodePositionX(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.width / 2;
                 y2 = getOriginalNodePositionY(selectedSiblings[i + 1]);
+
+                if (x1 - selectedSiblings[i].size.width / 2 > getOriginalNodePositionX(selectedNode) + selectedNode.size.width ||
+                    x1 + selectedSiblings[i].size.width / 2 < getOriginalNodePositionX(selectedNode))
+                    thisCircleCoord = x1
+                else
+                    thisCircleCoord = circleCoord
             } else {
                 x1 = getOriginalNodePositionX(selectedSiblings[i]) + selectedSiblings[i].size.width;
                 y1 = getOriginalNodePositionY(selectedSiblings[i]) + selectedSiblings[i].size.height / 2;
                 x2 = getOriginalNodePositionX(selectedSiblings[i + 1]);
                 y2 = getOriginalNodePositionY(selectedSiblings[i + 1]) + selectedSiblings[i + 1].size.height / 2;
+
+                if (y1 - selectedSiblings[i].size.height / 2 > getOriginalNodePositionY(selectedNode) + selectedNode.size.height ||
+                    y1 + selectedSiblings[i].size.height / 2 < getOriginalNodePositionY(selectedNode))
+                    thisCircleCoord = y1
+                else
+                    thisCircleCoord = circleCoord
             }
 
             // Get middle coords between current and next sibling
             let middleX, middleY
             if (direction === Direction.LEFT || direction === Direction.RIGHT) {
-                middleX = circleCoord
+                middleX = thisCircleCoord
                 middleY = (y1 + y2) / 2
             } else {
                 middleX = (x1 + x2) / 2
-                middleY = circleCoord
+                middleY = thisCircleCoord
             }
 
             // Start point
@@ -120,11 +132,11 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 let x, y
 
                 if (direction === Direction.LEFT || direction === Direction.RIGHT) {
-                    x = circleCoord
+                    x = thisCircleCoord
                     y = y1 - selectedSiblings[i].size.height - approxNodeSpacing / 2
                 } else {
                     x = x1 - selectedSiblings[i].size.width - approxNodeSpacing / 2
-                    y = circleCoord
+                    y = thisCircleCoord
                 }
 
                 result = <g>{result}{renderCircle(i === highlightedIndex, x, y, false)}</g>;
@@ -140,11 +152,11 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 let x, y;
 
                 if (direction === Direction.LEFT || direction === Direction.RIGHT) {
-                    x = circleCoord
+                    x = thisCircleCoord
                     y = y2 + selectedSiblings[i + 1].size.height + approxNodeSpacing / 2
                 } else {
                     x = x2 + selectedSiblings[i + 1].size.width + approxNodeSpacing / 2
-                    y = circleCoord
+                    y = thisCircleCoord
                 }
 
                 result = <g>{result}{renderCircle(highlightedIndex === -1, x, y, false)}</g>;
