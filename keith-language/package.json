@@ -1,5 +1,5 @@
 {
-  "name": "keith-language",
+  "name": "@kieler/keith-language",
   "version": "0.1.0",
   "description": "An extension for Theia connection language support for KEITH",
   "author": "Kiel University https://rtsys.informatik.uni-kiel.de/kieler",
@@ -17,13 +17,19 @@
     "build": "tsc && yarn lint",
     "watch": "tsc -w"
   },
+  "dependencies": {
+    "@theia/application-package": "next",
+    "@theia/getting-started": "next",
+    "@theia/monaco": "next",
+    "@theia/navigator": "next"
+  },
   "devDependencies": {
-    "@types/chai": "^4.0.1",
-    "@types/chai-as-promised": "0.0.31",
-    "@types/mocha": "^2.2.41",
-    "mocha": "^3.4.2",
-    "ts-node": "^3.2.0",
-    "typescript": "2.9.1"
+    "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "7.1.0",
+    "@types/mocha": "^5.2.6",
+    "mocha": "^6.0.2",
+    "ts-node": "^8.0.3",
+    "typescript": "latest"
   },
   "files": [
     "lib",

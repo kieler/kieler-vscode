@@ -1,9 +1,22 @@
-import { KLineCap, LineCap, KLineJoin, LineJoin, KLineStyle, LineStyle, HorizontalAlignment,
-    VerticalAlignment, KHorizontalAlignment, KVerticalAlignment, KPosition, KRenderingLibrary,
-    KColoring, KRendering, KGraphElement, Decoration, KRotation, KEdge, KPolyline, KText, KTextUnderline, Underline } from "./kgraph-models"
-import { Bounds, Point, toDegrees, ModelRenderer } from "sprotty/lib"
-import { VNode } from "snabbdom/vnode";
-import { ColorStyles, ShadowStyles, KStyles } from "./views-styles";
+/*
+ * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
+ *
+ * http://rtsys.informatik.uni-kiel.de/kieler
+ *
+ * Copyright 2019 by
+ * + Kiel University
+ *   + Department of Computer Science
+ *     + Real-Time and Embedded Systems Group
+ *
+ * This code is provided under the terms of the Eclipse Public License (EPL).
+ */
+import { VNode } from 'snabbdom/vnode';
+import { Bounds, ModelRenderer, Point, toDegrees } from 'sprotty/lib';
+import {
+    Decoration, HorizontalAlignment, KColoring, KHorizontalAlignment, KLineCap, KLineJoin, KLineStyle, KPolyline, KPosition, KRendering,
+    KRenderingLibrary, KRotation, KText, KTextUnderline, KVerticalAlignment, LineCap, LineJoin, LineStyle, SKEdge, SKGraphElement, SKNode, Underline, VerticalAlignment
+} from './skgraph-models';
+import { KStyles, ColorStyle } from './views-styles';
 
 // ------------- Util Class names ------------- //
 const K_LEFT_POSITION = 'KLeftPositionImpl'
@@ -12,23 +25,23 @@ const K_TOP_POSITION = 'KTopPositionImpl'
 const K_BOTTOM_POSITION = 'KBottomPositionImpl'
 
 // ------------- constants for string building --------------- //
-const ID_SEPARATOR = '$'
-const BACKGROUND = 'background'
-const FOREGROUND = 'foreground'
-const SHADOW = 'shadow'
-const URL_START = 'url(#'
-const URL_END = ')'
 const RGB_START = 'rgb('
 const RGB_END = ')'
-const RGBA_START = 'rgba('
-const RGBA_END = ')'
 
-export class KGraphRenderingContext extends ModelRenderer {
+/**
+ * Contains additional data needed for the rendering of SKGraphs.
+ */
+export class SKGraphRenderingContext extends ModelRenderer {
     boundsMap: any
     decorationMap: any
     kRenderingLibrary: KRenderingLibrary
+    renderingDefs: Map<string, VNode>
 }
 
+/**
+ * Translates a KLineCap into the text needed for the SVG 'stroke-linecap' attribute.
+ * @param lineCap The KLineCap.
+ */
 export function lineCapText(lineCap: KLineCap): 'butt' | 'round' | 'square' {
     switch (lineCap.lineCap) {
         case LineCap.CAP_FLAT: { // the flat LineCap option is actually called 'butt' in svg and most other usages.
@@ -43,6 +56,10 @@ export function lineCapText(lineCap: KLineCap): 'butt' | 'round' | 'square' {
     }
 }
 
+/**
+ * Translates a KLineJoin into the text needed for the SVG 'stroke-linejoin' attribute.
+ * @param lineJoin The KLineJoin.
+ */
 export function lineJoinText(lineJoin: KLineJoin): 'bevel' | 'miter' | 'round' {
     switch (lineJoin.lineJoin) {
         case LineJoin.JOIN_BEVEL: {
@@ -58,8 +75,9 @@ export function lineJoinText(lineJoin: KLineJoin): 'bevel' | 'miter' | 'round' {
 }
 
 /**
- * Calculates the formatting string to define the given lineStyle. If the resulting lineStyle would be a solid line, return undefined instead.
- * @param lineStyle The line style to format
+ * Translates a KLineStyle into the text needed for the SVG 'stroke-dasharray' attribute.
+ * If the resulting dasharray would be a solid line, return undefined instead.
+ * @param lineStyle The KLineStyle
  * @param lineWidth The width of the drawn line
  */
 export function lineStyleText(lineStyle: KLineStyle, lineWidth: number): string | undefined { // TODO: implement dashOffset
@@ -91,20 +109,10 @@ export function lineStyleText(lineStyle: KLineStyle, lineWidth: number): string 
     }
 }
 
-export function horizontalAlignmentText(horizontalAlignment: HorizontalAlignment): 'middle' | 'start' | 'end' {
-    switch (horizontalAlignment) {
-        case HorizontalAlignment.CENTER: {
-            return 'middle'
-        }
-        case HorizontalAlignment.LEFT: {
-            return 'start'
-        }
-        case HorizontalAlignment.RIGHT: {
-            return 'end'
-        }
-    }
-}
-
+/**
+ * Translates a VerticalAlignment into the text needed for the SVG text 'dominant-baseline' attribute.
+ * @param verticalAlignment The VerticalAlignment.
+ */
 export function verticalAlignmentText(verticalAlignment: VerticalAlignment): 'middle' | 'baseline' | 'hanging' {
     switch (verticalAlignment) {
         case VerticalAlignment.CENTER: {
@@ -119,6 +127,10 @@ export function verticalAlignmentText(verticalAlignment: VerticalAlignment): 'mi
     }
 }
 
+/**
+ * Translates a KTextUnderline into the text needed for the SVG 'text-decoration-style' attribute.
+ * @param underline The KTextUnderline.
+ */
 export function textDecorationStyleText(underline: KTextUnderline): 'solid' | 'double' | 'wavy' | undefined {
     switch (underline.underline) {
         case Underline.NONE: {
@@ -146,8 +158,14 @@ export function textDecorationColor(underline: KTextUnderline): string | undefin
     return undefined // TODO:
 }
 
-// This will now always return the left coordinate of the text's bounding box.
-export function calculateX(x: number, width: number, horizontalAlignment: KHorizontalAlignment, textWidth: number | undefined): number {
+/**
+ * Calculates the x-coordinate of the text's positioning box when considering its available space and its alignment.
+ * @param x The calculated x-coordinate pointing to the left coordinate of the text rendering box.
+ * @param width The available width for the text.
+ * @param horizontalAlignment The KHorizontalAlignment.
+ * @param textWidth The real width the rendered text needs.
+ */
+export function calculateX(x: number, width: number, horizontalAlignment: KHorizontalAlignment, textWidth?: number): number {
     if (textWidth === undefined) {
         switch (horizontalAlignment.horizontalAlignment) {
             case HorizontalAlignment.CENTER: {
@@ -173,10 +191,17 @@ export function calculateX(x: number, width: number, horizontalAlignment: KHoriz
             }
         }
     }
-    console.error("horizontalAlignment is not defined.")
+    console.error('horizontalAlignment is not defined.')
     return 0
 }
 
+/**
+ * Calculates the y-coordinate of the text's potitioning box when considering its alignment.
+ * @param y The calculated y-coordinate pointing to the top coordinate of the text rendering box.
+ * @param height The available height for the text.
+ * @param verticalAlignment The KVerticalAlignment.
+ * @param numberOfLines The number of lines in the given text.
+ */
 export function calculateY(y: number, height: number, verticalAlignment: KVerticalAlignment, numberOfLines: number): number {
     let lineHeight = height / numberOfLines
     if (numberOfLines === 0) {
@@ -196,16 +221,16 @@ export function calculateY(y: number, height: number, verticalAlignment: KVertic
 }
 
 /**
- * Evaluates a position inside given parent bounds. Inspired by the java method PlacementUtil.evaluateKPosition
- * @param position the position
- * @param parentBounds the parent bounds
- * @param topLeft in case position is undefined assume a topLeft KPosition, and a bottomRight KPosition otherwise
- * @returns the evaluated position
+ * Evaluates a position inside given parent bounds. Inspired by the java method PlacementUtil.evaluateKPosition.
+ * @param position The position.
+ * @param parentBounds The parent bounds.
+ * @param topLeft In case position is undefined assume a topLeft KPosition, and a bottomRight KPosition otherwise.
+ * @returns The evaluated position.
  */
 export function evaluateKPosition(position: KPosition, parentBounds: Bounds, topLeft: boolean): Point {
     const width = parentBounds.width
     const height = parentBounds.height
-    let point = {x: 0, y: 0}
+    let point = { x: 0, y: 0 }
 
     let xPos = position.x
     let yPos = position.y
@@ -239,80 +264,58 @@ export function evaluateKPosition(position: KPosition, parentBounds: Bounds, top
     return point
 }
 
+/**
+ * Tries to find the ID in the given map object.
+ * @param map The object containing something under the given ID.
+ * @param idString The ID too look up.
+ */
 export function findById(map: any, idString: string): any {
     if (map === undefined) {
         return
     }
     return map[idString]
-    // TODO: why did I first implement this variant? Can there be renderings not on top level of the boundsMap?
-    // const ids = idString.split(ID_SEPARATOR)
-    // let obj = boundsMap
-    // for (let id of ids) {
-    //     obj = obj[id]
-    //     if (obj === undefined) {
-    //         return
-    //     }
-    // }
-    // return obj
 }
 
+/**
+ * Returns if the given coloring is a single color and no gradient.
+ * @param coloring The coloring to check.
+ */
 export function isSingleColor(coloring: KColoring) {
     return coloring.targetColor === undefined || coloring.targetAlpha === undefined
 }
 
-export function fillBackground(id: string): string {
-    return URL_START + backgroundId(id) + URL_END
-}
-
-export function fillForeground(id: string): string {
-    return URL_START + foregroundId(id) + URL_END
-}
-
-export function fillSingleColor(coloring: KColoring) {
-    if (coloring.alpha === undefined || coloring.alpha === 255) {
-        return RGB_START + coloring.color.red   + ','
-                         + coloring.color.green + ','
-                         + coloring.color.blue
-             + RGB_END
-    } else {
-        return RGBA_START + coloring.color.red + ','
-                          + coloring.color.green + ','
-                          + coloring.color.blue + ','
-                          + coloring.alpha / 255
-             + RGBA_END
+/**
+ * Returns the SVG fill string representing the given coloring, if it is a single color. Check that with isSingleColor(KColoring) beforehand.
+ * @param coloring The coloring.
+ */
+export function fillSingleColor(coloring: KColoring): ColorStyle {
+    return {
+        color: RGB_START + coloring.color.red + ','
+            + coloring.color.green + ','
+            + coloring.color.blue
+            + RGB_END,
+        opacity: coloring.alpha === undefined || coloring.alpha === 255 ? undefined : (coloring.alpha / 255).toString()
     }
 }
 
-export function shadowFilter(id: string): string {
-    return URL_START + shadowId(id) + URL_END
-}
-
-export function backgroundId(id: string): string {
-    return id + ID_SEPARATOR + BACKGROUND
-}
-
-export function foregroundId(id: string): string {
-    return id + ID_SEPARATOR + FOREGROUND
-}
-
-export function shadowId(id: string): string {
-    return id + ID_SEPARATOR + SHADOW
-}
-
-export function angle(x0: Point, x1: Point): number {
-    return toDegrees(Math.atan2(x1.y - x0.y, x1.x - x0.x))
-}
-
 /**
- * transforms any string in 'CamelCaseFormat' to a string in 'kebab-case-format'.
- * @param string the string to transform
+ * Transforms any string in 'CamelCaseFormat' to a string in 'kebab-case-format'.
+ * @param string The string to transform.
  */
 export function camelToKebab(string: string): string {
     return string.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function findBoundsAndTransformationData(rendering: KRendering, kRotation: KRotation | undefined, parent: KGraphElement,
-    context: KGraphRenderingContext, isEdge?: boolean): BoundsAndTransformation | undefined {
+/**
+ * Calculate the bounds of the given rendering and the SVG transformation string that has to be applied to the SVG element for this rendering.
+ * @param rendering The rendering to calculate the bounds and transformation for.
+ * @param kRotation The KRotation style of the rendering.
+ * @param parent The parent SKGraphElement this rendering is contained in.
+ * @param context The rendering context used to render this element.
+ * @param isEdge If the rendering is for an edge.
+ */
+export function findBoundsAndTransformationData(rendering: KRendering, kRotation: KRotation | undefined, parent: SKGraphElement,
+    context: SKGraphRenderingContext, isEdge?: boolean): BoundsAndTransformation | undefined {
     let bounds
     let decoration
 
@@ -346,15 +349,29 @@ export function findBoundsAndTransformationData(rendering: KRendering, kRotation
             }
         }
     }
-    // Error check: If there are no bounds or decoration, at least try to fall back to a possible size attribute in the parent element.
+    // Error check: If there are no bounds or decoration, at least try to fall back to possible size and position attributes in the parent element.
     // If the parent element has no bounds either, the object can not be rendered.
-    if (decoration === undefined && bounds === undefined && !('size' in parent)) {
-        console.error('could not find bounds or decoration data to render this element: ' + rendering + ' for this parent: ' + parent)
-        return
+    if (decoration === undefined && bounds === undefined && 'size' in parent && 'position' in parent) {
+        bounds = {
+            x: (parent as any).position.x,
+            y: (parent as any).position.y,
+            width: (parent as any).size.width,
+            height: (parent as any).size.height
+        }
     } else if (decoration === undefined && bounds === undefined) {
-        console.error('could not find bounds or decoration data to render this element. Using parent bounds as a fallback.')
-        bounds = (parent as any).size
+        return
     }
+
+    if (parent instanceof SKNode && parent.shadow) {
+        // bounds of the shadow indicating the old position of the node
+        bounds = {
+            x: parent.shadowX - parent.position.x,
+            y: parent.shadowY - parent.position.y,
+            width: parent.size.width,
+            height: parent.size.height
+        }
+    }
+
     // Calculate the svg transformation function string for this element and all its child elements given the bounds and decoration.
     const transformation = getTransformation(bounds, decoration, kRotation, isEdge)
 
@@ -364,12 +381,20 @@ export function findBoundsAndTransformationData(rendering: KRendering, kRotation
     }
 }
 
-export function findTextBoundsAndTransformationData(rendering: KText, styles: KStyles, parent: KGraphElement, context: KGraphRenderingContext, lines: number) {
+/**
+ * Calculate the bounds of the given text rendering and the SVG transformation string that has to be applied to the SVG element for this text.
+ * @param rendering The text rendering to calculate the bounds and transformation for.
+ * @param styles The styles for this text rendering
+ * @param parent The parent SKGraphElement this rendering is contained in.
+ * @param context The rendering context used to render this element.
+ * @param lines The number of lines the text rendering spans across.
+ */
+export function findTextBoundsAndTransformationData(rendering: KText, styles: KStyles, parent: SKGraphElement, context: SKGraphRenderingContext, lines: number) {
     let bounds: {
-            x: number | undefined,
-            y: number | undefined,
-            height: number | undefined,
-            width: number | undefined
+        x: number | undefined,
+        y: number | undefined,
+        height: number | undefined,
+        width: number | undefined
     } = {
         x: undefined,
         y: undefined,
@@ -416,25 +441,30 @@ export function findTextBoundsAndTransformationData(rendering: KText, styles: KS
                 bounds.height = decoration.bounds.height
             }
         }
-        // Error check: If there are no bounds or decoration, at least try to fall back to a possible size attribute in the parent element.
+        // Error check: If there are no bounds or decoration, at least try to fall back to possible size and position attributes in the parent element.
         // If the parent element has no bounds either, the object can not be rendered.
-        if (decoration === undefined && bounds.x === undefined && !('size' in parent)) {
-            console.error('could not find bounds or decoration data to render this element: ' + rendering + ' for this parent: ' + parent)
-            return
-        } else if (decoration === undefined && bounds.x === undefined) {
-            console.error('could not find bounds or decoration data to render this element. Using parent bounds as a fallback.')
-            bounds.x = (parent as any).size.x
-            bounds.y = (parent as any).size.y
+        if (decoration === undefined && bounds.x === undefined && 'size' in parent && 'position' in parent) {
+            bounds.x = (parent as any).position.x
+            bounds.y = (parent as any).position.y
             bounds.width = (parent as any).size.width
             bounds.height = (parent as any).size.height
+        } else if (decoration === undefined && bounds.x === undefined) {
+            return
         }
     }
 
 
-    // If still no bounds are found, set x to 0. This will be the case when the texts are drawn first to estimate their sizes.
-    // Multiline texts should still be rendered beneath each other, so the x coordinate is important for each <tspan>
+    // If still no bounds are found, set all by default to 0. This will be the case when the texts are drawn first to estimate their sizes.
     if (bounds.x === undefined) {
-        bounds.x = 0
+        bounds = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        }
+        // Do not apply any rotation style in that case either, as the bounds estimation may get confused then.
+        // TODO: really, the rotation style should not even be sent as a style on texts when estimating their sizes.
+        styles.kRotation = undefined
     }
     // Calculate the svg transformation function string for this element given the bounds and decoration.
     const transformation = getTransformation(bounds as Bounds, decoration, styles.kRotation, false, true)
@@ -444,11 +474,22 @@ export function findTextBoundsAndTransformationData(rendering: KText, styles: KS
     }
 }
 
+/**
+ * Simple container interface to hold bounds and a SVG transformation string.
+ */
 export interface BoundsAndTransformation {
     bounds: Bounds,
     transformation: string | undefined
 }
 
+/**
+ * Calculates the SVG transformation string that has to be applied to the SVG element.
+ * @param bounds The bounds of the rendering.
+ * @param decoration The decoration of the rendering.
+ * @param rotation The KRotation style of the rendering.
+ * @param isEdge If the rendering is for an edge.
+ * @param isText If the rendering is a text.
+ */
 export function getTransformation(bounds: Bounds, decoration: Decoration, rotation: KRotation | undefined, isEdge?: boolean, isText?: boolean) {
     if (isEdge === undefined) {
         isEdge = false
@@ -488,7 +529,7 @@ export function getTransformation(bounds: Bounds, decoration: Decoration, rotati
                 const CENTER = {
                     x: {
                         type: K_LEFT_POSITION,
-                        absolute:  0,
+                        absolute: 0,
                         relative: 0.5
                     },
                     y: {
@@ -511,7 +552,13 @@ export function getTransformation(bounds: Bounds, decoration: Decoration, rotati
     return (isTransform ? transform : undefined)
 }
 
-export function getPoints(parent: KGraphElement | KEdge, rendering: KPolyline, boundsAndTransformation: BoundsAndTransformation): Point[] {
+/**
+ * calculates an array of all points that the polyline rendering should follow.
+ * @param parent The parent element containing this rendering.
+ * @param rendering The polyline rendering.
+ * @param boundsAndTransformation The bounds and transformation data calculated by findBoundsAndTransformation(...).
+ */
+export function getPoints(parent: SKGraphElement | SKEdge, rendering: KPolyline, boundsAndTransformation: BoundsAndTransformation): Point[] {
     let points: Point[] = []
     // If the rendering has points defined, use them for the rendering.
     if ('points' in rendering) {
@@ -550,7 +597,7 @@ export function getPoints(parent: KGraphElement | KEdge, rendering: KPolyline, b
             maxX = p.x
         }
         if (p.y < minY) {
-            minX = p.y
+            minY = p.y
         }
         if (p.y > maxY) {
             maxY = p.y
@@ -565,25 +612,13 @@ export function getPoints(parent: KGraphElement | KEdge, rendering: KPolyline, b
         // if this path has no width and the last point does not add anything to that, we need to shift one value by a tiny, invisible value so the width will now be bigger than 0.
         if (maxX - minX === 0 && lastX === maxX) {
             lastX += EPSILON
-            points[points.length - 1] = {x: lastX, y: lastY}
+            points[points.length - 1] = { x: lastX, y: lastY }
         }
         // same for Y
         if (maxY - minY === 0 && lastY === maxY) {
             lastY += EPSILON
-            points[points.length - 1] = {x: lastX, y: lastY}
+            points[points.length - 1] = { x: lastX, y: lastY }
         }
     }
     return points
-}
-
-export function addDefinitions(element: VNode, colorStyles: ColorStyles, shadowStyles: ShadowStyles) {
-    if (colorStyles.background.definition) {
-        (element.children as (string | VNode)[]).push(colorStyles.background.definition)
-    }
-    if (colorStyles.foreground.definition) {
-        (element.children as (string | VNode)[]).push(colorStyles.foreground.definition)
-    }
-    if (shadowStyles.definition) {
-        (element.children as (string | VNode)[]).push(shadowStyles.definition)
-    }
 }

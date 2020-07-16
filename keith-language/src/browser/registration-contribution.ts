@@ -12,7 +12,7 @@
  */
 
 import { injectable } from 'inversify';
-import { CommandContribution, CommandRegistry } from '@theia/core';
+import { CommandRegistry, CommandContribution } from '@theia/core';
 
 @injectable()
 export class RegistrationContribution implements CommandContribution {

@@ -1,60 +1,73 @@
 /*
- * Copyright (C) 2017 TypeFox and others.
+ * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * http://rtsys.informatik.uni-kiel.de/kieler
+ *
+ * Copyright 2019 by
+ * + Kiel University
+ *   + Department of Computer Science
+ *     + Real-Time and Embedded Systems Group
+ *
+ * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-import { Container, ContainerModule } from "inversify"
-import { ConsoleLogger, LogLevel, SGraph,
-        SGraphView, TYPES, boundsModule,
-        buttonModule, configureModelElement, defaultModule, expandModule,
-        exportModule, fadeModule, hoverModule, modelSourceModule, moveModule,
-        openModule, overrideViewerOptions, selectModule, undoRedoModule,
-        viewportModule } from 'sprotty/lib'
-import { popupModelFactory } from "./popup"
-import { KEdgeView,  KNodeView, KPortView, KLabelView} from "./views"
-import { KNode, KPort, KLabel, KEdge } from "./kgraph-models"
-import { KGraphModelFactory } from "./model-factory"
-import { RequestTextBoundsCommand } from "./actions"
-import { HiddenTextBoundsUpdater } from "./hidden-text-bounds-updater"
 
-const kGraphDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
+import { interactiveModule } from '@kieler/keith-interactive/lib/interactive-module';
+import { Container, ContainerModule, interfaces } from 'inversify';
+import {
+    configureModelElement, ConsoleLogger, defaultModule, exportModule, hoverModule, HoverState, HtmlRoot, HtmlRootView,
+    LogLevel, modelSourceModule, overrideViewerOptions, PreRenderedElement, PreRenderedView, selectModule, SGraph, SGraphFactory,
+    TYPES, updateModule, viewportModule
+} from 'sprotty/lib';
+import actionModule from './actions/actions-module';
+import { KeithHoverMouseListener } from './hover/hover';
+import { RenderOptions } from './options';
+import { SKEdge, SKLabel, SKNode, SKPort } from './skgraph-models';
+import textBoundsModule from './textbounds/textbounds-module';
+import { KEdgeView, KLabelView, KNodeView, KPortView, SKGraphView } from './views';
+
+/**
+ * Dependency injection module that adds functionality for diagrams and configures the views for SKGraphElements.
+ */
+const kGraphDiagramModule = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind, isBound: interfaces.IsBound, rebind: interfaces.Rebind) => {
     rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope()
     rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn)
-    rebind(TYPES.IModelFactory).to(KGraphModelFactory).inSingletonScope()
-    bind(TYPES.PopupModelFactory).toConstantValue(popupModelFactory)
-    const context = { bind, unbind, isBound, rebind };
-    configureModelElement(context, 'graph', SGraph, SGraphView);
-    configureModelElement(context, 'node', KNode, KNodeView)
-    configureModelElement(context, 'edge', KEdge, KEdgeView)
-    configureModelElement(context, 'port', KPort, KPortView)
-    configureModelElement(context, 'label', KLabel, KLabelView)
+    rebind(TYPES.IModelFactory).to(SGraphFactory).inSingletonScope()
+    rebind(TYPES.CommandStackOptions).toConstantValue({
+        // Override the default animation speed to be 500 ms, as the default value is too quick.
+        defaultDuration: 500,
+        undoHistoryLimit: 50
+    })
+    bind(TYPES.MouseListener).to(KeithHoverMouseListener)
+    rebind<HoverState>(TYPES.HoverState).toDynamicValue(ctx => ({
+        mouseOverTimer: undefined,
+        mouseOutTimer: undefined,
+        popupOpen: false,
+        previousPopupElement: undefined
+    }));
+    const context = { bind, unbind, isBound, rebind }
+    configureModelElement(context, 'html', HtmlRoot, HtmlRootView)
+    configureModelElement(context, 'pre-rendered', PreRenderedElement, PreRenderedView)
+    configureModelElement(context, 'graph', SGraph, SKGraphView);
+    configureModelElement(context, 'node', SKNode, KNodeView)
+    configureModelElement(context, 'edge', SKEdge, KEdgeView)
+    configureModelElement(context, 'port', SKPort, KPortView)
+    configureModelElement(context, 'label', SKLabel, KLabelView)
+    bind(RenderOptions).toSelf().inSingletonScope()
 })
 
-const textBoundsModule = new ContainerModule((bind, unbind, isBound, rebind) => {
-    // TODO:
-    // This should really first unbind the RequestBoundsCommand from the TYPES.ICommand registry
-    // and the HiddenBoundsUpdater from the TYPES.HiddenVNodeDecorator registry, but inversify
-    // does not support such a feature.
-    // See the ticket https://github.com/inversify/InversifyJS/issues/1035
-    // I would like some syntax such as:
-    // unbind(Types.HiddenVNodeDecorator).from(HiddenBoundsUpdater)
-    // to remove only that specific binding, not all of the bindings registered for the Types.HiddenVNodeDecorator.
-    // With that, the HiddenBoundsUpdater should not be called anymore and not issue any CalculatedBoundsAction,
-    // which is currently only ignored by the overwritten handle method for that action in the KeithDiagramServer.
-    bind(TYPES.ICommand).toConstructor(RequestTextBoundsCommand)
-    bind(TYPES.HiddenVNodeDecorator).to(HiddenTextBoundsUpdater).inSingletonScope()
-});
-
+/**
+ * Dependency injection container that bundles all needed sprotty and custom modules to allow SKGraphs to be drawn with sprotty.
+ */
 export default function createContainer(widgetId: string): Container {
     const container = new Container()
-    container.load(defaultModule, selectModule, moveModule, boundsModule, undoRedoModule, viewportModule,
-        hoverModule, fadeModule, exportModule, expandModule, openModule, buttonModule, modelSourceModule,
-        kGraphDiagramModule, textBoundsModule)
+    container.load(defaultModule, selectModule, interactiveModule, viewportModule, exportModule, modelSourceModule, updateModule, hoverModule,
+        // keep the keith-specific modules at the last positions because of possible binding overrides.
+        textBoundsModule, actionModule, kGraphDiagramModule)
     overrideViewerOptions(container, {
         needsClientLayout: false,
         needsServerLayout: true,
-        baseDiv: widgetId
+        baseDiv: widgetId,
+        hiddenDiv: widgetId + '_hidden'
     })
     return container
 }

@@ -1,5 +1,5 @@
 {
-  "name": "keith-kicool",
+  "name": "@kieler/keith-kicool",
   "version": "0.1.0",
   "description": "An extension for Theia connection language support for KEITH to compile models",
   "author": "Kiel University https://rtsys.informatik.uni-kiel.de/kieler",
@@ -17,20 +17,17 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@theia/core": "latest",
-    "@theia/editor": "latest",
-    "@theia/filesystem": "latest",
-    "@theia/languages": "latest",
-    "keith-diagram": "0.1.0",
-    "keith-language": "0.1.0"
+    "@kieler/keith-diagram": "0.1.0",
+    "@kieler/keith-language": "0.1.0",
+    "@theia/filesystem": "next"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.1",
-    "@types/chai-as-promised": "0.0.31",
-    "@types/mocha": "^2.2.41",
-    "mocha": "^3.4.2",
-    "ts-node": "^3.2.0",
-    "typescript": "2.9.1"
+    "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "7.1.0",
+    "@types/mocha": "^5.2.6",
+    "mocha": "^6.0.2",
+    "ts-node": "^8.0.3",
+    "typescript": "latest"
   },
   "files": [
     "lib",

@@ -1,7 +1,7 @@
 {
-  "name": "keith-sprotty",
+  "name": "@kieler/keith-sprotty",
   "version": "0.1.0",
-  "description": "sprotty diagrams for Keith RiCharts",
+  "description": "sprotty diagrams for KEITH",
   "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
   "license": "EPL-1.0",
   "keywords": [
@@ -17,12 +17,14 @@
     "watch": "tsc -w -p ./tsconfig.json"
   },
   "dependencies": {
-    "sprotty": "0.4.2"
+    "@kieler/keith-interactive": "0.1.0",
+    "inversify": "5.0.1",
+    "sprotty": "next"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
-    "tslint": "^5.5.0",
-    "typescript": "2.9.1"
+    "rimraf": "^2.6.3",
+    "tslint": "^5.13.1",
+    "typescript": "latest"
   },
   "files": [
     "lib",

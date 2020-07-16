@@ -14,23 +14,30 @@
 /**
  * Description of a compilation system for selectbox in compiler widget
  */
-export class CompilationSystems {
+export class CompilationSystem {
     label: string
     id: string
     isPublic: boolean
+    simulation: boolean
+    snapshotSystem: boolean
 }
 
 /**
  * Equivalent to CodeContainer send by LS
  */
 export interface CodeContainer {
-    files: Snapshots[]
+    files: Snapshot[][]
+}
+
+export interface Code {
+    fileName: string
+    code: string
 }
 
 /**
  * (name, snapshotId) should be unique. GroupId for bundling in phases
  */
-export class Snapshots {
+export class Snapshot {
     name: string;
     snapshotIndex: number;
     errors: string[];
