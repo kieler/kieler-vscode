@@ -21,7 +21,7 @@ import { LS_ID, LS_NAME } from '../common';
 
 
 const osExtension = isWindows ? join('kieler', 'kieler.exe') : (isOSX ? join('kieler.app', 'Contents', 'MacOs', 'kieler') : join('kieler', 'kieler'))
-const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', '..', '..', osExtension))
+const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', osExtension))
 
 function getPort(): number | undefined {
     let arg = process.argv.filter(arg => arg.startsWith('--LSP_PORT='))[0]
@@ -66,14 +66,7 @@ class KeithLanguageServerContribution extends BaseLanguageServerContribution {
             // check whether the path to the LS was specified
             if (!lsPath) {
                 // --root-dir is only present in the arguments if KEITH is started in its development setup
-                let arg = process.argv.filter(arg => arg.startsWith('--root-dir='))[0]
-                if (!arg) {
-                    lsPath = EXECUTABLE_PATH
-                    console.log("Starting with product path")
-                } else {
-                    // An exception is thrown if no LS_PATH is specified in the developer setup.
-                    throw new Error("No path to LS was specified. Use '--LS_PATH=' to specify one.");
-                }
+                lsPath = EXECUTABLE_PATH
             } else {
                 console.log("Starting with LS_PATH as argument")
             }
