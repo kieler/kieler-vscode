@@ -58,6 +58,9 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 approxNodeSpacing = dist
         }
 
+        if (selectedSiblings.length === 1)
+            approxNodeSpacing = 0
+
         // Dashed rect
         let color = 'grey'
         let minX: number = Number.MAX_VALUE
