@@ -28,37 +28,6 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
     const direction = nodes[0].direction
     let result = <g></g>
 
-    // Draw rect around all nodes
-    let color = 'grey'
-    let minX: number = Number.MAX_VALUE
-    let minY: number = Number.MAX_VALUE
-    let maxX: number = Number.MIN_VALUE
-    let maxY: number = Number.MIN_VALUE
-    nodes.forEach(node => {
-        if (node.position.x < minX) {
-            minX = node.position.x
-        }
-        if (node.position.y < minY) {
-            minY = node.position.y
-        }
-        if (node.position.x + node.size.width > maxX) {
-            maxX = node.position.x + node.size.width
-        }
-        if (node.position.y + node.size.height > maxY) {
-            maxY = node.position.y + node.size.height
-        }
-    })
-    result = <g>{result}<rect
-        x={minX - boundingBoxMargin}
-        y={minY - boundingBoxMargin}
-        width={maxX - minX + 2 * boundingBoxMargin}
-        height={maxY - minY + 2 * boundingBoxMargin}
-        stroke={color}
-        fill= 'rgba(0,0,0,0)'
-        strokeWidth={2 * boundingBoxMargin}
-        style={{ 'stroke-dasharray': 4 } as React.CSSProperties}>
-    </rect></g>
-
     // Render Valid locations
     let selectedNode = nodes.find(x => x.selected)
     let selectedKNode = selectedNode as KNode
@@ -89,6 +58,39 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 approxNodeSpacing = dist
         }
 
+        // Dashed rect
+        let color = 'grey'
+        let minX: number = Number.MAX_VALUE
+        let minY: number = Number.MAX_VALUE
+        let maxX: number = Number.MIN_VALUE
+        let maxY: number = Number.MIN_VALUE
+        selectedSiblings.forEach(n => {
+            var x = getOriginalNodePositionX(n), y = getOriginalNodePositionY(n)
+            if (x < minX) {
+                minX = x
+            }
+            if (y < minY) {
+                minY = y
+            }
+            if (x + n.size.width > maxX) {
+                maxX = x + n.size.width
+            }
+            if (y + n.size.height > maxY) {
+                maxY = y + n.size.height
+            }
+        })
+        result = <g>{result}<rect
+            x={minX - boundingBoxMargin - approxNodeSpacing / 2}
+            y={minY - boundingBoxMargin}
+            width={maxX - minX + 2 * (boundingBoxMargin + approxNodeSpacing / 2)}
+            height={maxY - minY + 2 * boundingBoxMargin}
+            stroke={color}
+            fill= 'rgba(0,0,0,0)'
+            strokeWidth={2 * boundingBoxMargin}
+            style={{ 'stroke-dasharray': 4 } as React.CSSProperties}>
+        </rect></g>
+
+        // Draw preview positions
         for (let i = 0; i < selectedSiblings.length - 1; i++) {
             let x1, y1, x2, y2;
             if (direction === Direction.LEFT || direction === Direction.RIGHT) {
@@ -119,9 +121,9 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
 
                 if (direction === Direction.LEFT || direction === Direction.RIGHT) {
                     x = x1
-                    y = y1 - selectedSiblings[i].size.height - approxNodeSpacing / 2
+                    y = y1 - selectedSiblings[i].size.height - approxNodeSpacing / 4 - boundingBoxMargin / 2
                 } else {
-                    x = x1 - selectedSiblings[i].size.width - approxNodeSpacing / 2
+                    x = x1 - selectedSiblings[i].size.width - approxNodeSpacing / 4 - boundingBoxMargin / 2
                     y = y1
                 }
 
@@ -139,9 +141,9 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
 
                 if (direction === Direction.LEFT || direction === Direction.RIGHT) {
                     x = x2
-                    y = y2 + selectedSiblings[selectedSiblings.length - 1].size.height + approxNodeSpacing / 2
+                    y = y2 + selectedSiblings[selectedSiblings.length - 1].size.height + approxNodeSpacing / 4 + boundingBoxMargin / 2
                 } else {
-                    x = x2 + selectedSiblings[selectedSiblings.length - 1].size.width + approxNodeSpacing / 2
+                    x = x2 + selectedSiblings[selectedSiblings.length - 1].size.width + approxNodeSpacing / 4 + boundingBoxMargin / 2
                     y = y2
                 }
 
