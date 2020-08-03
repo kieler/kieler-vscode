@@ -11,17 +11,17 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { isOSX, isWindows } from "@theia/core";
+// import { isOSX, isWindows } from "@theia/core";
 import { BaseLanguageServerContribution, IConnection, LanguageServerContribution } from '@theia/languages/lib/node';
 import { ContainerModule, injectable } from 'inversify';
 import * as net from 'net';
-import { join, resolve } from 'path';
+import { /* join, */ resolve } from 'path';
 import { createSocketConnection } from 'vscode-ws-jsonrpc/lib/server';
 import { LS_ID, LS_NAME } from '../common';
 
 
-const osExtension = isWindows ? join('kieler', 'kieler.exe') : (isOSX ? join('kieler.app', 'Contents', 'MacOs', 'kieler') : join('kieler', 'kieler'))
-const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', osExtension))
+// const osExtension = isWindows ? join('kieler', 'kieler.exe') : (isOSX ? join('kieler.app', 'Contents', 'MacOs', 'kieler') : join('kieler', 'kieler'))
+const EXECUTABLE_PATH = resolve('/home/theia/', 'kieler/kieler')
 
 function getPort(): number | undefined {
     let arg = process.argv.filter(arg => arg.startsWith('--LSP_PORT='))[0]
@@ -72,6 +72,7 @@ class KeithLanguageServerContribution extends BaseLanguageServerContribution {
             }
             console.log("Starting LS with path: " + lsPath)
             const command = lsPath
+            this.spawnProcess("cd /home/theia/kieler && ls")
             const serverConnection = await this.createProcessStreamConnectionAsync(command, []);
             this.forward(clientConnection, serverConnection);
             serverConnection.onClose(() => console.log("Connection closed"))
