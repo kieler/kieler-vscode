@@ -68,7 +68,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
         let maxX: number = Number.MIN_VALUE
         let maxY: number = Number.MIN_VALUE
         selectedSiblings.forEach(n => {
-            var x = getOriginalNodePositionX(n), y = getOriginalNodePositionY(n)
+            let x = getOriginalNodePositionX(n), y = getOriginalNodePositionY(n)
             if (x < minX) {
                 minX = x
             }
