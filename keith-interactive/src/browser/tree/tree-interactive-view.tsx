@@ -82,11 +82,23 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode) {
                 maxY = y + n.size.height
             }
         })
+        let x, y, width, height
+        if (direction === Direction.LEFT || direction === Direction.RIGHT) {
+            x = minX - boundingBoxMargin
+            y = minY - boundingBoxMargin - approxNodeSpacing / 2
+            width = maxX - minX + 2 * boundingBoxMargin
+            height = maxY - minY + 2 * (boundingBoxMargin + approxNodeSpacing / 2)
+        } else {
+            x = minX - boundingBoxMargin - approxNodeSpacing / 2
+            y = minY - boundingBoxMargin
+            width = maxX - minX + 2 * (boundingBoxMargin + approxNodeSpacing / 2)
+            height = maxY - minY + 2 * boundingBoxMargin
+        }
         result = <g>{result}<rect
-            x={minX - boundingBoxMargin - approxNodeSpacing / 2}
-            y={minY - boundingBoxMargin}
-            width={maxX - minX + 2 * (boundingBoxMargin + approxNodeSpacing / 2)}
-            height={maxY - minY + 2 * boundingBoxMargin}
+            x={x}
+            y={y}
+            width={width}
+            height={height}
             stroke={color}
             fill= 'rgba(0,0,0,0)'
             strokeWidth={2 * boundingBoxMargin}
