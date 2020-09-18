@@ -102,7 +102,7 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
         }
     }
     // position of selected node
-    let curPos = getPositionInLayer(layerNodes, target)
+    let curPos = getPositionInLayer(layerNodes, target, direction)
 
     layerNodes.sort((a, b) => a.properties.positionId - b.properties.positionId)
     if (layerNodes.length > 0) {

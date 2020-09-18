@@ -282,20 +282,50 @@ export function getNodesOfLayer(layer: number, nodes: KNode[]): KNode[] {
  * @param nodes Nodes of the layer the target is in.
  * @param target Node which position should be calculated.
  */
-export function getPositionInLayer(nodes: KNode[], target: KNode): number {
-    // Sort the layer array by y coordinate.
-    nodes.sort((a, b) => a.position.y - b.position.y)
+export function getPositionInLayer(nodes: KNode[], target: KNode, direction: Direction): number {
+    // Sort the layer array by coordinates of the nodes.
+    switch (direction) {
+        case Direction.UNDEFINED:
+        case Direction.LEFT:
+        case Direction.RIGHT: {
+            nodes.sort((a, b) => a.position.y - b.position.y)
+            break;
+        }
+        case Direction.UP:
+        case Direction.DOWN: {
+            nodes.sort((a, b) => a.position.x - b.position.x)
+            break;
+        }
+    }
+
     // Find the position of the target
     if (nodes.indexOf(target) !== -1) {
         // target is already in the list
         return nodes.indexOf(target)
     }
 
-    for (let i = 0; i < nodes.length; i++) {
-        if (target.position.y < nodes[i].position.y) {
-            return i
+    switch (direction) {
+        case Direction.UNDEFINED:
+        case Direction.LEFT:
+        case Direction.RIGHT: {
+            for (let i = 0; i < nodes.length; i++) {
+                if (target.position.y < nodes[i].position.y) {
+                    return i
+                }
+            }
+            break;
+        }
+        case Direction.UP:
+        case Direction.DOWN: {
+            for (let i = 0; i < nodes.length; i++) {
+                if (target.position.x < nodes[i].position.x) {
+                    return i
+                }
+            }
+            break;
         }
     }
+
     return nodes.length
 }
 
@@ -356,7 +386,7 @@ export function setProperty(nodes: KNode[], layers: Layer[], target: SModelEleme
     // calculate layer and position the target has in the graph at the new position
     const layerOfTarget = getLayerOfNode(targetNode, nodes, layers, direction)
     const nodesOfLayer = getNodesOfLayer(layerOfTarget, nodes)
-    const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode)
+    const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode, direction)
     const newPositionCons = getActualTargetIndex(positionOfTarget, nodesOfLayer.indexOf(targetNode) !== -1, nodesOfLayer)
     const newLayerCons = getActualLayer(targetNode, nodes, layerOfTarget)
     const forbidden = isLayerForbidden(targetNode, newLayerCons)
