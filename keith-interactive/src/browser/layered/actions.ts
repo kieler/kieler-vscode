@@ -12,7 +12,7 @@
  */
 
 import { Action } from 'sprotty/lib';
-import { DeleteConstraint, LayerConstraint, PositionConstraint, StaticConstraint } from './constraint-types';
+import { DeleteConstraint, ILPredOfConstraint, LayerConstraint, PositionConstraint, StaticConstraint, ILSuccOfConstraint } from './constraint-types';
 
 /**
  * Sent from client to server to set a position and layer constraint.
@@ -79,5 +79,27 @@ export class SetPositionConstraintAction implements Action {
     readonly kind = SetPositionConstraintAction.KIND
 
     constructor(public readonly constraint: PositionConstraint) {
+    }
+}
+
+/**
+ * Sent from client to server to set a in layer predecessor of constraint on a node.
+ */
+export class SetILPredOfConstraintAction implements Action {
+    static readonly KIND: string = 'setILPredOfConstraint'
+    readonly kind = SetILPredOfConstraintAction.KIND
+
+    constructor(public readonly constraint: ILPredOfConstraint) {
+    }
+}
+
+/**
+ * Sent from client to server to set a in layer successor of constraint on a node.
+ */
+export class SetILSuccOfConstraintAction implements Action {
+    static readonly KIND: string = 'setILSuccOfConstraint'
+    readonly kind = SetILSuccOfConstraintAction.KIND
+
+    constructor(public readonly constraint: ILSuccOfConstraint) {
     }
 }
