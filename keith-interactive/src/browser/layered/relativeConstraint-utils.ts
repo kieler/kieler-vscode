@@ -1,3 +1,4 @@
+import { isUndefined } from "@theia/plugin-ext/lib/common/types"
 import { Action, SModelElement } from "sprotty"
 import { RefreshDiagramAction } from "../actions"
 import { Direction, KNode } from "../constraint-classes"
@@ -19,7 +20,6 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
     const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode, direction)
 
     // TODO: Randfall: Knoten war vorher schon im layer -> im bereich seiner alten position sollte kein cons gestezt werden
-    // TODO: catch indexoutofbound excp.
     const predNode = nodesOfLayer[positionOfTarget - 1]
     const succNode = nodesOfLayer[positionOfTarget]
 
@@ -33,7 +33,7 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
         case Direction.UNDEFINED:
         case Direction.LEFT:
         case Direction.RIGHT: {
-            if (midY - predNode.position.y - predNode.size.height < succNode.position.y - midY) {
+            if (isUndefined(succNode) || (!isUndefined(predNode) && midY - predNode.position.y - predNode.size.height < succNode.position.y - midY)) {
                 // distance between current node and predecessor is lower
                 if (midX < predNode.position.x + predNode.size.width && midX > predNode.position.x) {
                     // moved node must be in certain x range
@@ -51,7 +51,7 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
         }
         case Direction.UP:
         case Direction.DOWN: {
-            if (midX - predNode.position.x - predNode.size.width < succNode.position.x - midX) {
+            if (isUndefined(succNode) || (!isUndefined(predNode) && midX - predNode.position.x - predNode.size.width < succNode.position.x - midX)) {
                 // distance between current node and predecessor is lower
                 if (midY < predNode.position.y + predNode.size.height && midY > predNode.position.y) {
                     // moved node must be in certain y range
