@@ -18,9 +18,10 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
     const nodesOfLayer = getNodesOfLayer(layerOfTarget, nodes)
     const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode, direction)
 
+    // TODO: Randfall: Knoten war vorher schon im layer -> im bereich seiner alten position sollte kein cons gestezt werden
     // TODO: catch indexoutofbound excp.
-    const predNode = nodes[positionOfTarget - 1]
-    const succNode = nodes[positionOfTarget + 1]
+    const predNode = nodesOfLayer[positionOfTarget - 1]
+    const succNode = nodesOfLayer[positionOfTarget]
 
     let consValue: string = ""
     let iLPredOf = false
@@ -32,8 +33,7 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
         case Direction.UNDEFINED:
         case Direction.LEFT:
         case Direction.RIGHT: {
-            // TODO: bewegter Knoten sollte auch in gewisser x Reichweite sein
-            if (midY - predNode.position.y + predNode.size.height < succNode.position.y - midY) {
+            if (midY - predNode.position.y - predNode.size.height < succNode.position.y - midY) {
                 // distance between current node and predecessor is lower
                 if (midX < predNode.position.x + predNode.size.width && midX > predNode.position.x) {
                     // moved node must be in certain x range
@@ -51,8 +51,7 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
         }
         case Direction.UP:
         case Direction.DOWN: {
-            // TODO: bewegter Knoten sollte auch in gewisser y Reichweite sein
-            if (midX - predNode.position.x + predNode.size.width < succNode.position.x - midX) {
+            if (midX - predNode.position.x - predNode.size.width < succNode.position.x - midX) {
                 // distance between current node and predecessor is lower
                 if (midY < predNode.position.y + predNode.size.height && midY > predNode.position.y) {
                     // moved node must be in certain y range
