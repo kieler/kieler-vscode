@@ -67,8 +67,8 @@ export class KNodeView implements IView {
         }
         if (isChildSelected(node as SKNode)) {
             if (((node as SKNode).properties.interactiveLayout) && this.mListener.hasDragged) {
-                // Render the objects indicating the layer and positions in the graph
-                nodes = renderInteractiveLayout(node as SKNode)
+                // Render the visualiztaion for interactive layout
+                nodes = renderInteractiveLayout(node as SKNode, this.mListener.relCons)
             }
         }
 
