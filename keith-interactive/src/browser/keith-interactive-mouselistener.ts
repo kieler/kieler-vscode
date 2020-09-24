@@ -20,6 +20,7 @@ import { KNode } from './constraint-classes';
 import { filterKNodes } from './helper-methods';
 import { DeleteStaticConstraintAction } from './layered/actions';
 import { getLayers, setProperty } from './layered/constraint-utils';
+import { setRelativeConstraint } from './layered/relativeConstraint-utils';
 import { RectPackDeletePositionConstraintAction } from './rect-packing/actions';
 import { setGenerateRectPackAction } from './rect-packing/constraint-util';
 
@@ -137,7 +138,11 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
             let result = super.mouseUp(this.target, event)
             const algorithm = (this.target.parent as KNode).properties.algorithm
             if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
-                result = [setProperty(this.nodes, this.data.get('layered'), this.target)].concat(super.mouseUp(this.target, event));
+                if (event.shiftKey) {
+                    result = [setRelativeConstraint(this.nodes, this.data.get('layered'), this.target)].concat(super.mouseUp(this.target, event));
+                } else {
+                    result = [setProperty(this.nodes, this.data.get('layered'), this.target)].concat(super.mouseUp(this.target, event));
+                }
             } else if (algorithm.endsWith('rectpacking')) {
                 const parent = this.nodes[0] ? this.nodes[0].parent as KNode : undefined
                 result = [setGenerateRectPackAction(this.nodes, this.target, parent, event)].concat(super.mouseUp(this.target, event));

@@ -78,3 +78,19 @@ export class StaticConstraint {
     posCons: number
     layerCons: number
 }
+
+/**
+ * data class for a in layer predecessor of constraint
+ */
+export class ILPredOfConstraint {
+    id: string
+    otherNode: string
+}
+
+/**
+ * data class for a in layer successor of constraint
+ */
+export class ILSuccOfConstraint {
+    id: string
+    otherNode: string
+}
