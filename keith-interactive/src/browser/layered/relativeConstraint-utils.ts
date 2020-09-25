@@ -21,7 +21,7 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
 
     const predNode = nodesOfLayer[positionOfTarget - 1]
     let succNode = nodesOfLayer[positionOfTarget]
-    if (succNode.id === targetNode.id && positionOfTarget !== targetNode.properties.positionId) {
+    if (!isUndefined(succNode) && succNode.id === targetNode.id && positionOfTarget !== targetNode.properties.positionId) {
         // if targets original position is in this layer it should not be its own successor unless it is its original position
         succNode = nodesOfLayer[positionOfTarget + 1]
     }
