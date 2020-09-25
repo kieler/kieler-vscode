@@ -41,11 +41,36 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
     const nodesOfLayer = getNodesOfLayer(layerOfTarget, nodes)
     const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode, direction)
 
-    const pred = nodesOfLayer[positionOfTarget - 1]
+    let pred = nodesOfLayer[positionOfTarget - 1]
     let succ = nodesOfLayer[positionOfTarget]
-    if (!isUndefined(succ) && succ.id === targetNode.id && positionOfTarget !== targetNode.properties.positionId) {
-        // if targets original position is in this layer it should not be its own successor unless it is its original position
+    if (!isUndefined(succ) && succ.id === targetNode.id) {
+        // node should not be its own successor
         succ = nodesOfLayer[positionOfTarget + 1]
+    }
+
+    // if node is in its original layer, it can be its own pred or succ
+    if (positionOfTarget === targetNode.properties.positionId && layerOfTarget === targetNode.properties.layerId) {
+        switch (direction) {
+            case Direction.UNDEFINED:
+            case Direction.LEFT:
+            case Direction.RIGHT: {
+                if (targetNode.position.y > targetNode.shadowY) {
+                    pred = targetNode
+                } else {
+                    succ = targetNode
+                }
+                break;
+            }
+            case Direction.UP:
+            case Direction.DOWN: {
+                if (targetNode.position.x > targetNode.shadowX) {
+                    pred = targetNode
+                } else {
+                    succ = targetNode
+                }
+                break;
+            }
+        }
     }
 
 
@@ -54,6 +79,7 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
     let midY = targetNode.position.y + 0.5 * targetNode.size.height
     let midX = targetNode.position.x + 0.5 * targetNode.size.width
 
+    // coordinates for the case the node is its own pred/succ
     let predY = 0
     let predX = 0
     if (!isUndefined(pred)) {
@@ -65,7 +91,6 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
             predX = pred.position.x
         }
     }
-
     let succY = 0
     let succX = 0
     if (!isUndefined(succ)) {
