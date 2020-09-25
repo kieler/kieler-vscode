@@ -15,7 +15,7 @@ import { isUndefined } from '@theia/plugin-ext/lib/common/types';
 // import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
 import { KNode } from '../constraint-classes';
-import { getSelectedNode } from '../helper-methods';
+import { filterKNodes, getSelectedNode } from '../helper-methods';
 import { getLayerOfNode, getLayers, getNodesOfLayer, getPositionInLayer } from './constraint-utils';
 import { determineCons } from './relativeConstraint-utils';
 
@@ -58,4 +58,39 @@ export function renderSuccOf(): VNode {
 export function renderPredOf(): VNode {
     // @ts-ignore
     return <g></g>
+}
+
+export function highlightNodes(root: KNode) {
+    let nodes = filterKNodes(root.children)
+    const direction = nodes[0].direction
+    let layers = getLayers(nodes, direction)
+    const targetNode = getSelectedNode(nodes)
+
+    if (!isUndefined(targetNode)) {
+        // calculate layer and position the target has in the graph at the new position
+        const layerOfTarget = getLayerOfNode(targetNode, nodes, layers, direction)
+        const nodesOfLayer = getNodesOfLayer(layerOfTarget, nodes)
+        const positionOfTarget = getPositionInLayer(nodesOfLayer, targetNode, direction)
+
+        const predNode = nodesOfLayer[positionOfTarget - 1]
+        let succNode = nodesOfLayer[positionOfTarget]
+        if (!isUndefined(succNode) && succNode.id === targetNode.id && positionOfTarget !== targetNode.properties.positionId) {
+            // if targets original position is in this layer it should not be its own successor unless it is its original position
+            succNode = nodesOfLayer[positionOfTarget + 1]
+        }
+
+        let cons = determineCons(targetNode, predNode, succNode, direction)
+
+        // TODO: replace number with enum
+        switch (cons) {
+            case -1:
+                targetNode.highlight = true
+                predNode.highlight = true
+                break;
+            case 1:
+                targetNode.highlight = true
+                succNode.highlight = true
+                break;
+        }
+    }
 }
