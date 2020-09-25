@@ -16,6 +16,7 @@ import { VNode } from 'snabbdom/vnode';
 
 import { isChildSelected } from '@kieler/keith-interactive/lib/helper-methods';
 import { renderConstraints, renderInteractiveLayout } from '@kieler/keith-interactive/lib/interactive-view';
+import { highlightNodes } from '@kieler/keith-interactive/lib/layered/layered-relCons-view';
 import { KeithInteractiveMouseListener } from '@kieler/keith-interactive/lib/keith-interactive-mouselistener';
 import { inject, injectable } from 'inversify';
 import { IView, RenderingContext, SGraph, SGraphFactory, SGraphView, TYPES } from 'sprotty/lib';
@@ -67,8 +68,11 @@ export class KNodeView implements IView {
         }
         if (isChildSelected(node as SKNode)) {
             if (((node as SKNode).properties.interactiveLayout) && this.mListener.hasDragged) {
-                // Render the objects indicating the layer and positions in the graph
-                nodes = renderInteractiveLayout(node as SKNode)
+                // Render the visualiztaion for interactive layout
+                nodes = renderInteractiveLayout(node as SKNode, this.mListener.relCons)
+                if (this.mListener.relCons) {
+                    highlightNodes(node as SKNode)
+                }
             }
         }
 
@@ -107,6 +111,7 @@ export class KNodeView implements IView {
             rendering = getRendering(node.data, node, new KStyles, ctx, this.mListener)
         }
         node.shadow = isShadow
+        node.highlight = false
 
         if (node.id === '$root') {
             // The root node should not be rendered, only its children should.

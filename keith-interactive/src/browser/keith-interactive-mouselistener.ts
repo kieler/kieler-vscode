@@ -42,6 +42,8 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
      */
     private target: KNode | undefined
 
+    public relCons: boolean
+
     /**
      * The diagram server.
      */
@@ -116,6 +118,14 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                         })]
                     }
                 }
+
+                // determines which visualization should be rendered
+                if (event.shiftKey) {
+                    this.relCons = true
+                } else {
+                    this.relCons = false
+                }
+
                 return super.mouseDown(this.target as SModelElement, event)
             }
         }

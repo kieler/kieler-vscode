@@ -18,17 +18,22 @@ import { filterKNodes } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
 import { isUndefined } from 'util';
+// import { renderRelCons } from './layered/layered-relCons-view';
 
 /**
  * Visualize the layers and available positions in the graph
  * @param root Root of the hierarchical level for which the layers and positions should be visualized.
  */
-export function renderInteractiveLayout(root: KNode): VNode {
+export function renderInteractiveLayout(root: KNode, relCons: boolean): VNode {
     // Filter KNodes
     let nodes = filterKNodes(root.children)
     let result = undefined
     if (isUndefined(root.properties.algorithm) || root.properties.algorithm.endsWith('layered')) {
-        result = renderHierarchyLevelLayered(nodes, root)
+        if (relCons) {
+            // result = renderRelCons(nodes, root)
+        } else {
+            result = renderHierarchyLevelLayered(nodes, root)
+        }
     } else if (root.properties.algorithm.endsWith('rectpacking')) {
         result = renderHierarchyLevelRectPacking(nodes, root)
     } else {

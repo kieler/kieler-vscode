@@ -50,6 +50,8 @@ export class KNode extends RectangularNode implements KGraphElement {
     shadow: boolean
     shadowX: number
     shadowY: number
+
+    highlight: boolean
 }
 
 export enum Direction {
@@ -99,4 +101,16 @@ export class KEdge extends SEdge implements KGraphElement {
     }
 
     moved: boolean
+}
+
+export class RelConsData {
+    relCons: RelCons
+    node: KNode
+    target: KNode
+}
+
+export enum RelCons {
+    IN_LAYER_SUCC_OF,
+    IN_LAYER_PRED_OF,
+    UNDEFINED
 }
