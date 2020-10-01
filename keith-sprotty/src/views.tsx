@@ -65,6 +65,11 @@ export class KNodeView implements IView {
         if (isShadow) {
             // Render shadow of the node
             shadow = getRendering(node.data, node, new KStyles, ctx, this.mListener)
+
+            if (this.mListener.relCons) {
+                // render visualization for relative constraints
+                result = <g>{result}{renderRelCons(node.parent as SKNode, node)}</g>
+            }
         }
         if (isChildSelected(node as SKNode)) {
             if (((node as SKNode).properties.interactiveLayout) && this.mListener.hasDragged) {
@@ -79,10 +84,6 @@ export class KNodeView implements IView {
         if (!this.mListener.hasDragged || isChildSelected(node.parent as SKNode)) {
             // Node should only be visible if the node is in the same hierarchical level as the moved node or no node is moved at all
             rendering = getRendering(node.data, node, new KStyles, ctx, this.mListener)
-
-            if (node.selected && this.mListener.relCons) {
-                result = <g>{result}{renderRelCons(node.parent as SKNode, node)}</g>
-            }
 
             if (this.rOptions.get(ShowConstraintOption.ID) && (node.parent as SKNode).properties && (node.parent as SKNode).properties.interactiveLayout) {
                 // render icon visualizing the set Constraints
