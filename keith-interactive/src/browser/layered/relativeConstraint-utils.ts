@@ -81,25 +81,19 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
 
     // coordinates for the case the node is its own pred/succ
     let predY = 0
-    let predX = 0
     if (!isUndefined(pred)) {
         if (pred.id === targetNode.id) {
             predY = targetNode.shadowY
-            predX = targetNode.shadowX
         } else {
             predY = pred.position.y
-            predX = pred.position.x
         }
     }
     let succY = 0
-    let succX = 0
     if (!isUndefined(succ)) {
         if (succ.id === targetNode.id) {
             succY = targetNode.shadowY
-            succX = targetNode.shadowX
         } else {
             succY = succ.position.y
-            succX = succ.position.x
         }
     }
 
@@ -109,15 +103,13 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
         case Direction.RIGHT: {
             if (isUndefined(succ) || (!isUndefined(pred) && midY - predY - pred.size.height < succY - midY)) {
                 // distance between current node and predecessor is lower
-                if (!isUndefined(pred) && pred.id !== targetNode.id && midX < predX + pred.size.width && midX > predX) {
-                    // no constraint should be set if the moved node is in range of its original position & moved node must be in certain x range
+                if (!isUndefined(pred) && pred.id !== targetNode.id) {
+                    // no constraint should be set if the moved node is in range of its original position
                     iLSuccOf = true
                 }
             } else if (!isUndefined(succ) && succ.id !== targetNode.id) {
-                if (midX < succX + succ.size.width && midX > succX) {
-                    // moved node must be in certain x range
-                    iLPredOf = true
-                }
+                // moved node must be in certain x range
+                iLPredOf = true
             }
             break;
         }
@@ -125,15 +117,13 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
         case Direction.DOWN: {
             if (isUndefined(succ) || (!isUndefined(pred) && midX - pred.position.x - pred.size.width < succ.position.x - midX)) {
                 // distance between current node and predecessor is lower
-                if (!isUndefined(pred) && pred.id !== targetNode.id && midY < pred.position.y + pred.size.height && midY > pred.position.y) {
-                    // no constraint should be set if the moved node is in range of its original position & moved node must be in certain x range
+                if (!isUndefined(pred) && pred.id !== targetNode.id) {
+                    // no constraint should be set if the moved node is in range of its original position
                     iLSuccOf = true
                 }
             } else if (!isUndefined(succ) && succ.id !== targetNode.id) {
-                if (midY < succ.position.y + succ.size.height && midY > succ.position.y) {
-                    // moved node must be in certain y range
-                    iLPredOf = true
-                }
+                // moved node must be in certain y range
+                iLPredOf = true
             }
             break;
         }

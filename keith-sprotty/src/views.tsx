@@ -16,7 +16,6 @@ import { VNode } from 'snabbdom/vnode';
 
 import { isChildSelected } from '@kieler/keith-interactive/lib/helper-methods';
 import { renderConstraints, renderInteractiveLayout } from '@kieler/keith-interactive/lib/interactive-view';
-import { highlightNodes } from '@kieler/keith-interactive/lib/layered/layered-relCons-view';
 import { KeithInteractiveMouseListener } from '@kieler/keith-interactive/lib/keith-interactive-mouselistener';
 import { inject, injectable } from 'inversify';
 import { IView, RenderingContext, SGraph, SGraphFactory, SGraphView, TYPES } from 'sprotty/lib';
@@ -25,6 +24,7 @@ import { SKEdge, SKLabel, SKNode, SKPort } from './skgraph-models';
 import { SKGraphRenderingContext } from './views-common';
 import { getJunctionPointRenderings, getRendering } from './views-rendering';
 import { KStyles } from './views-styles';
+import { renderRelCons } from '@kieler/keith-interactive/lib/layered/layered-relCons-view';
 
 /**
  * IView component that turns an SGraph element and its children into a tree of virtual DOM elements.
@@ -65,14 +65,16 @@ export class KNodeView implements IView {
         if (isShadow) {
             // Render shadow of the node
             shadow = getRendering(node.data, node, new KStyles, ctx, this.mListener)
+
+            if (this.mListener.relCons) {
+                // render visualization for relative constraints
+                result = <g>{result}{renderRelCons(node.parent as SKNode, node)}</g>
+            }
         }
         if (isChildSelected(node as SKNode)) {
             if (((node as SKNode).properties.interactiveLayout) && this.mListener.hasDragged) {
                 // Render the visualiztaion for interactive layout
                 nodes = renderInteractiveLayout(node as SKNode, this.mListener.relCons)
-                if (this.mListener.relCons) {
-                    highlightNodes(node as SKNode)
-                }
             }
         }
 
