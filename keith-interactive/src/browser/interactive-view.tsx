@@ -14,11 +14,11 @@
 import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
 import { KNode } from './constraint-classes';
-import { filterKNodes } from './helper-methods';
+import { filterKNodes, getSelectedNode } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
 import { isUndefined } from 'util';
-// import { renderRelCons } from './layered/layered-relCons-view';
+import { highlightNodes } from './layered/layered-relCons-view';
 
 /**
  * Visualize the layers and available positions in the graph
@@ -30,7 +30,11 @@ export function renderInteractiveLayout(root: KNode, relCons: boolean): VNode {
     let result = undefined
     if (isUndefined(root.properties.algorithm) || root.properties.algorithm.endsWith('layered')) {
         if (relCons) {
-            // result = renderRelCons(nodes, root)
+            let selNode = getSelectedNode(nodes)
+            if (!isUndefined(selNode)) {
+                // result = renderRelCons(nodes, selNode)
+            }
+            highlightNodes(root)
         } else {
             result = renderHierarchyLevelLayered(nodes, root)
         }
