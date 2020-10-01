@@ -18,6 +18,7 @@ import { filterKNodes } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
 import { isUndefined } from 'util';
+import { renderSetRelConstraint } from './layered/layered-relCons-view';
 
 /**
  * Visualize the layers and available positions in the graph
@@ -55,7 +56,7 @@ export function renderConstraints(node: KNode): VNode {
     let result = <g></g>
     const algorithm = (node.parent as KNode).properties.algorithm
     if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
-        result = renderLayeredConstraint(node)
+        result = <g>{renderLayeredConstraint(node)}{renderSetRelConstraint(node)}</g>
     } else if (algorithm.endsWith( 'rectpacking')) {
         if (node.properties.desiredPosition !== -1) {
             result = renderRectPackConstraint(node)
