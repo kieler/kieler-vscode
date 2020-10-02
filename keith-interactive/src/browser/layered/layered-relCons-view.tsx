@@ -15,9 +15,10 @@ import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
 import { Direction, KNode, RelCons } from '../constraint-classes';
 import { filterKNodes } from '../helper-methods';
-import { getLayers } from './constraint-utils';
+import { getLayerOfNode, getLayers } from './constraint-utils';
 import { determineCons } from './relativeConstraint-utils';
 import { renderDirArrow } from '../interactive-view-objects';
+import { renderPositions } from './layered-interactive-view';
 
 
 const verticalArrowXOffset = -2.5
@@ -122,4 +123,18 @@ export function renderSetRelConstraint(node: KNode) {
     }
     // @ts-ignore
     return result
+}
+
+
+/**
+ * Creates circles that indicate the available positions.
+ * The position the node would be set to if it released is indicated by a filled circle.
+ * @param nodes All nodes of the graph.
+ * @param selNode Node that is currently selected.
+ */
+export function renderPosIndicators(nodes: KNode[], selNode: KNode): VNode {
+    const direction = selNode.direction
+    const layers = getLayers(nodes, direction)
+    const current = getLayerOfNode(selNode, nodes, layers, direction)
+    return renderPositions(current, nodes, layers, true, direction, true)
 }
