@@ -113,7 +113,9 @@ export function renderSetRelConstraint(node: KNode) {
     const constraintOffset = 2
 
     if (iLPConstraint != null && iLSConstraint != null) {
-        // TODO: arrows should not overlap. Maybe use another arrow
+        // both rel cons are set
+        result = <g>{renderILPredOf(x + constraintOffset, y + 2 * constraintOffset, node.direction, "grey")}
+                    {renderILSuccOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
     } else if (iLPConstraint != null) {
         // predecessor cons is set
         result = <g>{renderILPredOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
