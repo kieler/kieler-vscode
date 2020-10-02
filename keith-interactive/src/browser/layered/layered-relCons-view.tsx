@@ -15,12 +15,19 @@ import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
 import { Direction, KNode, RelCons } from '../constraint-classes';
 import { filterKNodes } from '../helper-methods';
-import { getLayers } from './constraint-utils';
+import { getLayerOfNode, getLayers } from './constraint-utils';
 import { determineCons } from './relativeConstraint-utils';
 import { renderDirArrow } from '../interactive-view-objects';
+import { renderPositions } from './layered-interactive-view';
+
+
+const verticalArrowXOffset = -2.5
+const verticalArrowYOffset = -5
+const horizontalArrowXOffset = -0.3
+const horizontalArrowYOffset = -0.7
 
 /**
- * Highlights the moved and target node visualize the constraint that will be set.
+ * Highlights the moved and target node & visualize the constraint that will be set.
  * @param root Root node of the graph
  * @param selNode selected node
  */
@@ -32,18 +39,21 @@ export function renderRelCons(root: KNode, selNode: KNode): VNode {
     let result = undefined
     let cons = determineCons(nodes, layers, selNode)
 
-    let x = selNode.size.width
-    let y = 0
-    const constraintOffset = 2
+    // relative constraint icon is shown left above the node
+    const x = 0
+    const y = 0
+    const constraintOffset = 5
+
     switch (cons.relCons) {
+        // must be shown at a place that doesnt cause overlap with the visualization of set constraints
         case RelCons.IN_LAYER_SUCC_OF:
-            result = renderILSuccOf(x + constraintOffset, y - constraintOffset, direction)
+            result = renderILSuccOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
             break;
         case RelCons.IN_LAYER_PRED_OF:
-            result = renderILPredOf(x + constraintOffset, y - constraintOffset, direction)
+            result = renderILPredOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
@@ -54,25 +64,20 @@ export function renderRelCons(root: KNode, selNode: KNode): VNode {
     return <g>{result}</g>
 }
 
-const verticalArrowXOffset = -2.5
-const verticalArrowYOffset = -5
-const horizontalArrowXOffset = -0.3
-const horizontalArrowYOffset = -0.7
-
 /**
  * Renders an arrow indicating the in-layer-successor-of constraint
  * @param x
  * @param y
  * @param direction layout direction of the graph
  */
-function renderILSuccOf(x: number, y: number, direction: Direction): VNode {
+function renderILSuccOf(x: number, y: number, direction: Direction, color: string): VNode {
     const vertical = !(direction === Direction.UNDEFINED || direction === Direction.RIGHT || direction === Direction.LEFT)
     const xOffset = vertical ? verticalArrowXOffset : horizontalArrowXOffset
     const yOffset = vertical ? verticalArrowYOffset : horizontalArrowYOffset
     const dir = vertical ? Direction.LEFT : Direction.UP
     // @ts-ignore
     return <g>
-        {renderDirArrow(x + xOffset, y + yOffset, dir, "red")}
+        {renderDirArrow(x + xOffset, y + yOffset, dir, color)}
     </g>
 }
 
@@ -82,13 +87,56 @@ function renderILSuccOf(x: number, y: number, direction: Direction): VNode {
  * @param y
  * @param direction layout direction of the graph
  */
-function renderILPredOf(x: number, y: number, direction: Direction): VNode {
+function renderILPredOf(x: number, y: number, direction: Direction, color: string): VNode {
     const vertical = !(direction === Direction.UNDEFINED || direction === Direction.RIGHT || direction === Direction.LEFT)
     const xOffset = vertical ? verticalArrowXOffset : horizontalArrowXOffset
     const yOffset = vertical ? verticalArrowYOffset : horizontalArrowYOffset
     const dir = vertical ? Direction.RIGHT : Direction.DOWN
     // @ts-ignore
     return <g>
-        {renderDirArrow(x + xOffset, y + yOffset, dir, "red")}
+        {renderDirArrow(x + xOffset, y + yOffset, dir, color)}
     </g>
+}
+
+/**
+ * Render something to indicate the constraint set on a node.
+ * @param node Node with a constraint
+ */
+export function renderSetRelConstraint(node: KNode) {
+    let result = <g></g>
+    const iLPConstraint = node.properties.iLPredOfConstraint
+    const iLSConstraint = node.properties.iLSuccOfConstraint
+
+    // relative constraint icon is shown to the right of the node
+    const x = node.size.width
+    const y = 0
+    const constraintOffset = 2
+
+    if (iLPConstraint != null && iLSConstraint != null) {
+        // both rel cons are set
+        result = <g>{renderILPredOf(x + constraintOffset, y + 2 * constraintOffset, node.direction, "grey")}
+                    {renderILSuccOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
+    } else if (iLPConstraint != null) {
+        // predecessor cons is set
+        result = <g>{renderILPredOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
+    } else if (iLSConstraint != null) {
+        // successor cons is set
+        result = <g>{renderILSuccOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
+    }
+    // @ts-ignore
+    return result
+}
+
+
+/**
+ * Creates circles that indicate the available positions.
+ * The position the node would be set to if it released is indicated by a filled circle.
+ * @param nodes All nodes of the graph.
+ * @param selNode Node that is currently selected.
+ */
+export function renderPosIndicators(nodes: KNode[], selNode: KNode): VNode {
+    const direction = selNode.direction
+    const layers = getLayers(nodes, direction)
+    const current = getLayerOfNode(selNode, nodes, layers, direction)
+    return renderPositions(current, nodes, layers, true, direction, true)
 }

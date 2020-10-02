@@ -77,6 +77,8 @@ export class NodeProperties {
     layerId: number
     positionConstraint: number
     positionId: number
+    iLPredOfConstraint: string
+    iLSuccOfConstraint: string
 }
 
 /**

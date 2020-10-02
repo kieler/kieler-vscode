@@ -13,11 +13,12 @@
 /** @jsx svg */
 import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
-import { Direction, KNode } from '../constraint-classes';
+import { Direction, KNode, RelCons } from '../constraint-classes';
 import { getSelectedNode } from '../helper-methods';
 import { createRect, createVerticalLine, renderArrow, renderCircle, renderLock } from '../interactive-view-objects';
 import { Layer } from './constraint-types';
 import { getLayerOfNode, getLayers, getNodesOfLayer, getPositionInLayer, isLayerForbidden, shouldOnlyLCBeSet } from './constraint-utils';
+import { determineCons } from './relativeConstraint-utils';
 
 
 /**
@@ -72,7 +73,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
         // Positions should only be rendered if a position constraint will be set
         if (!onlyLC) {
             // @ts-ignore
-            return <g>{result}{renderPositions(currentLayer, nodes, layers, forbidden, direction)}</g>
+            return <g>{result}{renderPositions(currentLayer, nodes, layers, forbidden, direction, false)}</g>
         } else {
             // Add available positions
     // @ts-ignore
@@ -91,7 +92,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
  * @param layers All layers in the graph at the hierarchical level.
  * @param forbidden Determines whether the current layer is forbidden.
  */
-export function renderPositions(current: number, nodes: KNode[], layers: Layer[], forbidden: boolean, direction: Direction): VNode {
+export function renderPositions(current: number, nodes: KNode[], layers: Layer[], forbidden: boolean, direction: Direction, relCons: boolean): VNode {
     let layerNodes: KNode[] = getNodesOfLayer(current, nodes)
 
     // get the selected node
@@ -104,50 +105,70 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
     // position of selected node
     let curPos = getPositionInLayer(layerNodes, target, direction)
 
+    // determine reative constraint
+    let cons = undefined
+    if (relCons) {
+        cons = determineCons(nodes, layers, target)
+    }
+
     layerNodes.sort((a, b) => a.properties.positionId - b.properties.positionId)
     if (layerNodes.length > 0) {
         let result = <g></g>
-        // mid of the current layer
-
         let shift = 1
         let x = 0, y = 0;
         // calculate positions between nodes
         for (let i = 0; i < layerNodes.length - 1; i++) {
+            let fill = curPos === i + shift
             let node = layerNodes[i]
-            // at the old position of the selected node should not be a circle
-            if (!node.selected && !layerNodes[i + 1].selected) {
+            // coordinates for both inspected nodes
+            let nodeY = node.position.y
+            let nodeX = node.position.x
+            let nextNodeY = layerNodes[i + 1].position.y
+            let nextNodeX = layerNodes[i + 1].position.x
+            if (node.selected) {
+                nodeY = node.shadowY
+                nodeX = node.shadowX
+                shift = 0
+                fill = cons !== undefined && cons.node.id === layerNodes[i + 1].id && cons.relCons === RelCons.IN_LAYER_PRED_OF
+            } else if (layerNodes[i + 1].selected) {
+                nextNodeY = layerNodes[i + 1].shadowY
+                nextNodeX = layerNodes[i + 1].shadowX
+                fill = cons !== undefined && cons.node.id === node.id && cons.relCons === RelCons.IN_LAYER_SUCC_OF
+            }
+            // at the old position of the selected node should only be a circle if a rel cons will be set
+            if (relCons || (!node.selected && !layerNodes[i + 1].selected)) {
                 // calculate y coordinate of the mid between the two nodes
                 switch (direction) {
                     case Direction.UNDEFINED: case Direction.RIGHT: {
                         x = layers[current].mid
-                        let topY = node.position.y + node.size.height
-                        let botY = layerNodes[i + 1].position.y
+                        let topY = nodeY + node.size.height
+                        let botY = nextNodeY
                         y = topY + (botY - topY) / 2
                         break;
                     }
                     case Direction.LEFT: {
                         x = layers[current].mid
-                        let topY = node.position.y + node.size.height
-                        let botY = layerNodes[i + 1].position.y
+                        let topY = nodeY + node.size.height
+                        let botY = nextNodeY
                         y = topY + (botY - topY) / 2
                         break;
                     }
                     case Direction.DOWN: {
                         y = layers[current].mid
-                        let topX = node.position.x + node.size.width
-                        let botX = layerNodes[i + 1].position.x
+                        let topX = nodeX + node.size.width
+                        let botX = nextNodeX
                         x = topX + (botX - topX) / 2
                         break;
                     }
                     case Direction.UP: {
                         y = layers[current].mid
-                        let topX = node.position.x + node.size.width
-                        let botX = layerNodes[i + 1].position.x
+                        let topX = nodeX + node.size.width
+                        let botX = nextNodeX
                         x = topX + (botX - topX) / 2
                         break;
                     }
                 }
-                result = <g>{result}{renderCircle(curPos === i + shift, x, y, forbidden)}</g>
+                result = <g>{result}{renderCircle(fill, x, y, forbidden)}</g>
             } else {
                 shift = 0
             }

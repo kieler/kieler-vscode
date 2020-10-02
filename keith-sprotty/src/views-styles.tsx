@@ -542,7 +542,7 @@ export function getSvgColorStyles(styles: KStyles, context: SKGraphRenderingCont
 
     if (parent instanceof SKNode && parent.highlight) {
         return {
-            foreground: {color: 'red', opacity: '255'},
+            foreground: {color: 'indianred', opacity: '255'},
             background: background === undefined ? DEFAULT_FILL : background,
             opacity: parent.opacity
         }
