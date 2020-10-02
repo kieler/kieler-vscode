@@ -46,13 +46,13 @@ export function renderRelCons(root: KNode, selNode: KNode): VNode {
     switch (cons.relCons) {
         // must be shown at a place that doesnt cause overlap with the visualization of set constraints
         case RelCons.IN_LAYER_SUCC_OF:
-            result = renderILSuccOf(x - 2 * constraintOffset, y + constraintOffset, direction, "red")
+            result = renderILSuccOf(x - 2 * constraintOffset, y + constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
             break;
         case RelCons.IN_LAYER_PRED_OF:
-            result = renderILPredOf(x - 2 * constraintOffset, y + constraintOffset, direction, "red")
+            result = renderILPredOf(x - 2 * constraintOffset, y + constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
