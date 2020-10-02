@@ -25,11 +25,6 @@ const verticalArrowYOffset = -5
 const horizontalArrowXOffset = -0.3
 const horizontalArrowYOffset = -0.7
 
-// relative constraint icon is shown left above the node
-const x = 0
-const y = 0
-const constraintOffset = 5
-
 /**
  * Highlights the moved and target node & visualize the constraint that will be set.
  * @param root Root node of the graph
@@ -43,16 +38,21 @@ export function renderRelCons(root: KNode, selNode: KNode): VNode {
     let result = undefined
     let cons = determineCons(nodes, layers, selNode)
 
+    // relative constraint icon is shown left above the node
+    const x = 0
+    const y = 0
+    const constraintOffset = 5
+
     switch (cons.relCons) {
         // must be shown at a place that doesnt cause overlap with the visualization of set constraints
         case RelCons.IN_LAYER_SUCC_OF:
-            result = renderILSuccOf(x - 2 * constraintOffset, y + constraintOffset, direction, "indianred")
+            result = renderILSuccOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
             break;
         case RelCons.IN_LAYER_PRED_OF:
-            result = renderILPredOf(x - 2 * constraintOffset, y + constraintOffset, direction, "indianred")
+            result = renderILPredOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
@@ -105,14 +105,20 @@ export function renderSetRelConstraint(node: KNode) {
     let result = <g></g>
     const iLPConstraint = node.properties.iLPredOfConstraint
     const iLSConstraint = node.properties.iLSuccOfConstraint
+
+    // relative constraint icon is shown to the right of the node
+    const x = node.size.width
+    const y = 0
+    const constraintOffset = 2
+
     if (iLPConstraint != null && iLSConstraint != null) {
         // TODO: arrows should not overlap. Maybe use another arrow
     } else if (iLPConstraint != null) {
         // predecessor cons is set
-        result = <g>{renderILPredOf(x - constraintOffset, y - constraintOffset, node.direction, "grey")}</g>
+        result = <g>{renderILPredOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
     } else if (iLSConstraint != null) {
         // successor cons is set
-        result = <g>{renderILSuccOf(x - constraintOffset, y - constraintOffset, node.direction, "grey")}</g>
+        result = <g>{renderILSuccOf(x + constraintOffset, y + constraintOffset, node.direction, "grey")}</g>
     }
     // @ts-ignore
     return result
