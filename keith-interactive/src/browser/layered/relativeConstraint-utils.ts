@@ -8,6 +8,8 @@ import { getLayerOfNode, getNodesOfLayer, getPositionInLayer } from "./constrain
 
 /**
  * Sets properties of the target accordingly to the position the target is moved to
+ * @param nodes All nodes of the graph
+ * @param layers Layers of the graph
  * @param target SModelElement that is moved
  */
 export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: SModelElement): Action {
@@ -31,7 +33,12 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
 
 }
 
-
+/**
+ * Determines the relative constraint that would be set and the target of the constraint.
+ * @param nodes All nodes of the graph
+ * @param layers Layer of the graph
+ * @param target Node that is moved
+ */
 export function determineCons(nodes: KNode[], layers: Layer[], target: SModelElement): RelConsData {
     const targetNode: KNode = target as KNode
     const direction = targetNode.direction
@@ -136,4 +143,34 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
     } else {
         return {relCons: RelCons.UNDEFINED, node: targetNode, target: targetNode}
     }
+}
+
+/**
+ * Determines the nodes that are connected to {@code node} by relative constraints.
+ * The nodes are not sorted.
+ * @param node One node of the chain
+ * @param layerNodes Nodes that are in the same layer as {@code node}
+ */
+export function getChain(node: KNode, layerNodes: KNode[]) {
+    const pos = layerNodes.indexOf(node)
+    let chainNodes: KNode[] = []
+    chainNodes[0] = node
+    // from node to the start
+    for (let i = pos - 1; i >= 0; i--) {
+        if (layerNodes[i].properties.iLPredOfConstraint != null || layerNodes[i + 1].properties.iLSuccOfConstraint != null) {
+            chainNodes[chainNodes.length] = layerNodes[i]
+        } else {
+            i = -1
+        }
+    }
+    // from node to the end
+    for (let i = pos + 1; i < layerNodes.length; i++) {
+        if (layerNodes[i].properties.iLSuccOfConstraint != null || layerNodes[i - 1].properties.iLPredOfConstraint != null) {
+            chainNodes[chainNodes.length] = layerNodes[i]
+        } else {
+            i = layerNodes.length
+        }
+    }
+
+    return chainNodes
 }
