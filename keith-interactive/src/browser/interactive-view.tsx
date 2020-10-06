@@ -14,21 +14,29 @@
 import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
 import { KNode } from './constraint-classes';
-import { filterKNodes } from './helper-methods';
+import { filterKNodes, getSelectedNode } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
 import { isUndefined } from 'util';
+import { renderPosIndicators, renderSetRelConstraint } from './layered/layered-relCons-view';
 
 /**
  * Visualize the layers and available positions in the graph
  * @param root Root of the hierarchical level for which the layers and positions should be visualized.
  */
-export function renderInteractiveLayout(root: KNode): VNode {
+export function renderInteractiveLayout(root: KNode, relCons: boolean): VNode {
     // Filter KNodes
     let nodes = filterKNodes(root.children)
     let result = undefined
     if (isUndefined(root.properties.algorithm) || root.properties.algorithm.endsWith('layered')) {
-        result = renderHierarchyLevelLayered(nodes, root)
+        if (relCons) {
+            let selNode = getSelectedNode(nodes)
+            if (!isUndefined(selNode)) {
+                result = renderPosIndicators(nodes, selNode)
+            }
+        } else {
+            result = renderHierarchyLevelLayered(nodes, root)
+        }
     } else if (root.properties.algorithm.endsWith('rectpacking')) {
         result = renderHierarchyLevelRectPacking(nodes, root)
     } else {
@@ -48,7 +56,7 @@ export function renderConstraints(node: KNode): VNode {
     let result = <g></g>
     const algorithm = (node.parent as KNode).properties.algorithm
     if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
-        result = renderLayeredConstraint(node)
+        result = <g>{renderLayeredConstraint(node)}{renderSetRelConstraint(node)}</g>
     } else if (algorithm.endsWith( 'rectpacking')) {
         if (node.properties.desiredPosition !== -1) {
             result = renderRectPackConstraint(node)

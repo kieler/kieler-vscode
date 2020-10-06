@@ -24,6 +24,7 @@ import { SKEdge, SKLabel, SKNode, SKPort } from './skgraph-models';
 import { SKGraphRenderingContext } from './views-common';
 import { getJunctionPointRenderings, getRendering } from './views-rendering';
 import { KStyles } from './views-styles';
+import { renderRelCons } from '@kieler/keith-interactive/lib/layered/layered-relCons-view';
 
 /**
  * IView component that turns an SGraph element and its children into a tree of virtual DOM elements.
@@ -64,11 +65,16 @@ export class KNodeView implements IView {
         if (isShadow) {
             // Render shadow of the node
             shadow = getRendering(node.data, node, new KStyles, ctx, this.mListener)
+
+            if (this.mListener.relCons) {
+                // render visualization for relative constraints
+                result = <g>{result}{renderRelCons(node.parent as SKNode, node)}</g>
+            }
         }
         if (isChildSelected(node as SKNode)) {
             if (((node as SKNode).properties.interactiveLayout) && this.mListener.hasDragged) {
-                // Render the objects indicating the layer and positions in the graph
-                nodes = renderInteractiveLayout(node as SKNode)
+                // Render the visualiztaion for interactive layout
+                nodes = renderInteractiveLayout(node as SKNode, this.mListener.relCons)
             }
         }
 
@@ -107,6 +113,7 @@ export class KNodeView implements IView {
             rendering = getRendering(node.data, node, new KStyles, ctx, this.mListener)
         }
         node.shadow = isShadow
+        node.highlight = false
 
         if (node.id === '$root') {
             // The root node should not be rendered, only its children should.
