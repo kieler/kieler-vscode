@@ -1,7 +1,7 @@
 import { isUndefined } from "@theia/plugin-ext/lib/common/types"
 import { Action, SModelElement } from "sprotty"
 import { RefreshDiagramAction } from "../actions"
-import { Direction, KNode, RelConsData, RelCons } from "../constraint-classes"
+import { Direction, KNode, RelConsData, RelCons, KEdge } from "../constraint-classes"
 import { SetILPredOfConstraintAction, SetILSuccOfConstraintAction } from "./actions"
 import { Layer } from "./constraint-types"
 import { getLayerOfNode, getNodesOfLayer, getPositionInLayer } from "./constraint-utils"
@@ -137,12 +137,16 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
     }
 
     if (iLSuccOf) {
-        return {relCons: RelCons.IN_LAYER_SUCC_OF, node: pred, target: targetNode}
+        if (!forbiddenRC(targetNode, pred)) {
+            return {relCons: RelCons.IN_LAYER_SUCC_OF, node: pred, target: targetNode}
+        }
     } else if (iLPredOf) {
-        return {relCons: RelCons.IN_LAYER_PRED_OF, node: succ, target: targetNode}
-    } else {
-        return {relCons: RelCons.UNDEFINED, node: targetNode, target: targetNode}
+        if (!forbiddenRC(targetNode, succ)) {
+            return {relCons: RelCons.IN_LAYER_PRED_OF, node: succ, target: targetNode}
+        }
     }
+
+    return {relCons: RelCons.UNDEFINED, node: targetNode, target: targetNode}
 }
 
 /**
@@ -173,4 +177,32 @@ export function getChain(node: KNode, layerNodes: KNode[]) {
     }
 
     return chainNodes
+}
+
+/**
+ * Determines whether a rel cons can be set between {@code node1} and {@code node2}
+ * @param node1 One of the nodes
+ * @param node2 The other one of the nodes
+ */
+function forbiddenRC(node1: KNode, node2: KNode) {
+    let connectedNodes: KNode[] = []
+    let edges = node1.outgoingEdges as any as KEdge[]
+    for (let edge of edges) {
+        connectedNodes[connectedNodes.length] = edge.target as KNode
+    }
+    edges = node1.incomingEdges as any as KEdge[]
+    for (let edge of edges) {
+        connectedNodes[connectedNodes.length] = edge.source as KNode
+    }
+
+    // check whether the other node is connnected to the first one
+    for (let node of connectedNodes) {
+        if (node.id === node2.id) {
+            // rel cons are forbidden for the given nodes
+            return true
+        }
+    }
+
+    // rel cons are valid for the given nodes
+    return false
 }
