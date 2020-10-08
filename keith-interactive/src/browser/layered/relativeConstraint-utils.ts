@@ -184,7 +184,7 @@ export function getChain(node: KNode, layerNodes: KNode[]) {
  * @param node1 One of the nodes
  * @param node2 The other one of the nodes
  */
-function forbiddenRC(node1: KNode, node2: KNode) {
+export function forbiddenRC(node1: KNode, node2: KNode) {
     let connectedNodes: KNode[] = []
     let edges = node1.outgoingEdges as any as KEdge[]
     for (let edge of edges) {
