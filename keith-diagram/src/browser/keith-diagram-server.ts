@@ -14,7 +14,7 @@
 import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import {
     DeleteLayerConstraintAction, DeletePositionConstraintAction, DeleteStaticConstraintAction,
-    SetPositionConstraintAction, SetLayerConstraintAction, SetStaticConstraintAction, SetILPredOfConstraintAction, SetILSuccOfConstraintAction
+    SetPositionConstraintAction, SetLayerConstraintAction, SetStaticConstraintAction, SetILPredOfConstraintAction, SetILSuccOfConstraintAction, DeleteRelativeConstraintsAction, DeleteILPredOfConstraintAction, DeleteILSuccOfConstraintAction
 } from '@kieler/keith-interactive/lib/layered/actions';
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
@@ -187,6 +187,9 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(DeleteLayerConstraintAction.KIND, this)
         registry.register(DeletePositionConstraintAction.KIND, this)
         registry.register(DeleteStaticConstraintAction.KIND, this)
+        registry.register(DeleteRelativeConstraintsAction.KIND, this)
+        registry.register(DeleteILPredOfConstraintAction.KIND, this)
+        registry.register(DeleteILSuccOfConstraintAction.KIND, this)
         // registry.register(KeithUpdateModelAction.KIND, this)
         registry.register(PerformActionAction.KIND, this)
         registry.register(RectPackSetPositionConstraintAction.KIND, this)
