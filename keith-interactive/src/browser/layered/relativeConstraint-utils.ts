@@ -156,6 +156,7 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
  * @param layerNodes Nodes that are in the same layer as {@code node}
  */
 export function getChain(node: KNode, layerNodes: KNode[]) {
+    layerNodes.sort((a, b) => a.properties.positionId - b.properties.positionId)
     const pos = layerNodes.indexOf(node)
     let chainNodes: KNode[] = []
     chainNodes[0] = node
