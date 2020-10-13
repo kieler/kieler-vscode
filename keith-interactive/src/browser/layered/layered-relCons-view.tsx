@@ -13,10 +13,10 @@
 /** @jsx svg */
 import { svg } from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
-import { Direction, KNode, RelCons } from '../constraint-classes';
+import { Direction, KEdge, KNode, RelCons } from '../constraint-classes';
 import { filterKNodes } from '../helper-methods';
-import { getLayerOfNode, getLayers } from './constraint-utils';
-import { determineCons } from './relativeConstraint-utils';
+import { getLayerOfNode, getLayers, getNodesOfLayer } from './constraint-utils';
+import { determineCons, getChain } from './relativeConstraint-utils';
 import { renderDirArrow } from '../interactive-view-objects';
 import { renderPositions } from './layered-interactive-view';
 
@@ -131,4 +131,36 @@ export function renderPosIndicators(nodes: KNode[], selNode: KNode): VNode {
     const layers = getLayers(nodes, direction)
     const current = getLayerOfNode(selNode, nodes, layers, direction)
     return renderPositions(current, nodes, layers, true, direction, true)
+}
+
+/**
+ * Sets the forbidden property of the nodes that can not have a rel cons to the selected node.
+ * @param nodes All nodes of the graph.
+ * @param selNode Node that is currently selected.
+ */
+export function forbiddenNodes(nodes: KNode[], selNode: KNode) {
+    const layerOfTarget = selNode.properties.layerId
+    let layerNodes = getNodesOfLayer(layerOfTarget, nodes)
+    let chainNodes = getChain(selNode, layerNodes)
+    // collect the connected nodes
+    let connectedNodes: KNode[] = []
+    for (let n of chainNodes) {
+        let edges = n.outgoingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.target as KNode
+        }
+        edges = n.incomingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.source as KNode
+        }
+    }
+
+    // conncted nodes and the ones in their chain are forbidden
+    for (let n of connectedNodes) {
+        layerNodes = getNodesOfLayer(n.properties.layerId, nodes)
+        chainNodes = getChain(n, layerNodes)
+        for (let cN of chainNodes) {
+            cN.forbidden = true
+        }
+    }
 }

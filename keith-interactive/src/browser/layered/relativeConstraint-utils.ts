@@ -2,6 +2,7 @@ import { isUndefined } from "@theia/plugin-ext/lib/common/types"
 import { Action, SModelElement } from "sprotty"
 import { RefreshDiagramAction } from "../actions"
 import { Direction, KNode, RelConsData, RelCons, KEdge } from "../constraint-classes"
+import { filterKNodes } from "../helper-methods"
 import { SetILPredOfConstraintAction, SetILSuccOfConstraintAction } from "./actions"
 import { Layer } from "./constraint-types"
 import { getLayerOfNode, getNodesOfLayer, getPositionInLayer } from "./constraint-utils"
@@ -186,24 +187,33 @@ export function getChain(node: KNode, layerNodes: KNode[]) {
  * @param node2 The other one of the nodes
  */
 export function forbiddenRC(node1: KNode, node2: KNode) {
+    // rel cons can not be set if the given nodes or nodes in their chains are addjacent
+    let layerNodes = getNodesOfLayer(node1.properties.layerId, filterKNodes(node1.parent.children as KNode []))
+    let chainNodes = getChain(node1, layerNodes)
+    // collect the connected nodes
     let connectedNodes: KNode[] = []
-    let edges = node1.outgoingEdges as any as KEdge[]
-    for (let edge of edges) {
-        connectedNodes[connectedNodes.length] = edge.target as KNode
-    }
-    edges = node1.incomingEdges as any as KEdge[]
-    for (let edge of edges) {
-        connectedNodes[connectedNodes.length] = edge.source as KNode
+    for (let n of chainNodes) {
+        let edges = n.outgoingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.target as KNode
+        }
+        edges = n.incomingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.source as KNode
+        }
     }
 
-    // check whether the other node is connnected to the first one
+    layerNodes = getNodesOfLayer(node2.properties.layerId, filterKNodes(node2.parent.children as KNode []))
+    chainNodes = getChain(node2, layerNodes)
+
+    // check the connected nodes for adjacent nodes
     for (let node of connectedNodes) {
-        if (node.id === node2.id) {
-            // rel cons are forbidden for the given nodes
+        if (chainNodes.includes(node)) {
+            // rel cons is forbidden for the given node
             return true
         }
     }
 
-    // rel cons are valid for the given nodes
+    // layer is valid for the given node
     return false
 }
