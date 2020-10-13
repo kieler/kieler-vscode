@@ -39,21 +39,13 @@ export function renderRelCons(root: KNode, selNode: KNode): VNode {
     let result = undefined
     let cons = determineCons(nodes, layers, selNode)
 
-    // relative constraint icon is shown left above the node
-    const x = 0
-    const y = 0
-    const constraintOffset = 5
-
     switch (cons.relCons) {
-        // must be shown at a place that doesnt cause overlap with the visualization of set constraints
         case RelCons.IN_LAYER_SUCC_OF:
-            result = renderILSuccOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
             break;
         case RelCons.IN_LAYER_PRED_OF:
-            result = renderILPredOf(x - constraintOffset, y - constraintOffset, direction, "indianred")
             // highlight nodes
             cons.target.highlight = true
             cons.node.highlight = true
