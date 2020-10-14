@@ -103,3 +103,38 @@ export class SetILSuccOfConstraintAction implements Action {
     constructor(public readonly constraint: ILSuccOfConstraint) {
     }
 }
+
+/**
+ * Sent from client to server to delete relative constraints on a node.
+ */
+export class DeleteRelativeConstraintsAction implements Action {
+    static readonly KIND: string = 'deleteRelativeConstraints'
+    readonly kind = DeleteRelativeConstraintsAction.KIND
+
+    constructor(public readonly constraint: DeleteConstraint) {
+    }
+}
+
+/**
+ * Sent from client to server to delete iLSuccOf constraint on a node.
+ * Currently unused.
+ */
+export class DeleteILSuccOfConstraintAction implements Action {
+    static readonly KIND: string = 'deleteILSuccOfConstraint'
+    readonly kind = DeleteILSuccOfConstraintAction.KIND
+
+    constructor(public readonly constraint: DeleteConstraint) {
+    }
+}
+
+/**
+ * Sent from client to server to delete iLPredOf constraint on a node.
+ * Currently unused.
+ */
+export class DeleteILPredOfConstraintAction implements Action {
+    static readonly KIND: string = 'deleteILPredOfConstraint'
+    readonly kind = DeleteILPredOfConstraintAction.KIND
+
+    constructor(public readonly constraint: DeleteConstraint) {
+    }
+}

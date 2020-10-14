@@ -18,7 +18,7 @@ import { getSelectedNode } from '../helper-methods';
 import { createRect, createVerticalLine, renderArrow, renderCircle, renderLock } from '../interactive-view-objects';
 import { Layer } from './constraint-types';
 import { getLayerOfNode, getLayers, getNodesOfLayer, getPositionInLayer, isLayerForbidden, shouldOnlyLCBeSet } from './constraint-utils';
-import { determineCons } from './relativeConstraint-utils';
+import { determineCons, forbiddenRC } from './relativeConstraint-utils';
 
 
 /**
@@ -118,7 +118,8 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
         let x = 0, y = 0;
         // calculate positions between nodes
         for (let i = 0; i < layerNodes.length - 1; i++) {
-            let fill = curPos === i + shift
+            // cons is undefined if target is an adjacent node. If this is the case, the circle should not be filled
+            let fill = cons !== undefined ? cons.relCons !== RelCons.UNDEFINED && curPos === i + shift : curPos === i + shift
             let node = layerNodes[i]
             // coordinates for both inspected nodes
             let nodeY = node.position.y
@@ -176,7 +177,7 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
 
         // position above the first node is available if the first node is not the selected one
         let first = layerNodes[0]
-        if (!first.selected) {
+        if (!first.selected && (cons === undefined || !forbiddenRC(first, target))) {
             switch (direction) {
                 case Direction.UNDEFINED: case Direction.RIGHT: {
                     x = layers[current].mid
@@ -203,7 +204,7 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
         }
         // position below the last node is available if the last node is not the selected one
         let last = layerNodes[layerNodes.length - 1]
-        if (!last.selected) {
+        if (!last.selected && (cons === undefined || !forbiddenRC(last, target))) {
             switch (direction) {
                 case Direction.UNDEFINED: case Direction.RIGHT: {
                     x = layers[current].mid

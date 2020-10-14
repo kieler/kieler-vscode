@@ -82,6 +82,9 @@ export class KNodeView implements IView {
         node.shadow = false
         let rendering = undefined
         if (!this.mListener.hasDragged || isChildSelected(node.parent as SKNode)) {
+            if (node.forbidden) {
+                node.opacity = 0.1
+            }
             // Node should only be visible if the node is in the same hierarchical level as the moved node or no node is moved at all
             rendering = getRendering(node.data, node, new KStyles, ctx, this.mListener)
 

@@ -52,6 +52,7 @@ export class KNode extends RectangularNode implements KGraphElement {
     shadowY: number
 
     highlight: boolean
+    forbidden: boolean
 }
 
 export enum Direction {

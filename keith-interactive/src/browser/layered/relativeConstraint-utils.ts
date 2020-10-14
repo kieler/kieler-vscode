@@ -1,13 +1,16 @@
 import { isUndefined } from "@theia/plugin-ext/lib/common/types"
 import { Action, SModelElement } from "sprotty"
 import { RefreshDiagramAction } from "../actions"
-import { Direction, KNode, RelConsData, RelCons } from "../constraint-classes"
+import { Direction, KNode, RelConsData, RelCons, KEdge } from "../constraint-classes"
+import { filterKNodes } from "../helper-methods"
 import { SetILPredOfConstraintAction, SetILSuccOfConstraintAction } from "./actions"
 import { Layer } from "./constraint-types"
 import { getLayerOfNode, getNodesOfLayer, getPositionInLayer } from "./constraint-utils"
 
 /**
  * Sets properties of the target accordingly to the position the target is moved to
+ * @param nodes All nodes of the graph
+ * @param layers Layers of the graph
  * @param target SModelElement that is moved
  */
 export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: SModelElement): Action {
@@ -31,7 +34,12 @@ export function setRelativeConstraint(nodes: KNode[], layers: Layer[], target: S
 
 }
 
-
+/**
+ * Determines the relative constraint that would be set and the target of the constraint.
+ * @param nodes All nodes of the graph
+ * @param layers Layer of the graph
+ * @param target Node that is moved
+ */
 export function determineCons(nodes: KNode[], layers: Layer[], target: SModelElement): RelConsData {
     const targetNode: KNode = target as KNode
     const direction = targetNode.direction
@@ -130,10 +138,82 @@ export function determineCons(nodes: KNode[], layers: Layer[], target: SModelEle
     }
 
     if (iLSuccOf) {
-        return {relCons: RelCons.IN_LAYER_SUCC_OF, node: pred, target: targetNode}
+        if (!forbiddenRC(targetNode, pred)) {
+            return {relCons: RelCons.IN_LAYER_SUCC_OF, node: pred, target: targetNode}
+        }
     } else if (iLPredOf) {
-        return {relCons: RelCons.IN_LAYER_PRED_OF, node: succ, target: targetNode}
-    } else {
-        return {relCons: RelCons.UNDEFINED, node: targetNode, target: targetNode}
+        if (!forbiddenRC(targetNode, succ)) {
+            return {relCons: RelCons.IN_LAYER_PRED_OF, node: succ, target: targetNode}
+        }
     }
+
+    return {relCons: RelCons.UNDEFINED, node: targetNode, target: targetNode}
+}
+
+/**
+ * Determines the nodes that are connected to {@code node} by relative constraints.
+ * The nodes are not sorted.
+ * @param node One node of the chain
+ * @param layerNodes Nodes that are in the same layer as {@code node}
+ */
+export function getChain(node: KNode, layerNodes: KNode[]) {
+    layerNodes.sort((a, b) => a.properties.positionId - b.properties.positionId)
+    const pos = layerNodes.indexOf(node)
+    let chainNodes: KNode[] = []
+    chainNodes[0] = node
+    // from node to the start
+    for (let i = pos - 1; i >= 0; i--) {
+        if (layerNodes[i].properties.iLPredOfConstraint != null || layerNodes[i + 1].properties.iLSuccOfConstraint != null) {
+            chainNodes[chainNodes.length] = layerNodes[i]
+        } else {
+            i = -1
+        }
+    }
+    // from node to the end
+    for (let i = pos + 1; i < layerNodes.length; i++) {
+        if (layerNodes[i].properties.iLSuccOfConstraint != null || layerNodes[i - 1].properties.iLPredOfConstraint != null) {
+            chainNodes[chainNodes.length] = layerNodes[i]
+        } else {
+            i = layerNodes.length
+        }
+    }
+
+    return chainNodes
+}
+
+/**
+ * Determines whether a rel cons can be set between {@code node1} and {@code node2}
+ * @param node1 One of the nodes
+ * @param node2 The other one of the nodes
+ */
+export function forbiddenRC(node1: KNode, node2: KNode) {
+    // rel cons can not be set if the given nodes or nodes in their chains are addjacent
+    let layerNodes = getNodesOfLayer(node1.properties.layerId, filterKNodes(node1.parent.children as KNode []))
+    let chainNodes = getChain(node1, layerNodes)
+    // collect the connected nodes
+    let connectedNodes: KNode[] = []
+    for (let n of chainNodes) {
+        let edges = n.outgoingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.target as KNode
+        }
+        edges = n.incomingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.source as KNode
+        }
+    }
+
+    layerNodes = getNodesOfLayer(node2.properties.layerId, filterKNodes(node2.parent.children as KNode []))
+    chainNodes = getChain(node2, layerNodes)
+
+    // check the connected nodes for adjacent nodes
+    for (let node of connectedNodes) {
+        if (chainNodes.includes(node)) {
+            // rel cons is forbidden for the given node
+            return true
+        }
+    }
+
+    // layer is valid for the given node
+    return false
 }

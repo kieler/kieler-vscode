@@ -18,7 +18,7 @@ import { isUndefined } from 'util';
 import { RefreshDiagramAction } from './actions';
 import { KNode } from './constraint-classes';
 import { filterKNodes } from './helper-methods';
-import { DeleteStaticConstraintAction } from './layered/actions';
+import { DeleteRelativeConstraintsAction, DeleteStaticConstraintAction } from './layered/actions';
 import { getLayers, setProperty } from './layered/constraint-utils';
 import { setRelativeConstraint } from './layered/relativeConstraint-utils';
 import { RectPackDeletePositionConstraintAction } from './rect-packing/actions';
@@ -107,7 +107,13 @@ export class KeithInteractiveMouseListener extends MoveMouseListener {
                 this.target.shadowX = this.target.position.x
                 this.target.shadowY = this.target.position.y
                 this.target.shadow = true
-                if (event.altKey) {
+                if (event.altKey && event.shiftKey) {
+                    if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
+                        return [new DeleteRelativeConstraintsAction({
+                            id: this.target.id
+                        })]
+                    }
+                } else if (event.altKey) {
                     if (isUndefined(algorithm) || algorithm.endsWith('layered')) {
                         return [new DeleteStaticConstraintAction({
                             id: this.target.id

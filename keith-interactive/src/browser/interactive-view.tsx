@@ -18,7 +18,7 @@ import { filterKNodes, getSelectedNode } from './helper-methods';
 import { renderHierarchyLevel as renderHierarchyLevelLayered, renderLayeredConstraint } from './layered/layered-interactive-view';
 import { renderHierarchyLevel as renderHierarchyLevelRectPacking, renderRectPackConstraint } from './rect-packing/rect-packing-interactive-view';
 import { isUndefined } from 'util';
-import { renderPosIndicators, renderSetRelConstraint } from './layered/layered-relCons-view';
+import { forbiddenNodes, renderPosIndicators, renderSetRelConstraint } from './layered/layered-relCons-view';
 
 /**
  * Visualize the layers and available positions in the graph
@@ -32,6 +32,7 @@ export function renderInteractiveLayout(root: KNode, relCons: boolean): VNode {
         if (relCons) {
             let selNode = getSelectedNode(nodes)
             if (!isUndefined(selNode)) {
+                forbiddenNodes(nodes, selNode)
                 result = renderPosIndicators(nodes, selNode)
             }
         } else {

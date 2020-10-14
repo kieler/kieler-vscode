@@ -14,8 +14,10 @@
 import { Action, SModelElement } from 'sprotty';
 import { RefreshDiagramAction } from '../actions';
 import { Direction, KEdge, KNode } from '../constraint-classes';
+import { filterKNodes } from '../helper-methods';
 import { SetLayerConstraintAction, SetPositionConstraintAction, SetStaticConstraintAction } from './actions';
 import { Layer } from './constraint-types';
+import { getChain } from './relativeConstraint-utils';
 
 /**
  * Offset for placement on below or above the first/last node in the layer.
@@ -337,15 +339,19 @@ export function getPositionInLayer(nodes: KNode[], target: KNode, direction: Dir
  * @param layer The number indicating the layer.
  */
 export function isLayerForbidden(node: KNode, layer: number): boolean {
+    let layerNodes = getNodesOfLayer(node.properties.layerId, filterKNodes(node.parent.children as KNode []))
+    let chainNodes = getChain(node, layerNodes)
     // collect the connected nodes
     let connectedNodes: KNode[] = []
-    let edges = node.outgoingEdges as any as KEdge[]
-    for (let edge of edges) {
-        connectedNodes[connectedNodes.length] = edge.target as KNode
-    }
-    edges = node.incomingEdges as any as KEdge[]
-    for (let edge of edges) {
-        connectedNodes[connectedNodes.length] = edge.source as KNode
+    for (let n of chainNodes) {
+        let edges = n.outgoingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.target as KNode
+        }
+        edges = n.incomingEdges as any as KEdge[]
+        for (let edge of edges) {
+            connectedNodes[connectedNodes.length] = edge.source as KNode
+        }
     }
 
     // check the connected nodes for layer constraints
