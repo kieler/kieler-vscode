@@ -146,7 +146,7 @@ export class KNodeView implements IView {
                 {ctx.renderChildren(node)}
             </g>
         }
-        result = <g>{result}{nodes}{constraints}</g>
+        result = <g>{nodes}{result}{constraints}</g>
         // Default case. If the children are not already rendered within a KChildArea add the children by default.
         if (!node.areChildrenRendered) {
             result = <g>{result}{ctx.renderChildren(node)}</g>
