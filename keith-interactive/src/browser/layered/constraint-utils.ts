@@ -54,7 +54,6 @@ export function getLayerOfNode(node: KNode, nodes: KNode[], layers: Layer[], dir
         return layers[layers.length - 1].id
     }
 
-    // TODO: in sccharts it must be "+2" instead of "+1"
     // node is in a new last layer
     return layers[layers.length - 1].id + 1
 }

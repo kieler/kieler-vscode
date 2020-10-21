@@ -62,7 +62,6 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
         let lastLayer = layers[layers.length - 1]
         let lastLNodes = getNodesOfLayer(lastLayer.id, nodes)
         if (lastLNodes.length !== 1 || !lastLNodes[0].selected) {
-            // TODO: in sccharts it must be "+2" instead of "+1"
             // Only show the layer if the moved node is not (the only node) in the last layer
             // globalEndCoordinate = lastLayer.end + lastLayer.end - lastLayer.begin
             if (currentLayer === lastLayer.id + 1) {
