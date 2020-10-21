@@ -39,24 +39,23 @@ export function getLayerOfNode(node: KNode, nodes: KNode[], layers: Layer[], dir
         ? node.position.x + node.size.width / 2 : node.position.y + node.size.height / 2
 
     // check for all layers if the node is in the layer
-    for (let i = 0; i < layers.length; i++) {
-        let layer = layers[i]
+    for (let layer of layers) {
         if (coordinateInLayoutDirection < layer.end &&
             (direction === Direction.UNDEFINED || direction === Direction.RIGHT || direction === Direction.DOWN) ||
         coordinateInLayoutDirection > layer.end && (direction === Direction.LEFT || direction === Direction.UP)) {
-            return i
+            return layer.id
         }
     }
 
     // if the node is the only one in the last layer it can not be in a new last layer
-    let lastLNodes = getNodesOfLayer(layers.length - 1, nodes)
+    let lastLNodes = getNodesOfLayer(layers[layers.length - 1].id, nodes)
     if (lastLNodes.length === 1 && lastLNodes[0].selected) {
         // node is in last layer
-        return layers.length - 1
+        return layers[layers.length - 1].id
     }
 
     // node is in a new last layer
-    return layers.length
+    return layers[layers.length - 1].id + 1
 }
 
 /**
@@ -137,14 +136,13 @@ export function getLayers(nodes: KNode[], direction: Direction): Layer[] {
     let topBorder = Number.MAX_VALUE // naming fits to the RIGHT direction (1)
     let bottomBorder = Number.MIN_VALUE
     // calculate bounds of the layers
-    for (let i = 0; i < nodes.length; i++) {
-        let node = nodes[i]
+    for (let node of nodes) {
         if (node.properties.layerId !== layer) {
             // node is in the next layer
-            layers[layer] = new Layer(beginCoordinate, endCoordinate, beginCoordinate + (endCoordinate - beginCoordinate) / 2, direction)
+            layers[layers.length] = new Layer(layer, beginCoordinate, endCoordinate, beginCoordinate + (endCoordinate - beginCoordinate) / 2, direction)
             beginCoordinate = (direction === Direction.UNDEFINED || direction === Direction.RIGHT || direction === Direction.DOWN) ? Number.MAX_VALUE : Number.MIN_VALUE
             endCoordinate = (direction === Direction.UNDEFINED || direction === Direction.RIGHT || direction === Direction.DOWN) ? Number.MIN_VALUE : Number.MAX_VALUE
-            layer++
+            layer = node.properties.layerId
         }
 
         // coordinates of the current node for case 1
@@ -192,7 +190,7 @@ export function getLayers(nodes: KNode[], direction: Direction): Layer[] {
         bottomBorder = Math.max(currentBottomBorder, bottomBorder)
     }
     // add last layer
-    layers[layer] = new Layer(beginCoordinate, endCoordinate, beginCoordinate + ((endCoordinate - beginCoordinate) / 2), direction)
+    layers[layers.length] = new Layer(layer, beginCoordinate, endCoordinate, beginCoordinate + ((endCoordinate - beginCoordinate) / 2), direction)
     // offset above & below the layers
     topBorder = topBorder - PLACEMENT_TOP_BOTTOM_OFFSET
     bottomBorder = bottomBorder + PLACEMENT_TOP_BOTTOM_OFFSET

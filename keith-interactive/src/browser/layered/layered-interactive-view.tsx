@@ -44,14 +44,15 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
         // determines whether only the layer constraint will be set when the node is released
         let onlyLC = shouldOnlyLCBeSet(selNode, layers, direction) && selNode.properties.layerId !== currentLayer
 
+        let curLayer = null
         // create layers
         let result = <g></g>
-        for (let i = 0; i < layers.length; i++) {
-            let layer = layers[i]
-            if (i === currentLayer) {
+        for (let layer of layers) {
+            if (layer.id === currentLayer) {
+                curLayer = layer
                 result = <g>{result}{createRect(layer.begin, layer.end, topBorder, bottomBorder, forbidden, onlyLC, direction)}</g>
             } else {
-                if (!isLayerForbidden(selNode, i)) {
+                if (!isLayerForbidden(selNode, layer.id)) {
                     result = <g>{result}{createVerticalLine(layer.mid, topBorder, bottomBorder, direction)}</g>
                 }
             }
@@ -59,11 +60,11 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
 
         // Show a new empty last layer the node can be moved to
         let lastLayer = layers[layers.length - 1]
-        let lastLNodes = getNodesOfLayer(layers.length - 1, nodes)
+        let lastLNodes = getNodesOfLayer(lastLayer.id, nodes)
         if (lastLNodes.length !== 1 || !lastLNodes[0].selected) {
             // Only show the layer if the moved node is not (the only node) in the last layer
             // globalEndCoordinate = lastLayer.end + lastLayer.end - lastLayer.begin
-            if (currentLayer === layers.length) {
+            if (currentLayer === lastLayer.id + 1) {
                 result = <g>{result}{createRect(lastLayer.end, lastLayer.end + (lastLayer.end - lastLayer.begin), topBorder, bottomBorder, forbidden, onlyLC, direction)}</g>
             } else {
                 result = <g>{result}{createVerticalLine(lastLayer.mid + (lastLayer.end - lastLayer.begin), topBorder, bottomBorder, direction)}</g>
@@ -73,7 +74,7 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
         // Positions should only be rendered if a position constraint will be set
         if (!onlyLC) {
             // @ts-ignore
-            return <g>{result}{renderPositions(currentLayer, nodes, layers, forbidden, direction, false)}</g>
+            return <g>{result}{renderPositions(curLayer, nodes, layers, forbidden, direction, false)}</g>
         } else {
             // Add available positions
     // @ts-ignore
@@ -87,13 +88,16 @@ export function renderHierarchyLevel(nodes: KNode[], root: KNode): VNode {
 /**
  * Creates circles that indicate the available positions.
  * The position the node would be set to if it released is indicated by a filled circle.
- * @param current Number of the layer the selected node is currently in.
+ * @param current The layer the selected node is currently in.
  * @param nodes All nodes in the hierarchical level for which the layers should be visualized.
  * @param layers All layers in the graph at the hierarchical level.
  * @param forbidden Determines whether the current layer is forbidden.
  */
-export function renderPositions(current: number, nodes: KNode[], layers: Layer[], forbidden: boolean, direction: Direction, relCons: boolean): VNode {
-    let layerNodes: KNode[] = getNodesOfLayer(current, nodes)
+export function renderPositions(curLayer: Layer, nodes: KNode[], layers: Layer[], forbidden: boolean, direction: Direction, relCons: boolean): VNode {
+    let layerNodes: KNode[] = []
+    if (curLayer !== null) {
+        layerNodes = getNodesOfLayer(curLayer.id, nodes)
+    }
 
     // get the selected node
     let target = nodes[0]
@@ -141,28 +145,28 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
                 // calculate y coordinate of the mid between the two nodes
                 switch (direction) {
                     case Direction.UNDEFINED: case Direction.RIGHT: {
-                        x = layers[current].mid
+                        x = curLayer.mid
                         let topY = nodeY + node.size.height
                         let botY = nextNodeY
                         y = topY + (botY - topY) / 2
                         break;
                     }
                     case Direction.LEFT: {
-                        x = layers[current].mid
+                        x = curLayer.mid
                         let topY = nodeY + node.size.height
                         let botY = nextNodeY
                         y = topY + (botY - topY) / 2
                         break;
                     }
                     case Direction.DOWN: {
-                        y = layers[current].mid
+                        y = curLayer.mid
                         let topX = nodeX + node.size.width
                         let botX = nextNodeX
                         x = topX + (botX - topX) / 2
                         break;
                     }
                     case Direction.UP: {
-                        y = layers[current].mid
+                        y = curLayer.mid
                         let topX = nodeX + node.size.width
                         let botX = nextNodeX
                         x = topX + (botX - topX) / 2
@@ -180,23 +184,23 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
         if (!first.selected && (cons === undefined || !forbiddenRC(first, target))) {
             switch (direction) {
                 case Direction.UNDEFINED: case Direction.RIGHT: {
-                    x = layers[current].mid
-                    y = layers[current].topBorder + (first.position.y - layers[current].topBorder) / 2
+                    x = curLayer.mid
+                    y = curLayer.topBorder + (first.position.y - curLayer.topBorder) / 2
                     break;
                 }
                 case Direction.LEFT: {
-                    x = layers[current].mid
-                    y = layers[current].topBorder + (first.position.y - layers[current].topBorder) / 2
+                    x = curLayer.mid
+                    y = curLayer.topBorder + (first.position.y - curLayer.topBorder) / 2
                     break;
                 }
                 case Direction.DOWN: {
-                    y = layers[current].mid
-                    x = layers[current].topBorder + (first.position.x - layers[current].topBorder) / 2
+                    y = curLayer.mid
+                    x = curLayer.topBorder + (first.position.x - curLayer.topBorder) / 2
                     break;
                 }
                 case Direction.UP: {
-                    y = layers[current].mid
-                    x = layers[current].topBorder + (first.position.x - layers[current].topBorder) / 2
+                    y = curLayer.mid
+                    x = curLayer.topBorder + (first.position.x - curLayer.topBorder) / 2
                     break;
                 }
             }
@@ -207,23 +211,23 @@ export function renderPositions(current: number, nodes: KNode[], layers: Layer[]
         if (!last.selected && (cons === undefined || !forbiddenRC(last, target))) {
             switch (direction) {
                 case Direction.UNDEFINED: case Direction.RIGHT: {
-                    x = layers[current].mid
-                    y = layers[current].bottomBorder - (layers[current].bottomBorder - (last.position.y + last.size.height)) / 2
+                    x = curLayer.mid
+                    y = curLayer.bottomBorder - (curLayer.bottomBorder - (last.position.y + last.size.height)) / 2
                     break;
                 }
                 case Direction.LEFT: {
-                    x = layers[current].mid
-                    y = layers[current].bottomBorder - (layers[current].bottomBorder - (last.position.y + last.size.height)) / 2
+                    x = curLayer.mid
+                    y = curLayer.bottomBorder - (curLayer.bottomBorder - (last.position.y + last.size.height)) / 2
                     break;
                 }
                 case Direction.DOWN: {
-                    y = layers[current].mid
-                    x = layers[current].bottomBorder - (layers[current].bottomBorder - (last.position.x + last.size.width)) / 2
+                    y = curLayer.mid
+                    x = curLayer.bottomBorder - (curLayer.bottomBorder - (last.position.x + last.size.width)) / 2
                     break;
                 }
                 case Direction.UP: {
-                    y = layers[current].mid
-                    x = layers[current].bottomBorder - (layers[current].bottomBorder - (last.position.x + last.size.width)) / 2
+                    y = curLayer.mid
+                    x = curLayer.bottomBorder - (curLayer.bottomBorder - (last.position.x + last.size.width)) / 2
                     break;
                 }
             }

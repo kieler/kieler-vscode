@@ -130,7 +130,17 @@ export function renderPosIndicators(nodes: KNode[], selNode: KNode): VNode {
     const direction = selNode.direction
     const layers = getLayers(nodes, direction)
     const current = getLayerOfNode(selNode, nodes, layers, direction)
-    return renderPositions(current, nodes, layers, true, direction, true)
+    let curLayer = null
+    for (let layer of layers) {
+        if (layer.id === current) {
+            curLayer = layer
+        }
+    }
+    if (curLayer !== null) {
+        return renderPositions(curLayer, nodes, layers, true, direction, true)
+    }
+    // @ts-ignore
+    return <g></g>
 }
 
 /**
