@@ -10,18 +10,21 @@
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
-import { isSKGraphElement, SKGraphElement } from "@kieler/keith-sprotty/lib/skgraph-models";
+// import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
+import { /* isSKGraphElement, */ SKGraphElement } from "@kieler/keith-sprotty/lib/skgraph-models";
 import { findRendering } from '@kieler/keith-sprotty/lib/skgraph-utils';
-import { injectable } from "inversify";
-import { HtmlRootSchema, PreRenderedElementSchema, RequestPopupModelAction, SModelElementSchema, SModelRootSchema } from "sprotty";
-import { IRootPopupModelProvider } from "sprotty-theia";
+import { CodeAction, Range } from '@theia/languages/lib/browser';
+import { injectable, inject } from "inversify";
+import { HtmlRootSchema, /* PreRenderedElementSchema, */ RequestPopupModelAction, SModelElementSchema, SModelRootSchema } from "sprotty";
+import { CodeActionPalettePopupProvider, CodeActionProvider, PaletteButtonSchema } from "sprotty-theia";
 
 @injectable()
-export class PopupModelProvider implements IRootPopupModelProvider {
+export class PopupModelProvider extends CodeActionPalettePopupProvider {
 
-    async getPopupModel(request: RequestPopupModelAction, elementSchema?: SModelRootSchema): Promise<SModelElementSchema | undefined> {
-        if (elementSchema
+    @inject(CodeActionProvider) codeActionProvider: CodeActionProvider;
+
+    async getPopupModel(request: RequestPopupModelAction, elementSchema: SModelRootSchema): Promise<SModelElementSchema | undefined> {
+/*         if (elementSchema
             && request instanceof RequestKeithPopupModelAction
             && isSKGraphElement(request.parent)
             && request.element !== undefined) {
@@ -40,7 +43,45 @@ export class PopupModelProvider implements IRootPopupModelProvider {
                     canvasBounds: request.bounds
                 }
             }
+        } */
+
+        // TODO: range anhand von elementSchema bestimmen -> dann kann auch der CodeActionPalettePopupProvider direkt benutzt werden
+        // TODO: statt popup lieber rechtsklick benutzen
+        const range = <Range> {
+            start: {
+                line: 0,
+                character: 0
+            },
+            end: {
+                line: 0,
+                character: 10
+            }
+        };
+        if (this.editDiagramLocker.allowEdit && range !== undefined) {
+            const codeActions = await this.codeActionProvider.getCodeActions(range, 'sprotty.create');
+            if (codeActions) {
+                const buttons: PaletteButtonSchema[] = [];
+                codeActions.forEach(codeAction => {
+                    if (CodeAction.is(codeAction)) {
+                        buttons.push(<PaletteButtonSchema>{
+                            id: codeAction.title,
+                            type: 'button:create',
+                            codeActionKind: codeAction.kind,
+                            range
+                        })
+                    }
+                })
+                return <HtmlRootSchema>{
+                    id: "palette",
+                    type: "palette",
+                    classes: ['sprotty-palette'],
+                    children: buttons,
+                    canvasBounds: request.bounds
+                };
+            }
         }
+
+        return undefined;
     }
 
     /**

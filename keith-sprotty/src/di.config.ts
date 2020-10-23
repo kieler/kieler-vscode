@@ -14,8 +14,10 @@
 import { interactiveModule } from '@kieler/keith-interactive/lib/interactive-module';
 import { Container, ContainerModule, interfaces } from 'inversify';
 import {
+    buttonModule,
     configureModelElement, ConsoleLogger, defaultModule, exportModule, hoverModule, HoverState, HtmlRoot, HtmlRootView,
     LogLevel, modelSourceModule, overrideViewerOptions, PreRenderedElement, PreRenderedView, selectModule, SGraph, SGraphFactory,
+    SModelRoot,
     TYPES, updateModule, viewportModule
 } from 'sprotty/lib';
 import actionModule from './actions/actions-module';
@@ -52,6 +54,7 @@ const kGraphDiagramModule = new ContainerModule((bind: interfaces.Bind, unbind: 
     configureModelElement(context, 'edge', SKEdge, KEdgeView)
     configureModelElement(context, 'port', SKPort, KPortView)
     configureModelElement(context, 'label', SKLabel, KLabelView)
+    configureModelElement(context, 'palette', SModelRoot, HtmlRootView)
     bind(RenderOptions).toSelf().inSingletonScope()
 })
 
@@ -60,7 +63,7 @@ const kGraphDiagramModule = new ContainerModule((bind: interfaces.Bind, unbind: 
  */
 export default function createContainer(widgetId: string): Container {
     const container = new Container()
-    container.load(defaultModule, selectModule, interactiveModule, viewportModule, exportModule, modelSourceModule, updateModule, hoverModule,
+    container.load(buttonModule, defaultModule, selectModule, interactiveModule, viewportModule, exportModule, modelSourceModule, updateModule, hoverModule,
         // keep the keith-specific modules at the last positions because of possible binding overrides.
         textBoundsModule, actionModule, kGraphDiagramModule)
     overrideViewerOptions(container, {
