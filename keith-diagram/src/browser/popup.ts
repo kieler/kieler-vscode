@@ -16,12 +16,13 @@ import { findRendering } from '@kieler/keith-sprotty/lib/skgraph-utils';
 import { CodeAction, Range } from '@theia/languages/lib/browser';
 import { injectable, inject } from "inversify";
 import { HtmlRootSchema, /* PreRenderedElementSchema, */ RequestPopupModelAction, SModelElementSchema, SModelRootSchema } from "sprotty";
-import { CodeActionPalettePopupProvider, CodeActionProvider, PaletteButtonSchema } from "sprotty-theia";
+import { CodeActionPalettePopupProvider, PaletteButtonSchema } from "sprotty-theia";
+import { OwnCodeActionProvider } from "./OwnCodeActionProvider";
 
 @injectable()
 export class PopupModelProvider extends CodeActionPalettePopupProvider {
 
-    @inject(CodeActionProvider) codeActionProvider: CodeActionProvider;
+    @inject(OwnCodeActionProvider) codeActionProvider: OwnCodeActionProvider;
 
     async getPopupModel(request: RequestPopupModelAction, elementSchema: SModelRootSchema): Promise<SModelElementSchema | undefined> {
 /*         if (elementSchema
@@ -58,6 +59,7 @@ export class PopupModelProvider extends CodeActionPalettePopupProvider {
             }
         };
         if (this.editDiagramLocker.allowEdit && range !== undefined) {
+            this.codeActionProvider.setTarget(request.elementId)
             const codeActions = await this.codeActionProvider.getCodeActions(range, 'sprotty.create');
             if (codeActions) {
                 const buttons: PaletteButtonSchema[] = [];

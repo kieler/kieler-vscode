@@ -6,14 +6,16 @@ import { CodeAction, CodeActionParams, Range } from '@theia/languages/lib/browse
 export class OwnCodeActionProvider extends CodeActionProvider {
 
     private GET_CODE_ACTIONS = 'keith/codeActions/getCodeActions'
+    private target = ""
 
     @inject(LSTheiaDiagramServerProvider) diagramServerProvider: LSTheiaDiagramServerProvider;
 
     async getCodeActions(range: Range, codeActionKind: string) {
         const diagramServer = await this.diagramServerProvider();
         const connector = diagramServer.connector;
+        console.log(this.target)
         const languageClient = await connector.getLanguageClient();
-        return languageClient.sendRequest(this.GET_CODE_ACTIONS, <CodeActionParams>{
+        return languageClient.sendRequest(this.GET_CODE_ACTIONS, <OwnCodeActionParams>{
             textDocument: {
                 uri: diagramServer.sourceUri
             },
@@ -21,7 +23,25 @@ export class OwnCodeActionProvider extends CodeActionProvider {
             context: {
                 diagnostics: [],
                 only: [codeActionKind]
-            }
+            },
+            target: this.target
         }) as Promise<CodeAction[]>
     }
+
+    /**
+     *
+     */
+    public setTarget(target: string) {
+        this.target = target
+    }
+}
+
+/**
+ * The parameters of a [CodeActionRequest](#CodeActionRequest).
+ */
+export interface OwnCodeActionParams extends CodeActionParams {
+    /**
+     * The document in which the command was invoked.
+     */
+    target: string
 }
