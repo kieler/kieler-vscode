@@ -14,7 +14,8 @@
 import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import {
     DeleteLayerConstraintAction, DeletePositionConstraintAction, DeleteStaticConstraintAction,
-    SetPositionConstraintAction, SetLayerConstraintAction, SetStaticConstraintAction, SetILPredOfConstraintAction, SetILSuccOfConstraintAction, DeleteRelativeConstraintsAction, DeleteILPredOfConstraintAction, DeleteILSuccOfConstraintAction
+    SetPositionConstraintAction, SetLayerConstraintAction, SetStaticConstraintAction, SetILPredOfConstraintAction,
+    SetILSuccOfConstraintAction, DeleteRelativeConstraintsAction, DeleteILPredOfConstraintAction, DeleteILSuccOfConstraintAction
 } from '@kieler/keith-interactive/lib/layered/actions';
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {

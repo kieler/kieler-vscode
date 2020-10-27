@@ -13,7 +13,6 @@ export class OwnCodeActionProvider extends CodeActionProvider {
     async getCodeActions(range: Range, codeActionKind: string) {
         const diagramServer = await this.diagramServerProvider();
         const connector = diagramServer.connector;
-        console.log(this.target)
         const languageClient = await connector.getLanguageClient();
         return languageClient.sendRequest(this.GET_CODE_ACTIONS, <OwnCodeActionParams>{
             textDocument: {
@@ -28,20 +27,12 @@ export class OwnCodeActionProvider extends CodeActionProvider {
         }) as Promise<CodeAction[]>
     }
 
-    /**
-     *
-     */
     public setTarget(target: string) {
         this.target = target
     }
 }
 
-/**
- * The parameters of a [CodeActionRequest](#CodeActionRequest).
- */
 export interface OwnCodeActionParams extends CodeActionParams {
-    /**
-     * The document in which the command was invoked.
-     */
+
     target: string
 }

@@ -10,22 +10,22 @@
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-// import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
-import { /* isSKGraphElement, */ SKGraphElement } from "@kieler/keith-sprotty/lib/skgraph-models";
+import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
+import { isSKGraphElement, SKGraphElement } from "@kieler/keith-sprotty/lib/skgraph-models";
 import { findRendering } from '@kieler/keith-sprotty/lib/skgraph-utils';
-import { CodeAction, Range } from '@theia/languages/lib/browser';
-import { injectable, inject } from "inversify";
-import { HtmlRootSchema, /* PreRenderedElementSchema, */ RequestPopupModelAction, SModelElementSchema, SModelRootSchema } from "sprotty";
-import { CodeActionPalettePopupProvider, PaletteButtonSchema } from "sprotty-theia";
-import { OwnCodeActionProvider } from "./OwnCodeActionProvider";
+// import { CodeAction, Range } from '@theia/languages/lib/browser';
+import { injectable/* , inject */ } from "inversify";
+import { HtmlRootSchema, PreRenderedElementSchema, RequestPopupModelAction, SModelElementSchema, SModelRootSchema } from "sprotty";
+import { CodeActionPalettePopupProvider/* , PaletteButtonSchema */ } from "sprotty-theia";
+// import { OwnCodeActionProvider } from "./OwnCodeActionProvider";
 
 @injectable()
 export class PopupModelProvider extends CodeActionPalettePopupProvider {
 
-    @inject(OwnCodeActionProvider) codeActionProvider: OwnCodeActionProvider;
+    // @inject(OwnCodeActionProvider) codeActionProvider: OwnCodeActionProvider;
 
     async getPopupModel(request: RequestPopupModelAction, elementSchema: SModelRootSchema): Promise<SModelElementSchema | undefined> {
-/*         if (elementSchema
+        if (elementSchema
             && request instanceof RequestKeithPopupModelAction
             && isSKGraphElement(request.parent)
             && request.element !== undefined) {
@@ -44,9 +44,9 @@ export class PopupModelProvider extends CodeActionPalettePopupProvider {
                     canvasBounds: request.bounds
                 }
             }
-        } */
+        }
 
-        // TODO: range anhand von elementSchema bestimmen -> dann kann auch der CodeActionPalettePopupProvider direkt benutzt werden
+/*         // TODO: range anhand von elementSchema bestimmen -> dann kann auch der CodeActionPalettePopupProvider direkt benutzt werden
         // TODO: statt popup lieber rechtsklick benutzen
         const range = <Range> {
             start: {
@@ -81,7 +81,7 @@ export class PopupModelProvider extends CodeActionPalettePopupProvider {
                     canvasBounds: request.bounds
                 };
             }
-        }
+        } */
 
         return undefined;
     }
