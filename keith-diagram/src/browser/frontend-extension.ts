@@ -22,6 +22,7 @@ import 'sprotty/css/sprotty.css';
 import '../../src/browser/style/index.css';
 import { KeithDiagramConfiguration } from './di.config';
 import { bindDiagramPreferences, KeithDiagramPreferenceService } from './diagram-preferences';
+import { KeithContextMenuService } from './keith-context-menu-service';
 import { KeithDiagramCommandContribution } from './keith-diagram-command-contribution';
 import { SynthesisCommandContribution } from './keith-diagram-commands';
 import './keith-diagram-icons';
@@ -54,6 +55,7 @@ export default new ContainerModule((bind, _unbind, _isBound, rebind) => {
     bind(SynthesisCommandContribution).toSelf().inSingletonScope()
     bind(MenuContribution).toService(SynthesisCommandContribution)
     bind(CommandContribution).toService(SynthesisCommandContribution)
+    bind(KeithContextMenuService).toSelf().inSingletonScope()
     bindDiagramPreferences(bind)
     bind(KeithDiagramLanguageClient).toSelf().inSingletonScope()
 

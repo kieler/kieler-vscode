@@ -12,14 +12,21 @@
  */
 
 import { createKeithDiagramContainer } from '@kieler/keith-sprotty/lib';
-import { Container, injectable } from 'inversify';
+import { Container, injectable, inject } from 'inversify';
 import {
+    CodeActionProvider,
     CompletionLabelEditor, DeleteWithWorkspaceEditCommand, DiagramConfiguration, EditDiagramLocker, IRootPopupModelProvider, LSTheiaDiagramServer, LSTheiaDiagramServerProvider,
+/*     PaletteButton,
+    PaletteMouseListener, */
     RenameLabelEditor, TheiaDiagramServer, TheiaKeyTool, WorkspaceEditCommand
 } from 'sprotty-theia/lib';
-import { configureCommand, KeyTool, TYPES } from 'sprotty/lib';
+import { configureCommand, /* configureModelElement, */ IActionDispatcher, KeyTool, TYPES } from 'sprotty/lib';
 import { KeithDiagramServer } from './keith-diagram-server';
+// import { PaletteButtonView } from '@kieler/keith-sprotty/lib/html-views'
+import { OwnCodeActionProvider } from './OwnCodeActionProvider';
 import { PopupModelProvider } from './popup';
+import { KeithContextMenuService } from './keith-context-menu-service';
+import { KeithContextMenuItemProvider } from './keith-context-menu-item-provider';
 
 export const diagramType: string = 'keith-diagram'
 
@@ -31,6 +38,7 @@ export const diagramType: string = 'keith-diagram'
 @injectable()
 export class KeithDiagramConfiguration implements DiagramConfiguration {
     diagramType: string = diagramType
+    @inject(KeithContextMenuService) protected readonly contextMenuService: KeithContextMenuService
 
     createContainer(widgetId: string): Container {
         const container = createKeithDiagramContainer(widgetId)
@@ -50,11 +58,24 @@ export class KeithDiagramConfiguration implements DiagramConfiguration {
             }
         })
 
+        container.bind(OwnCodeActionProvider).toSelf().inSingletonScope();
+        container.bind(CodeActionProvider).to(OwnCodeActionProvider).inSingletonScope();
+/*         container.bind(IRootPopupModelProvider).to(PopupModelProvider).inSingletonScope();
+        container.bind(PaletteMouseListener).toSelf().inSingletonScope();
+        container.rebind(TYPES.PopupMouseListener).to(PaletteMouseListener)
+        configureModelElement(container, 'button:create', PaletteButton, PaletteButtonView); */
+
         configureCommand(container, DeleteWithWorkspaceEditCommand)
         configureCommand(container, WorkspaceEditCommand)
 
         container.bind(CompletionLabelEditor).toSelf().inSingletonScope();
         container.bind(RenameLabelEditor).toSelf().inSingletonScope();
+
+        container.bind(TYPES.IContextMenuService).toConstantValue(this.contextMenuService)
+        if (this.contextMenuService instanceof KeithContextMenuService) {
+            this.contextMenuService.connect(container.get<IActionDispatcher>(TYPES.IActionDispatcher))
+        }
+        container.bind(TYPES.IContextMenuItemProvider).to(KeithContextMenuItemProvider)
 
         return container
     }
