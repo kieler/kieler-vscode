@@ -57,6 +57,8 @@ export class KNode extends RectangularNode implements KGraphElement {
     shadow: boolean
     shadowX: number
     shadowY: number
+
+    expansionState: boolean
 }
 
 export enum Direction {

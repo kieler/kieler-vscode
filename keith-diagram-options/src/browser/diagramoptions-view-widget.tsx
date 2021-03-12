@@ -157,7 +157,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
                     break
                 }
                 case TransformationOptionType.RANGE: {
-                    console.error('The rendering for ' + option.type + ' is not implemented yet.')
+                    children.push(this.renderRRange(option as RangeOption))
                     break
                 }
                 case TransformationOptionType.SEPARATOR: {
@@ -219,7 +219,38 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         option.currentValue = !option.currentValue
         this.storeOption(option.id, option.currentValue, RENDER_OPTION)
         this.sendNewRenderOption(option)
-        this.update()
+    }
+
+    /**
+     * Renders a range RenderOption as an HTML input with a range.
+     *
+     * @param option The range option to render.
+     */
+    private renderRRange(option: RangeOption): JSX.Element {
+        return <div key={option.id} className='diagram-option-range'>
+            <label htmlFor={option.name}>{option.name}: {option.currentValue}</label>
+            <input
+                type='range'
+                id={option.name}
+                name={option.name}
+                min={option.range.first}
+                max={option.range.second}
+                value={option.currentValue}
+                step={option.stepSize}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.onRRange(event, option)}
+            />
+        </div>
+    }
+
+    /**
+     * Called whenever a range slider has been modified. Updates the option that belongs to this range slider.
+     * @param event The mouseEvent that updated the range slider.
+     * @param option The synthesis option connected to the range slider.
+     */
+    private onRRange(event: React.ChangeEvent<HTMLInputElement>, option: SynthesisOption) {
+        option.currentValue = event.currentTarget.value
+        this.storeOption(option.id, option.currentValue, RENDER_OPTION)
+        this.sendNewRenderOption(option)
     }
 
     /**
@@ -326,7 +357,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         option.currentValue = !option.currentValue
         this.storeOption(option.id, option.currentValue, SYNTHESIS_OPTION)
         this.sendNewSynthesisOption(option)
-        this.update()
+		this.update()
     }
 
     /**
@@ -372,7 +403,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         option.currentValue = newValue
         this.storeOption(option.id, newValue, SYNTHESIS_OPTION)
         this.sendNewSynthesisOption(option)
-        this.update()
+		this.update()
     }
 
     /**
@@ -480,7 +511,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         // This is called before the target opened or closed, so the inverted current open value is the correct value to use here.
         option.currentValue = !clickedDetailsElement.open
         this.storeOption(option.id, option.currentValue, SYNTHESIS_OPTION)
-        this.sendNewSynthesisOption(option)
+		this.sendNewSynthesisOption(option)
     }
 
     /**
