@@ -11,8 +11,6 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { RenderOption } from '@kieler/keith-sprotty/lib/options';
-import { TransformationOptionType } from '@kieler/keith-sprotty/lib/options';
 import { Emitter } from '@theia/core';
 import { Message, ReactWidget } from '@theia/core/lib/browser';
 import { Event } from '@theia/core/lib/common';
@@ -21,7 +19,7 @@ import * as React from 'react';
 import { isNullOrUndefined } from 'util';
 import '../../src/browser/style/index.css';
 import { diagramOptionsWidgetId, LAYOUT_OPTION, OPTION_KEY, RENDER_OPTION, SYNTHESIS_OPTION } from '../common';
-import { DisplayedActionData, LayoutOptionUIData, LayoutOptionValue, RangeOption, SynthesisOption, Type } from '../common/option-models';
+import { DisplayedActionData, LayoutOptionUIData, LayoutOptionValue, RangeOption, RenderOption, SynthesisOption, TransformationOptionType, Type } from '../common/option-models';
 
 /**
  * The widget displaying the diagram options.
@@ -357,7 +355,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         option.currentValue = !option.currentValue
         this.storeOption(option.id, option.currentValue, SYNTHESIS_OPTION)
         this.sendNewSynthesisOption(option)
-		this.update()
+        this.update()
     }
 
     /**
@@ -403,7 +401,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         option.currentValue = newValue
         this.storeOption(option.id, newValue, SYNTHESIS_OPTION)
         this.sendNewSynthesisOption(option)
-		this.update()
+        this.update()
     }
 
     /**
@@ -511,7 +509,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
         // This is called before the target opened or closed, so the inverted current open value is the correct value to use here.
         option.currentValue = !clickedDetailsElement.open
         this.storeOption(option.id, option.currentValue, SYNTHESIS_OPTION)
-		this.sendNewSynthesisOption(option)
+        this.sendNewSynthesisOption(option)
     }
 
     /**

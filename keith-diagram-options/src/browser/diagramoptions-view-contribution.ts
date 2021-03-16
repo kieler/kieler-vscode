@@ -17,14 +17,14 @@ import { updateOptions } from '@kieler/keith-diagram/lib/browser/keith-diagram-s
 import { KeithDiagramWidget } from '@kieler/keith-diagram/lib/browser/keith-diagram-widget';
 import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import { KeithLanguageClientContribution } from '@kieler/keith-language/lib/browser/keith-language-client-contribution';
-import { RenderOption, RenderOptions, ShowConstraintOption } from '@kieler/keith-sprotty/lib/options';
+import { RenderOptions, ShowConstraintOption } from '@kieler/keith-sprotty/lib/options';
 import { Command, CommandHandler, CommandRegistry } from '@theia/core';
 import { DidCreateWidgetEvent, Widget, WidgetManager } from '@theia/core/lib/browser';
 import { FrontendApplication, FrontendApplicationContribution } from '@theia/core/lib/browser/frontend-application';
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
 import { inject, injectable } from 'inversify';
 import { PERFORM_ACTION, SET_LAYOUT_OPTIONS, SET_SYNTHESIS_OPTIONS, diagramOptionsWidgetId, SPROTTY_ACTION } from '../common';
-import { LayoutOptionValue, SynthesisOption } from '../common/option-models';
+import { LayoutOptionValue, RenderOption, SynthesisOption } from '../common/option-models';
 import { DiagramOptionsViewWidget } from './diagramoptions-view-widget';
 import { RenderingOptions } from '@kieler/keith-sprotty/lib/rendering-options'
 
@@ -142,7 +142,7 @@ export class DiagramOptionsViewContribution extends AbstractViewContribution<Dia
         const renderingOptions = RenderingOptions.getInstance()
         renderingOptions.updateSettings(option)
         // Update the diagram to draw according to the changed render option.
-        if(option instanceof ShowConstraintOption) {
+        if (option instanceof ShowConstraintOption) {
             const lClient = await this.client.languageClient
             await lClient.sendNotification(SPROTTY_ACTION, {clientId: 'keith-diagram_sprotty', action: new RefreshDiagramAction()})
         } else {
@@ -171,7 +171,7 @@ export class DiagramOptionsViewContribution extends AbstractViewContribution<Dia
                     // Get option from local storage if it exists.
                     let localRenderOptions: RenderOption[] = []
                     const renderingOptions = RenderingOptions.getInstance()
-                    this.rOptions.getRenderOptions().forEach(option => {
+                    this.rOptions.getRenderOptions().forEach((option: RenderOption) => {
                         renderingOptions.updateSettings(option)
                         const localStorageString = window.localStorage.getItem(option.id);
                         if (localStorageString) {

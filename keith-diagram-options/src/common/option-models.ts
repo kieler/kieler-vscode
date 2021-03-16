@@ -9,9 +9,31 @@
  *     + Real-Time and Embedded Systems Group
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
- */
+*/
 
-import { RenderOption } from '@kieler/keith-sprotty/lib/options';
+/**
+ * A RenderOption with unique id and name as well as the option type.
+ * Holds the current value and the initial value of the option.
+ */
+export interface RenderOption {
+    id: string
+    name: string
+    type: TransformationOptionType
+    initialValue: any
+    currentValue: any
+}
+
+/**
+ * The different types a SynthesisOption can have.
+ */
+ export enum TransformationOptionType {
+    CHECK = 0,
+    CHOICE = 1,
+    RANGE = 2,
+    TEXT = 3,
+    SEPARATOR = 4,
+    CATEGORY = 5
+}
 
  /**
   * Holds an option defined by the diagram synthesis.
@@ -38,6 +60,7 @@ export interface RangeOption extends SynthesisOption {
     range: Range
     stepSize: number
 }
+
 
 /**
  * A value range between a first and second value.
