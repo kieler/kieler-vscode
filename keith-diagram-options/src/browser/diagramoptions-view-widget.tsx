@@ -11,6 +11,8 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
+import { RenderOption } from '@kieler/keith-sprotty/lib/options';
+import { TransformationOptionType } from '@kieler/keith-sprotty/lib/options';
 import { Emitter } from '@theia/core';
 import { Message, ReactWidget } from '@theia/core/lib/browser';
 import { Event } from '@theia/core/lib/common';
@@ -19,7 +21,7 @@ import * as React from 'react';
 import { isNullOrUndefined } from 'util';
 import '../../src/browser/style/index.css';
 import { diagramOptionsWidgetId, LAYOUT_OPTION, OPTION_KEY, RENDER_OPTION, SYNTHESIS_OPTION } from '../common';
-import { DisplayedActionData, LayoutOptionUIData, LayoutOptionValue, RangeOption, RenderOption, SynthesisOption, TransformationOptionType, Type } from '../common/option-models';
+import { DisplayedActionData, LayoutOptionUIData, LayoutOptionValue, RangeOption, SynthesisOption, Type } from '../common/option-models';
 
 /**
  * The widget displaying the diagram options.

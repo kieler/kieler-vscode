@@ -17,16 +17,15 @@ import { updateOptions } from '@kieler/keith-diagram/lib/browser/keith-diagram-s
 import { KeithDiagramWidget } from '@kieler/keith-diagram/lib/browser/keith-diagram-widget';
 import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import { KeithLanguageClientContribution } from '@kieler/keith-language/lib/browser/keith-language-client-contribution';
-import { RenderOptions, ShowConstraintOption } from '@kieler/keith-sprotty/lib/options';
+import { RenderOption, RenderOptions, RenderingOptions, ShowConstraintOption } from '@kieler/keith-sprotty/lib/options';
 import { Command, CommandHandler, CommandRegistry } from '@theia/core';
 import { DidCreateWidgetEvent, Widget, WidgetManager } from '@theia/core/lib/browser';
 import { FrontendApplication, FrontendApplicationContribution } from '@theia/core/lib/browser/frontend-application';
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
 import { inject, injectable } from 'inversify';
 import { PERFORM_ACTION, SET_LAYOUT_OPTIONS, SET_SYNTHESIS_OPTIONS, diagramOptionsWidgetId, SPROTTY_ACTION } from '../common';
-import { LayoutOptionValue, RenderOption, SynthesisOption } from '../common/option-models';
+import { LayoutOptionValue, SynthesisOption } from '../common/option-models';
 import { DiagramOptionsViewWidget } from './diagramoptions-view-widget';
-import { RenderingOptions } from '@kieler/keith-sprotty/lib/rendering-options'
 
 /**
  * The keybinding to toggle the diagram options view widget.
