@@ -9,7 +9,7 @@
  *     + Real-Time and Embedded Systems Group
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
-*/
+ */
 
 import { RenderOption } from '@kieler/keith-sprotty/lib/options';
 
@@ -38,7 +38,6 @@ export interface RangeOption extends SynthesisOption {
     range: Range
     stepSize: number
 }
-
 
 /**
  * A value range between a first and second value.

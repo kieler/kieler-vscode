@@ -141,7 +141,7 @@ export class DiagramOptionsViewContribution extends AbstractViewContribution<Dia
         const renderingOptions = RenderingOptions.getInstance()
         renderingOptions.updateSettings(option)
         // Update the diagram to draw according to the changed render option.
-        if (option instanceof ShowConstraintOption) {
+        if (option.updateNeeded) {
             const lClient = await this.client.languageClient
             await lClient.sendNotification(SPROTTY_ACTION, {clientId: 'keith-diagram_sprotty', action: new RefreshDiagramAction()})
         } else {

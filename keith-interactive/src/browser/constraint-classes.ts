@@ -58,6 +58,10 @@ export class KNode extends RectangularNode implements KGraphElement {
     shadowX: number
     shadowY: number
 
+    /**
+     * Holds the depth map specific expansion state.
+     * True for expanded, false for collapsed.
+     */
     expansionState: boolean
 }
 
