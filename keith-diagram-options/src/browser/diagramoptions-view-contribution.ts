@@ -17,7 +17,7 @@ import { updateOptions } from '@kieler/keith-diagram/lib/browser/keith-diagram-s
 import { KeithDiagramWidget } from '@kieler/keith-diagram/lib/browser/keith-diagram-widget';
 import { RefreshDiagramAction } from '@kieler/keith-interactive/lib/actions';
 import { KeithLanguageClientContribution } from '@kieler/keith-language/lib/browser/keith-language-client-contribution';
-import { RenderOption, RenderOptions, RenderingOptions, ShowConstraintOption } from '@kieler/keith-sprotty/lib/options';
+import { RenderOption, RenderOptions, RenderingOptions } from '@kieler/keith-sprotty/lib/options';
 import { Command, CommandHandler, CommandRegistry } from '@theia/core';
 import { DidCreateWidgetEvent, Widget, WidgetManager } from '@theia/core/lib/browser';
 import { FrontendApplication, FrontendApplicationContribution } from '@theia/core/lib/browser/frontend-application';
