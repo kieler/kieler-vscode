@@ -32,6 +32,11 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
             type: 'boolean',
             description: 'Describes if a diagram element selection should select the corresponding text segments',
             default: false
+        },
+        'diagram.hierarchyDepth': {
+            type: 'number',
+            description: 'Describes how many hierarchy levels should be rendered',
+            default: 5
         }
     }
 }
@@ -39,6 +44,7 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
 export interface DiagramConfiguration {
     'diagram.shouldSelectDiagram': boolean
     'diagram.shouldSelectText': boolean
+    'diagram.hierarchyDepth': number
 }
 
 export const DiagramPreferences = Symbol('DiagramPreferences')
@@ -86,7 +92,8 @@ export class KeithDiagramPreferenceService {
     getPreferences(): DiagramConfiguration {
         return {
             'diagram.shouldSelectDiagram': this.preferences['diagram.shouldSelectDiagram'],
-            'diagram.shouldSelectText': this.preferences['diagram.shouldSelectText']
+            'diagram.shouldSelectText': this.preferences['diagram.shouldSelectText'],
+            'diagram.hierarchyDepth': this.preferences['diagram.hierarchyDepth']
         }
     }
 
@@ -110,7 +117,8 @@ export class KeithDiagramPreferenceService {
     async preferenceChanged(e: PreferenceChangeEvent<DiagramConfiguration>) {
         // Put the changed preference in an object
         const newPreference: Partial<DiagramConfiguration> = {}
-        newPreference[e.preferenceName] = e.newValue
+        // newPreference[e.preferenceName] = e.newValue <-- this doesn't work for non boolean types
+        Object.assign(newPreference[e.preferenceName], e.newValue)
         this.sendPreferences(newPreference)
     }
 }
