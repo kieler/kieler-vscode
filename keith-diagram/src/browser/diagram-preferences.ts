@@ -118,6 +118,7 @@ export class KeithDiagramPreferenceService {
         // Put the changed preference in an object
         const newPreference: Partial<DiagramConfiguration> = {}
         // newPreference[e.preferenceName] = e.newValue <-- this doesn't work for non boolean types
+        // below also doesn't seem to work, random values are used, rage is induced
         Object.assign(newPreference[e.preferenceName], e.newValue)
         this.sendPreferences(newPreference)
     }
