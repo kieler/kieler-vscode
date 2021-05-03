@@ -36,7 +36,7 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
         'diagram.hierarchyDepth': {
             type: 'number',
             description: 'Describes how many hierarchy levels should be rendered',
-            default: 5
+            default: 5,
         }
     }
 }
@@ -117,9 +117,8 @@ export class KeithDiagramPreferenceService {
     async preferenceChanged(e: PreferenceChangeEvent<DiagramConfiguration>) {
         // Put the changed preference in an object
         const newPreference: Partial<DiagramConfiguration> = {}
-        // newPreference[e.preferenceName] = e.newValue <-- this doesn't work for non boolean types
-        // below also doesn't seem to work, random values are used, rage is induced
-        Object.assign(newPreference[e.preferenceName], e.newValue)
+        // Casting as any is necessary for non boolean types
+        newPreference[e.preferenceName] = e.newValue as any
         this.sendPreferences(newPreference)
     }
 }
