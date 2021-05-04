@@ -33,9 +33,15 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
             description: 'Describes if a diagram element selection should select the corresponding text segments',
             default: false
         },
+        'diagram.diagramGenerator': {
+            type: 'string',
+            enum: ['recursive', 'topdown'],
+            default: 'topdown',
+            description: 'Instructs the server which diagram generation method to use to create the SGraph',
+        },
         'diagram.hierarchyDepth': {
             type: 'number',
-            description: 'Describes how many hierarchy levels should be rendered',
+            description: 'Describes how many hierarchy levels should be generated when using the topdown generator. Ignored otherwise.',
             default: 5,
         }
     }
@@ -45,6 +51,7 @@ export interface DiagramConfiguration {
     'diagram.shouldSelectDiagram': boolean
     'diagram.shouldSelectText': boolean
     'diagram.hierarchyDepth': number
+    'diagram.diagramGenerator': string
 }
 
 export const DiagramPreferences = Symbol('DiagramPreferences')
@@ -93,7 +100,8 @@ export class KeithDiagramPreferenceService {
         return {
             'diagram.shouldSelectDiagram': this.preferences['diagram.shouldSelectDiagram'],
             'diagram.shouldSelectText': this.preferences['diagram.shouldSelectText'],
-            'diagram.hierarchyDepth': this.preferences['diagram.hierarchyDepth']
+            'diagram.hierarchyDepth': this.preferences['diagram.hierarchyDepth'],
+            'diagram.diagramGenerator': this.preferences['diagram.diagramGenerator']
         }
     }
 
