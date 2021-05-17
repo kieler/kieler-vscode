@@ -19,7 +19,7 @@ import {
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
     CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, KeithUpdateModelAction, Pair, PerformActionAction, RefreshLayoutAction, RequestTextBoundsCommand,
-    SetSynthesesAction, SetSynthesisAction, StoreImagesAction
+    SetSynthesesAction, SetSynthesisAction, StoreImagesAction, RequestDiagramPieceAction, SetDiagramPieceAction
 } from '@kieler/keith-sprotty/lib/actions/actions';
 import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
 import { injectable } from 'inversify';
@@ -34,6 +34,7 @@ import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
 import { Emitter, Event } from '@theia/core/lib/common';
+import { insertSModelElementIntoModel } from './smodel-util';
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -71,12 +72,38 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 }
                 if (message.action.kind === SetModelCommand.KIND) {
                     diagramWidget.modelUpdated()
+                    // After model is received request next piece.
+                    
+                    // TODO: Here some state aware process should handle requesting pieces
+                    this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
                 }
                 if (diagramWidget.resizeToFit) {
                     // Fit the received model to the widget size.
                     this.actionDispatcher.dispatch(new FitToScreenAction(['$root'], diagramPadding, undefined, true))
                 }
             }
+        }
+        // TODO: Here some state aware process should handle requesting pieces
+
+        // When a another diagram piece is received, insert it into
+        // the model and request the next piece
+        if (message.action.kind === SetDiagramPieceAction.KIND) {
+            // TODO: do something
+            //       access current stored model
+            //       insert received piece in stored model
+            //       draw updated model
+            // Issues:
+            //    - some id's are sent multiple times, need to look into what that is
+            let action = message.action as SetDiagramPieceAction
+            insertSModelElementIntoModel(this.currentRoot, action.diagramPiece)
+            const diagramWidget = this.getWidget()
+            if (diagramWidget instanceof KeithDiagramWidget) {
+                diagramWidget.modelUpdated()
+            }
+
+            
+            // get next piece
+            this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
         }
     }
 
@@ -92,11 +119,14 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 return false
             case SetSynthesisAction.KIND:
                 return true
+            case RequestDiagramPieceAction.KIND:
+                return true;
         }
         return super.handleLocally(action)
     }
 
     handle(action: Action): void | ICommand | Action {
+        this.logger.log(this, "handle(action): " + action.kind)
         if (action.kind === SetSynthesesAction.KIND) {
             this.handleSetSyntheses(action as SetSynthesesAction)
         } else if (action.kind === PerformActionAction.KIND &&
@@ -120,6 +150,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             || action.kind === SwitchEditModeAction.KIND
             || action.kind === BringToFrontAction.KIND) {
             // Ignore these ones
+        } else if (action.kind === RequestDiagramPieceAction.KIND) {
+            this.handleRequestDiagramPiece(action as RequestDiagramPieceAction)
         } else {
             super.handle(action)
         }
@@ -175,6 +207,10 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         return false
     }
 
+    handleRequestDiagramPiece(action: RequestDiagramPieceAction) {
+        this.forwardToServer(action)
+    }
+
     disconnect() {
         super.disconnect()
         // Unregister all commands for this server on disconnect.
@@ -210,6 +246,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(StoreImagesAction.KIND, this)
         registry.register(SwitchEditModeAction.KIND, this)
         registry.register(updateOptionsKind, this)
+        registry.register(RequestDiagramPieceAction.KIND, this)
+        registry.register(SetDiagramPieceAction.KIND, this)
     }
 
     handleComputedBounds(_action: ComputedBoundsAction): boolean {

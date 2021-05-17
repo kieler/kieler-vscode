@@ -12,7 +12,7 @@
  */
 import { inject, injectable } from 'inversify';
 import {
-    Action, CommandExecutionContext, CommandResult, ElementAndBounds, generateRequestId, HiddenCommand, RequestAction, ResponseAction, SModelRootSchema, TYPES, Match, UpdateModelAction
+    Action, CommandExecutionContext, CommandResult, ElementAndBounds, generateRequestId, HiddenCommand, RequestAction, ResponseAction, SModelRootSchema, TYPES, Match, UpdateModelAction, SModelElement, SModelElementSchema,
 } from 'sprotty/lib';
 import { KImage } from '../skgraph-models';
 import { SetSynthesesActionData } from '../syntheses/synthesis-message-data';
@@ -172,4 +172,25 @@ export class KeithUpdateModelAction extends UpdateModelAction {
         super(input, animate)
         this.cause = cause
     }
+}
+
+/**
+ * Sent from client to request a certain piece of the diagram.
+ */
+export class RequestDiagramPieceAction implements RequestAction<SetDiagramPieceAction> {
+    static readonly KIND: string = 'requestDiagramPiece'
+    readonly kind = RequestDiagramPieceAction.KIND
+
+    constructor(public readonly requestId: string = '') {}
+}
+
+/**
+ * Response to {@link RequestDiagramPieceAction}. Contains the requested SModelElement.
+ */
+export class SetDiagramPieceAction implements ResponseAction {
+    static readonly KIND: string = 'setDiagramPiece'
+    readonly kind = SetDiagramPieceAction.KIND
+
+    constructor(public readonly responseId: string = '',
+                public readonly diagramPiece: SModelElementSchema) {}
 }
