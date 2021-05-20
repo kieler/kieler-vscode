@@ -11,7 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { SModelElementSchema, SModelRootSchema } from "sprotty";
+import { SChildElement, SModelElement, SModelRoot, SParentElement } from "sprotty";
 
 /**
  * Utility function to insert an SModelElement into an existing model.
@@ -20,13 +20,12 @@ import { SModelElementSchema, SModelRootSchema } from "sprotty";
  * @param modelRoot 
  * @param modelElement 
  */
-export function insertSModelElementIntoModel(modelRoot: SModelRootSchema, modelElement: SModelElementSchema){
+export function insertSModelElementIntoModel(modelRoot: SModelRoot, modelElement: SModelElement){
     // traverse model and search for insertion point
     replaceNodeById(modelRoot, modelElement);
-    // TODO: refactor this into one function not two
 }
 
-function replaceNodeById(root: SModelElementSchema, modelElement: SModelElementSchema) {
+function replaceNodeById(root: SParentElement, modelElement: SModelElement) {
     let id = modelElement.id
     if (root.children === undefined) {
         return;
@@ -38,7 +37,10 @@ function replaceNodeById(root: SModelElementSchema, modelElement: SModelElementS
 
     if (index > -1) {
         // replace if it exists
-        root.children[index] = modelElement
+        // root.children[index] = modelElement
+        root.remove(root.children[index])
+        root.add(modelElement as SChildElement, index)
+
     } else {
         // recurse further down otherwise
         root.children.forEach(childNode => {

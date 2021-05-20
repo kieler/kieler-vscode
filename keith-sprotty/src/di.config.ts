@@ -19,6 +19,7 @@ import {
     TYPES, updateModule, viewportModule, ViewRegistry
 } from 'sprotty/lib';
 import actionModule from './actions/actions-module';
+import diagramPieceModule from './diagram-pieces/diagram-pieces-module';
 import { KeithHoverMouseListener } from './hover/hover';
 import { RenderOptions } from './options';
 import { SKGraphModelRenderer } from './skgraph-model-renderer';
@@ -69,7 +70,7 @@ export default function createContainer(widgetId: string): Container {
     const container = new Container()
     container.load(defaultModule, selectModule, interactiveModule, viewportModule, exportModule, modelSourceModule, updateModule, hoverModule,
         // keep the keith-specific modules at the last positions because of possible binding overrides.
-        textBoundsModule, actionModule, kGraphDiagramModule)
+        textBoundsModule, actionModule, kGraphDiagramModule, diagramPieceModule)
     overrideViewerOptions(container, {
         needsClientLayout: false,
         needsServerLayout: true,

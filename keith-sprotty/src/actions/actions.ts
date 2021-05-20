@@ -12,10 +12,11 @@
  */
 import { inject, injectable } from 'inversify';
 import {
-    Action, CommandExecutionContext, CommandResult, ElementAndBounds, generateRequestId, HiddenCommand, RequestAction, ResponseAction, SModelRootSchema, TYPES, Match, UpdateModelAction, SModelElement, SModelElementSchema,
+    Action, CommandExecutionContext, CommandResult, ElementAndBounds, generateRequestId, HiddenCommand, RequestAction, ResponseAction, SModelRootSchema, TYPES, Match, UpdateModelAction, SModelElementSchema, ResetCommand, SModelRoot,
 } from 'sprotty/lib';
 import { KImage } from '../skgraph-models';
 import { SetSynthesesActionData } from '../syntheses/synthesis-message-data';
+import { insertSModelElementIntoModel } from '../diagram-pieces/smodel-util';
 
 /**
  * Sent from the server to the client to send a list of all available syntheses for the current model.
@@ -193,4 +194,39 @@ export class SetDiagramPieceAction implements ResponseAction {
 
     constructor(public readonly responseId: string = '',
                 public readonly diagramPiece: SModelElementSchema) {}
+}
+
+/**
+ * Command to trigger re-rendering of diagram when new pieces arrive.
+ */
+@injectable()
+export class SetDiagramPieceCommand extends ResetCommand {
+    static readonly KIND: string = 'setDiagramPiece'
+
+    root: SModelRoot
+
+    constructor(@inject(TYPES.Action) protected action: SetDiagramPieceAction) {
+        super()
+    }
+
+    execute(context: CommandExecutionContext): CommandResult {
+        this.root = context.modelFactory.createRoot(context.root)
+        insertSModelElementIntoModel(
+            this.root, 
+            context.modelFactory.createElement(this.action.diagramPiece))
+        return {
+            model: this.root,
+            modelChanged: true,
+            cause: this.action
+        }
+    }
+
+    undo(context: CommandExecutionContext): SModelRoot {
+        return this.root
+    }
+
+    redo(context: CommandExecutionContext): SModelRoot {
+        return this.root
+    }
+
 }

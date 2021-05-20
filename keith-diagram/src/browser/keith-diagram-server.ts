@@ -34,7 +34,6 @@ import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
 import { Emitter, Event } from '@theia/core/lib/common';
-import { insertSModelElementIntoModel } from './smodel-util';
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -72,9 +71,11 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 }
                 if (message.action.kind === SetModelCommand.KIND) {
                     diagramWidget.modelUpdated()
-                    // After model is received request next piece.
+                    // After model is received request first piece.
                     
                     // TODO: Here some state aware process should handle requesting pieces
+                    //       This needs to be initialized here, probably also do this stuff
+                    //       with commands
                     this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
                 }
                 if (diagramWidget.resizeToFit) {
@@ -83,26 +84,10 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 }
             }
         }
-        // TODO: Here some state aware process should handle requesting pieces
-
-        // When a another diagram piece is received, insert it into
-        // the model and request the next piece
         if (message.action.kind === SetDiagramPieceAction.KIND) {
-            // TODO: do something
-            //       access current stored model
-            //       insert received piece in stored model
-            //       draw updated model
-            // Issues:
-            //    - some id's are sent multiple times, need to look into what that is
-            let action = message.action as SetDiagramPieceAction
-            insertSModelElementIntoModel(this.currentRoot, action.diagramPiece)
-            const diagramWidget = this.getWidget()
-            if (diagramWidget instanceof KeithDiagramWidget) {
-                diagramWidget.modelUpdated()
-            }
-
-            
             // get next piece
+            // TODO: Here some state aware process should handle requesting pieces
+
             this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
         }
     }
