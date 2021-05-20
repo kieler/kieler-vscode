@@ -29,7 +29,6 @@ import {
     ICommand, RequestPopupModelAction, SetModelCommand,
     SetPopupModelAction, SwitchEditModeAction, /* UpdateModelAction */
 } from 'sprotty/lib';
-import { isNullOrUndefined } from 'util';
 import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
@@ -136,7 +135,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         const notCached: Pair<string, string>[] = []
         for (let image of (action as CheckImagesAction).images) {
             const id = KeithDiagramServer.imageToSessionStorageString(image.bundleName, image.imagePath)
-            if (isNullOrUndefined(sessionStorage.getItem(id))) {
+            let item = sessionStorage.getItem(id)
+            if (item === null || item === undefined) {
                 notCached.push({k: image.bundleName, v: image.imagePath})
             }
         }
