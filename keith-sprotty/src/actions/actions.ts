@@ -182,7 +182,8 @@ export class RequestDiagramPieceAction implements RequestAction<SetDiagramPieceA
     static readonly KIND: string = 'requestDiagramPiece'
     readonly kind = RequestDiagramPieceAction.KIND
 
-    constructor(public readonly requestId: string = '') {}
+    constructor(public readonly requestId: string = '',
+                public readonly modelElementId: string) {}
 }
 
 /**

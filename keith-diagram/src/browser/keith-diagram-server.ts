@@ -26,6 +26,7 @@ import { injectable } from 'inversify';
 import { LSTheiaDiagramServer } from 'sprotty-theia/lib';
 import {
     Action, ActionHandlerRegistry, ActionMessage, BringToFrontAction, ComputedBoundsAction, findElement, FitToScreenAction,
+    generateRequestId,
     ICommand, RequestPopupModelAction, SetModelCommand,
     SetPopupModelAction, SwitchEditModeAction, /* UpdateModelAction */
 } from 'sprotty/lib';
@@ -76,7 +77,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                     // TODO: Here some state aware process should handle requesting pieces
                     //       This needs to be initialized here, probably also do this stuff
                     //       with commands
-                    this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
+                    // get root diagram piece
+                    this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), '$root'))
                 }
                 if (diagramWidget.resizeToFit) {
                     // Fit the received model to the widget size.
@@ -88,7 +90,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             // get next piece
             // TODO: Here some state aware process should handle requesting pieces
 
-            this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
+            // this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
         }
     }
 
