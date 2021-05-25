@@ -58,6 +58,10 @@ export const updateOptions: Event<Action | undefined> = onUpdateOptionsEmitter.e
  */
 @injectable()
 export class KeithDiagramServer extends LSTheiaDiagramServer {
+
+    // FIXME: this is the most naive implementation, can be replaced by more advanced mechanisms in the future
+    childrenToRequestQueue: string[] = []
+
     messageReceived(message: ActionMessage) {
         const wasUpdateModelAction = message.action.kind === KeithUpdateModelAction.KIND;
         super.messageReceived(message)
@@ -91,6 +95,17 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             // TODO: Here some state aware process should handle requesting pieces
 
             // this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
+            // add any children of the requested piece as stubs into queue
+            if ((message.action as SetDiagramPieceAction).diagramPiece.children !== undefined) {
+                const children = (message.action as SetDiagramPieceAction).diagramPiece.children!
+                children.forEach(element => {
+                    this.childrenToRequestQueue.push(element.id)
+                });
+            }
+            if (this.childrenToRequestQueue.length > 0) {
+                let childId = this.childrenToRequestQueue.pop()!
+                this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), childId))
+            }
         }
     }
 
