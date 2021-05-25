@@ -35,6 +35,7 @@ import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
 import { Emitter, Event } from '@theia/core/lib/common';
+import { IDiagramPieceRequestManager, QueueDiagramPieceRequestManager } from './diagram-piece-request-manager';
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -59,8 +60,7 @@ export const updateOptions: Event<Action | undefined> = onUpdateOptionsEmitter.e
 @injectable()
 export class KeithDiagramServer extends LSTheiaDiagramServer {
 
-    // FIXME: this is the most naive implementation, can be replaced by more advanced mechanisms in the future
-    childrenToRequestQueue: string[] = []
+    childrenToRequestQueue: IDiagramPieceRequestManager = new QueueDiagramPieceRequestManager
 
     messageReceived(message: ActionMessage) {
         const wasUpdateModelAction = message.action.kind === KeithUpdateModelAction.KIND;
@@ -82,6 +82,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                     //       This needs to be initialized here, probably also do this stuff
                     //       with commands
                     // get root diagram piece
+                    this.childrenToRequestQueue.reset()
                     this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), '$root'))
                 }
                 if (diagramWidget.resizeToFit) {
@@ -102,7 +103,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                     this.childrenToRequestQueue.push(element.id)
                 });
             }
-            if (this.childrenToRequestQueue.length > 0) {
+            if (this.childrenToRequestQueue.peek() !== undefined) {
                 let childId = this.childrenToRequestQueue.pop()!
                 this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), childId))
             }
