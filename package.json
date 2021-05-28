@@ -8,9 +8,9 @@
   "theia": {
     "target": "electron",
     "frontend": {
-        "config": {
-            "defaultTheme": "light"
-        }
+      "config": {
+        "defaultTheme": "light"
+      }
     }
   },
   "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
@@ -78,17 +78,17 @@
   },
   "devDependencies": {
     "@theia/cli": "1.4.0",
-    "lerna": "^3.22.1",
-    "electron-builder": "^22.4.1",
     "bufferutil": "4",
-    "utf-8-validate": "5",
-    "typescript": "latest"
+    "electron-builder": "^22.4.1",
+    "lerna": "^3.22.1",
+    "typescript": "latest",
+    "utf-8-validate": "5"
   },
   "// Notes:": [
-      "The resolution for `fs-extra` was required due to this: https://spectrum.chat/theia/general/our-theia-electron-builder-app-no-longer-starts~f5cf09a0-6d88-448b-8818-24ad0ec2ee7c"
+    "The resolution for `fs-extra` was required due to this: https://spectrum.chat/theia/general/our-theia-electron-builder-app-no-longer-starts~f5cf09a0-6d88-448b-8818-24ad0ec2ee7c"
   ],
   "resolutions": {
-      "**/fs-extra": "^4.0.3"
+    "**/fs-extra": "^4.0.3"
   },
   "workspaces": [
     "keith-app",
