@@ -27,15 +27,16 @@ import { LSTheiaDiagramServer } from 'sprotty-theia/lib';
 import {
     Action, ActionHandlerRegistry, ActionMessage, BringToFrontAction, ComputedBoundsAction, findElement, FitToScreenAction,
     generateRequestId,
+    GetViewportAction,
     ICommand, RequestPopupModelAction, SetModelCommand,
-    SetPopupModelAction, SwitchEditModeAction, /* UpdateModelAction */
+    SetPopupModelAction, SwitchEditModeAction, ViewportResult, /* UpdateModelAction */
 } from 'sprotty/lib';
 import { isNullOrUndefined } from 'util';
 import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
 import { Emitter, Event } from '@theia/core/lib/common';
-import { IDiagramPieceRequestManager, QueueDiagramPieceRequestManager } from './diagram-piece-request-manager';
+import { IDiagramPieceRequestManager, GridDiagramPieceRequestManager } from './diagram-piece-request-manager';
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -60,7 +61,8 @@ export const updateOptions: Event<Action | undefined> = onUpdateOptionsEmitter.e
 @injectable()
 export class KeithDiagramServer extends LSTheiaDiagramServer {
 
-    childrenToRequestQueue: IDiagramPieceRequestManager = new QueueDiagramPieceRequestManager
+    childrenToRequestQueue: IDiagramPieceRequestManager = new GridDiagramPieceRequestManager
+    // childrenToRequestQueue: IDiagramPieceRequestManager = new QueueDiagramPieceRequestManager
 
     messageReceived(message: ActionMessage) {
         const wasUpdateModelAction = message.action.kind === KeithUpdateModelAction.KIND;
@@ -92,20 +94,19 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             }
         }
         if (message.action.kind === SetDiagramPieceAction.KIND) {
-            // get next piece
-            // TODO: Here some state aware process should handle requesting pieces
-
-            // this.actionDispatcher.dispatch(new RequestDiagramPieceAction())
             // add any children of the requested piece as stubs into queue
             if ((message.action as SetDiagramPieceAction).diagramPiece.children !== undefined) {
                 const children = (message.action as SetDiagramPieceAction).diagramPiece.children!
                 children.forEach(element => {
-                    this.childrenToRequestQueue.push(element.id)
+                    // FIXME: not all types of children should be added here, edges for example are already
+                    //        complete as they can't have any own children
+                    this.childrenToRequestQueue.push((message.action as SetDiagramPieceAction).diagramPiece.id, element)
                 });
             }
             if (this.childrenToRequestQueue.peek() !== undefined) {
-                let childId = this.childrenToRequestQueue.pop()!
-                this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), childId))
+
+                // get viewport
+                this.actionDispatcher.dispatch(GetViewportAction.create())
             }
         }
     }
@@ -155,6 +156,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             // Ignore these ones
         } else if (action.kind === RequestDiagramPieceAction.KIND) {
             this.handleRequestDiagramPiece(action as RequestDiagramPieceAction)
+        } else if (action.kind === ViewportResult.KIND) {
+            this.handleViewportResult(action as ViewportResult)
         } else {
             super.handle(action)
         }
@@ -214,6 +217,13 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         this.forwardToServer(action)
     }
 
+    handleViewportResult(action: ViewportResult) {
+        this.childrenToRequestQueue.setViewport(action.viewport)
+        let child = this.childrenToRequestQueue.pop()!
+        console.log("NEXT REQUEST: " + child.id)
+        this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), child.id))
+    }
+
     disconnect() {
         super.disconnect()
         // Unregister all commands for this server on disconnect.
@@ -251,6 +261,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(updateOptionsKind, this)
         registry.register(RequestDiagramPieceAction.KIND, this)
         registry.register(SetDiagramPieceAction.KIND, this)
+        registry.register(ViewportResult.KIND, this)
     }
 
     handleComputedBounds(_action: ComputedBoundsAction): boolean {
