@@ -18,7 +18,6 @@ import { Message, ReactWidget } from '@theia/core/lib/browser';
 import { Event } from '@theia/core/lib/common';
 import { injectable } from 'inversify';
 import * as React from 'react';
-import { isNullOrUndefined } from 'util';
 import '../../src/browser/style/index.css';
 import { diagramOptionsWidgetId, LAYOUT_OPTION, OPTION_KEY, RENDER_OPTION, SYNTHESIS_OPTION } from '../common';
 import { DisplayedActionData, LayoutOptionUIData, LayoutOptionValue, RangeOption, SynthesisOption, Type } from '../common/option-models';
@@ -79,7 +78,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
     }
 
     protected render(): JSX.Element {
-        if (isNullOrUndefined(this.synthesisOptions)) {
+        if (this.synthesisOptions === null || this.synthesisOptions === undefined) {
             // Default view if no diagram has been opened yet.
             return <div className='diagram-option-widget'>
                 <div className='diagram-option'>
@@ -740,7 +739,7 @@ export class DiagramOptionsViewWidget extends ReactWidget {
      * @param value The new value of the option.
      */
     public sendNewLayoutOption(optionId: string, value: any): void {
-        this.onSendNewLayoutOptionEmitter.fire({optionId, value})
+        this.onSendNewLayoutOptionEmitter.fire({ optionId, value })
     }
 
 
