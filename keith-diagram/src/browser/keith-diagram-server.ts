@@ -218,9 +218,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
     }
 
     handleViewportResult(action: ViewportResult) {
-        this.childrenToRequestQueue.setViewport(action.viewport)
+        this.childrenToRequestQueue.setViewport(action)
         let child = this.childrenToRequestQueue.pop()!
-        console.log("NEXT REQUEST: " + child.id)
         this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), child.id))
     }
 
