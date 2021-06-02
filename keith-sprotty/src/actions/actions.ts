@@ -229,5 +229,56 @@ export class SetDiagramPieceCommand extends ResetCommand {
     redo(context: CommandExecutionContext): SModelRoot {
         return this.root
     }
+}
 
+/**
+ * Incremental version of { @link ComputedTextBoundsAction }
+ */
+ export class IncrementalComputedTextBoundsAction implements ResponseAction {
+    static readonly KIND = 'incrementalComputedTextBounds'
+    readonly kind = IncrementalComputedTextBoundsAction.KIND
+
+    constructor(public readonly bounds: ElementAndBounds[],
+                public readonly responseId = '') {
+    }
+}
+
+/**
+ * Incremental version of { @link RequestTextBoundsAction }
+ */
+export class IncrementalRequestTextBoundsAction implements RequestAction<IncrementalComputedTextBoundsAction> {
+    static readonly KIND: string = 'incrementalRequestTextBounds'
+    readonly kind = IncrementalRequestTextBoundsAction.KIND
+
+    constructor(public readonly textDiagram: SModelRootSchema,
+                public readonly requestId: string = '') {}
+
+    /** Factory function to dispatch a request with the `IActionDispatcher` */
+    static create(newRoot: SModelRootSchema): Action {
+        return new IncrementalRequestTextBoundsAction(newRoot, generateRequestId());
+    }
+}
+
+/**
+ * The command triggered to perform a hidden rendering of the text diagram defined in the constructor's RequestTextBoundsAction.
+ */
+@injectable()
+export class IncrementalRequestTextBoundsCommand extends HiddenCommand {
+    static readonly KIND: string = IncrementalRequestTextBoundsAction.KIND
+
+    constructor(@inject(TYPES.Action) protected action: IncrementalRequestTextBoundsAction) {
+        super()
+    }
+
+    execute(context: CommandExecutionContext): CommandResult {
+        return {
+            model: context.modelFactory.createRoot(this.action.textDiagram),
+            modelChanged: true,
+            cause: this.action
+        }
+    }
+
+    get blockUntil(): (action: Action) => boolean {
+        return action => action.kind === IncrementalComputedTextBoundsAction.KIND
+    }
 }

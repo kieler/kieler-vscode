@@ -19,7 +19,9 @@ import {
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
     CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, KeithUpdateModelAction, Pair, PerformActionAction, RefreshLayoutAction, RequestTextBoundsCommand,
-    SetSynthesesAction, SetSynthesisAction, StoreImagesAction, RequestDiagramPieceAction, SetDiagramPieceAction
+    SetSynthesesAction, SetSynthesisAction, StoreImagesAction, RequestDiagramPieceAction, SetDiagramPieceAction,
+    IncrementalRequestTextBoundsCommand,
+    IncrementalComputedTextBoundsAction
 } from '@kieler/keith-sprotty/lib/actions/actions';
 import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
 import { injectable } from 'inversify';
@@ -124,6 +126,10 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
             case SetSynthesisAction.KIND:
                 return true
             case RequestDiagramPieceAction.KIND:
+                return true;
+            case IncrementalRequestTextBoundsCommand.KIND:
+                return false;
+            case IncrementalComputedTextBoundsAction.KIND:
                 return true;
         }
         return super.handleLocally(action)
@@ -261,6 +267,8 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         registry.register(RequestDiagramPieceAction.KIND, this)
         registry.register(SetDiagramPieceAction.KIND, this)
         registry.register(ViewportResult.KIND, this)
+        registry.register(IncrementalRequestTextBoundsCommand.KIND, this)
+        registry.register(IncrementalComputedTextBoundsAction.KIND, this)
     }
 
     handleComputedBounds(_action: ComputedBoundsAction): boolean {
