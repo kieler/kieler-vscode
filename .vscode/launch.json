@@ -6,6 +6,7 @@
     "configurations": [
 
         {
+            "runtimeExecutable": "/home/max/.nvm/versions/node/v10.24.0/bin/node",
             "type": "node",
             "request": "launch",
             "name": "Start Browser Backend Socket",
@@ -66,7 +67,7 @@
             "name": "Launch in Chrome",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost:3000",
+            "url": "http://localhost:3000/#/home/max/workspace-keith",
             "webRoot": "${workspaceFolder}",
             "sourceMapPathOverrides": {
                 "webpack:///../*": "${webRoot}/*"
