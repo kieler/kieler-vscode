@@ -45,14 +45,13 @@ export interface IDiagramPieceRequestManager {
      * Submit info about current viewport position to be used to prioritize the ordering of requests.
      */
     setViewport(viewportResult: ViewportResult): void
-    // TODO: add methods which supply info about user viewport so that the manager can 
+    // TODO: add methods which supply info about user viewport so that the manager can
     //       adjust the ordering of items
 }
 
 export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestManager {
-    
+
     piecesToRequest: SModelElementSchema[] = []
-    
     push(_parentId: string, diagramPiece: SModelElementSchema): void {
         this.piecesToRequest.push(diagramPiece)
     }
@@ -76,20 +75,20 @@ export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestMana
 }
 
 export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManager {
-    
-    idToAbsolutePositions: Map<string,Point>
+
+    idToAbsolutePositions: Map<string, Point>
     // ordering of elements per grid corresponds to layer, therefore operations on it should be FIFO
     /* https://stackoverflow.com/questions/39005798/fastest-way-of-using-coordinates-as-keys-in-javascript-hashmap */
-    gridToPieces: Map<number, SModelElementSchema[]>
+    gridToPieces: Map<number, SModelElementSchema []>
 
-    readonly MAX_16BIT_SIGNED = 32767 
+    readonly MAX_16BIT_SIGNED = 32767
 
     /**
-     * Determines how many pixels wide each grid square should be. 
-     * 
+     * Determines how many pixels wide each grid square should be.
+     *
      * FIXME: evaluate what value makes sense here. If a proper spiral loop is in place, it shouldn't be too important though.
      *        canvas width is typically between 500 and 1000 pixels, zoom level important to consider
-     *        This width is constant with respect to the actual diagram, this means that for small diagrams the 
+     *        This width is constant with respect to the actual diagram, this means that for small diagrams the
      *        grid has relatively large squares and for large diagrams the squares are relatively small
      *        There might be an advantage of setting this dynamically according to the diagram size beforehand
      *        This would require some extra communication before the actual diagram requesting process begins
@@ -107,7 +106,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
      */
     currentGridPosition = {x: 0, y: 0}
 
-    getKey(point: Point): number{
+    getKey(point: Point): number {
         let x = point.x
         let y = point.y
         if (x > this.MAX_16BIT_SIGNED || y > this.MAX_16BIT_SIGNED) {
@@ -129,21 +128,21 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
          *     X       X
          *     X       X
          *     X       X
-         *     X X X X X    
+         *     X X X X X
          */
 
         let result = []
         // first get all edge coordinates
-        for (let i = (-(n+1)); i <= (n-1); i++) {
+        for (let i = (-(n + 1)); i <= (n - 1); i++) {
             result.push({x: -n, y: i})
         }
-        for (let i = (-(n+1)); i <= (n-1); i++) {
+        for (let i = (-(n + 1)); i <= (n - 1); i++) {
             result.push({x: n, y: i})
         }
-        for (let i = (-(n+1)); i <= (n-1); i++) {
+        for (let i = (-(n + 1)); i <= (n - 1); i++) {
             result.push({x: i, y: -n})
         }
-        for (let i = (-(n+1)); i <= (n-1); i++) {
+        for (let i = (-(n + 1)); i <= (n - 1); i++) {
             result.push({x: i, y: n})
         }
         // push corner coordinates
@@ -153,7 +152,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         result.push({x: n, y: -n})
         return result
     }
-    
+
     push(parentId: string, diagramPiece: SModelElementSchema): void {
         if (diagramPiece.type === "node") {
             let castPiece = diagramPiece as any
@@ -167,8 +166,8 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             }
 
             // add pieces to grid
-            let gridX = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.x + castPiece.size.width/2) / this.gridResolution)
-            let gridY = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.y + castPiece.size.height/2) / this.gridResolution)
+            let gridX = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.x + castPiece.size.width / 2) / this.gridResolution)
+            let gridY = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.y + castPiece.size.height / 2) / this.gridResolution)
             // let test = this.gridToPieces.get(gridPoint)
             let key = this.getKey({ x: gridX, y: gridY })
             if (this.gridToPieces.get(key) !== undefined) {
@@ -191,16 +190,10 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             return list.shift()
         } else {
             // check for next closest piece
-            /* https://stackoverflow.com/questions/398299/looping-in-a-spiral */
-            // TODO: use a spiral over the grid
             let piece: SModelElementSchema | undefined = undefined
-            // have to do this because of:
-            /* Type 'IterableIterator<number>' is not an array type or a string type. 
-             * Use compiler option '--downlevelIteration' to allow iterating of 
-             * iterators.ts(2569) */
-            // Otherwise could do for (key of this.gridToPieces.keys())
-            
-            
+
+            // here we compute the coordinates of rings around the current central point
+            // A spiral could be another way to approach this: https://stackoverflow.com/questions/398299/looping-in-a-spiral
             for (let i = 1; i <= this.maxRingCount; i++) {
                 let ring = this.ringCoords(i)
                 for (let j = 0; j < ring.length; j++) {
@@ -212,9 +205,15 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
                 }
             }
 
+            // have to do this because of:
+            /* Type 'IterableIterator<number>' is not an array type or a string type.
+             * Use compiler option '--downlevelIteration' to allow iterating of
+             * iterators.ts(2569) */
+            // Otherwise could do for (key of this.gridToPieces.keys())
+
             // fallback if nothing in immediate area
             let gridArray = Array.from(this.gridToPieces.keys())
-            for (let square of gridArray){
+            for (let square of gridArray) {
                 let value = this.gridToPieces.get(square)!
                 if (value.length > 0) {
                     piece = value.shift()!
@@ -233,25 +232,17 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         let key = this.getKey(this.currentGridPosition)
         let list = this.gridToPieces.get(key)
         if (list !== undefined && list.length > 0) {
-            return list[list.length-1]
+            return list[list.length - 1]
         } else {
             // check for next closest piece
-            /* https://stackoverflow.com/questions/398299/looping-in-a-spiral */
-            // TODO: use a spiral over the grid
             let piece: SModelElementSchema | undefined = undefined
-            // have to do this because of:
-            /* Type 'IterableIterator<number>' is not an array type or a string type. 
-             * Use compiler option '--downlevelIteration' to allow iterating of 
-             * iterators.ts(2569) */
-            // Otherwise could do for (key of this.gridToPieces.keys())
-            
-            
+
             for (let i = 1; i <= this.maxRingCount; i++) {
                 let ring = this.ringCoords(i)
                 for (let j = 0; j < ring.length; j++) {
                     let value = this.gridToPieces.get(this.getKey(ring[j]))!
                     if (value !== undefined && value.length > 0) {
-                        piece = value[value.length-1]
+                        piece = value[value.length - 1]
                         return piece
                     }
                 }
@@ -259,10 +250,10 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
 
             // fallback if nothing in immediate area
             let gridArray = Array.from(this.gridToPieces.keys())
-            for (let square of gridArray){
+            for (let square of gridArray) {
                 let value = this.gridToPieces.get(square)!
                 if (value.length > 0) {
-                    piece = value[value.length-1]
+                    piece = value[value.length - 1]
                     return piece
                 }
             }
@@ -271,9 +262,8 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
     setViewport(viewportResult: ViewportResult): void {
         let viewport = viewportResult.viewport
         let canvasBounds = viewportResult.canvasBounds
-        let gridX = Math.floor((viewport.scroll.x + (canvasBounds.width/2) / viewport.zoom) / this.gridResolution)
-        let gridY = Math.floor((viewport.scroll.y + (canvasBounds.height/2) / viewport.zoom) / this.gridResolution)
+        let gridX = Math.floor((viewport.scroll.x + (canvasBounds.width / 2) / viewport.zoom) / this.gridResolution)
+        let gridY = Math.floor((viewport.scroll.y + (canvasBounds.height / 2) / viewport.zoom) / this.gridResolution)
         this.currentGridPosition = {x: gridX, y: gridY}
     }
-    
 }

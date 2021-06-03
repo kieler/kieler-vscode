@@ -81,7 +81,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 if (message.action.kind === SetModelCommand.KIND) {
                     diagramWidget.modelUpdated()
                     // After model is received request first piece.
-                    
+
                     // TODO: Here some state aware process should handle requesting pieces
                     //       This needs to be initialized here, probably also do this stuff
                     //       with commands
