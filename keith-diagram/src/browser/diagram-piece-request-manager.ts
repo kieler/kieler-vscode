@@ -167,8 +167,8 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             }
 
             // add pieces to grid
-            let gridX = Math.floor(this.idToAbsolutePositions.get(diagramPiece.id)!.x / this.gridResolution)
-            let gridY = Math.floor(this.idToAbsolutePositions.get(diagramPiece.id)!.y / this.gridResolution)
+            let gridX = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.x + castPiece.size.width/2) / this.gridResolution)
+            let gridY = Math.floor((this.idToAbsolutePositions.get(diagramPiece.id)!.y + castPiece.size.height/2) / this.gridResolution)
             // let test = this.gridToPieces.get(gridPoint)
             let key = this.getKey({ x: gridX, y: gridY })
             if (this.gridToPieces.get(key) !== undefined) {
@@ -204,7 +204,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             for (let i = 1; i <= this.maxRingCount; i++) {
                 let ring = this.ringCoords(i)
                 for (let j = 0; j < ring.length; j++) {
-                    let value = this.gridToPieces.get(this.getKey(ring[j]))!
+                    let value = this.gridToPieces.get(this.getKey(add(this.currentGridPosition, ring[j])))!
                     if (value !== undefined && value.length > 0) {
                         piece = value.shift()!
                         return piece
