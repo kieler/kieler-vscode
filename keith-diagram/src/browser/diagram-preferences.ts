@@ -25,12 +25,12 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
     properties: {
         'diagram.shouldSelectDiagram': {
             type: 'boolean',
-            description: 'Describes if a text segment selection should select the corresponding diagram element',
+            description: 'Describes if a text segment selection should select the corresponding diagram element.',
             default: true
         },
         'diagram.shouldSelectText': {
             type: 'boolean',
-            description: 'Describes if a diagram element selection should select the corresponding text segments',
+            description: 'Describes if a diagram element selection should select the corresponding text segments. Warning: this option currently increases all diagram generation times by up to 50%.',
             default: false
         }
     }
