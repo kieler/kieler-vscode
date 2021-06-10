@@ -19,6 +19,7 @@
     "url": "https://rtsys.informatik.uni-kiel.de/jira"
   },
   "homepage": "https://rtsys.informatik.uni-kiel.de/kieler",
+  "publish": null,
   "scripts": {
     "build": "theia build",
     "package": "yarn run build && electron-builder",
@@ -79,7 +80,7 @@
   "devDependencies": {
     "@theia/cli": "1.4.0",
     "lerna": "^3.22.1",
-    "electron-builder": "^22.4.1",
+    "electron-builder": "^22.10.5",
     "bufferutil": "4",
     "utf-8-validate": "5",
     "typescript": "latest"
