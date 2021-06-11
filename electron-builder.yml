@@ -26,6 +26,7 @@ win:
       filter: ["kieler-language-server.win.jar"]  
   target:
     - zip
+  icon: ./icons/keith-logo.ico
 mac:
   # copy ls
   identity: null
@@ -36,6 +37,8 @@ mac:
       filter: ["kieler-language-server.osx.jar"]
   target:
     - zip
+    - dmg
+  icon: ./icons/keith-logo.icns
 linux:
   # copy ls
   extraResources:
@@ -47,18 +50,19 @@ linux:
     - tar.gz
     - AppImage
   category: Development
+  icon: ./icons/keith-logo512x512.png
 
-# dmg:
-#   background: ./icons/keith-logo-512x512.png
-#   icon: ./icons/keith-logo.icns
-#   iconSize: 128
-#   contents:
-#     -
-#       x: 380
-#       y: 240
-#       type: link
-#       path: /Applications
-#     -
-#       x: 122
-#       y: 240
-#       type: file
+dmg:
+  background: ./icons/keith-logo512x512.png
+  icon: ./icons/keith-logo.icns
+  iconSize: 128
+  contents:
+    -
+      x: 380
+      y: 240
+      type: link
+      path: /Applications
+    -
+      x: 122
+      y: 240
+      type: file
