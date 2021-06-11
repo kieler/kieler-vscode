@@ -26,7 +26,7 @@ win:
       filter: ["kieler-language-server.win.jar"]  
   target:
     - zip
-  icon: ./icons/keith-logo.ico
+  icon: ./icons/foerde-logo.ico
 mac:
   # copy ls
   identity: null
@@ -37,7 +37,7 @@ mac:
       filter: ["kieler-language-server.osx.jar"]
   target:
     - zip
-  icon: ./icons/keith-logo.icns
+  icon: ./icons/foerde-logo.icns
 linux:
   # copy ls
   extraResources:
@@ -49,11 +49,11 @@ linux:
     - tar.gz
     - AppImage
   category: Development
-  icon: ./icons/icons/
+  icon: ./icons/foerde-logo-512x512.png
 
 dmg:
-  background: ./icons/keith-logo-512x512.png
-  icon: ./icons/keith-logo.icns
+  background: ./icons/foerde-logo-512x512.png
+  icon: ./icons/foerde-logo.icns
   iconSize: 128
   contents:
     -
