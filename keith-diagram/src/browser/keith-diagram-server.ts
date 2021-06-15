@@ -33,6 +33,7 @@ import { diagramPadding } from '../common/constants';
 import { KeithDiagramWidget } from './keith-diagram-widget';
 import { KeithTheiaSprottyConnector } from './keith-theia-sprotty-connector';
 import { Emitter, Event } from '@theia/core/lib/common';
+import {UpdateDepthmapModelAction} from '@kieler/keith-sprotty/lib/update/update-depthmap-model'
 
 export const KeithDiagramServerProvider = Symbol('KeithDiagramServerProvider');
 
@@ -58,11 +59,15 @@ export const updateOptions: Event<Action | undefined> = onUpdateOptionsEmitter.e
 export class KeithDiagramServer extends LSTheiaDiagramServer {
     messageReceived(message: ActionMessage) {
         const wasUpdateModelAction = message.action.kind === KeithUpdateModelAction.KIND;
+
         super.messageReceived(message)
         // Special handling for the SetModel action.
         if (message.action.kind === SetModelCommand.KIND || wasUpdateModelAction) {
             // Fire the widget's event that a new model was received.
             const diagramWidget = this.getWidget()
+            // update the DepthmapModel using the UpdateDepthmapModelCommand triggered by its corresponding action
+            this.actionDispatcher.dispatch(new UpdateDepthmapModelAction((message.action as any).newRoot))
+
             if (diagramWidget instanceof KeithDiagramWidget) {
                 if (wasUpdateModelAction && (message.action as KeithUpdateModelAction).cause
                     && (message.action as KeithUpdateModelAction).cause.kind) {
