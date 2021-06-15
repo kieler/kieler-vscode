@@ -37,6 +37,7 @@ mac:
       filter: ["kieler-language-server.osx.jar"]
   target:
     - zip
+    - dmg
   icon: ./icons/keith-logo.icns
 linux:
   # copy ls
@@ -53,7 +54,7 @@ linux:
 
 dmg:
   background: ./icons/keith-logo512x512.png
-  icon: ./icons/foerde-logo.icns
+  icon: ./icons/keith-logo.icns
   iconSize: 128
   contents:
     -
