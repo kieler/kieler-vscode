@@ -1,4 +1,4 @@
-import { Command, CommandExecutionContext, CommandReturn, isViewport, TYPES } from "sprotty";
+import { Command, CommandExecutionContext, CommandReturn, isViewport, TYPES, ViewportAnimation } from "sprotty";
 import { Action } from "sprotty/lib/base/actions/action";
 import { inject } from "inversify";
 import { Point } from "electron";
@@ -8,9 +8,10 @@ export class BookmarkAction implements Action {
     static readonly KIND = 'bookmark';
     readonly kind = BookmarkAction.KIND;
 
-    constructor() {}
+    constructor() { }
 }
 
+const ANIMATE_BOOKMARK: bool = true
 
 export class BookmarkCommand extends Command {
     static readonly KIND = BookmarkAction.KIND;
@@ -34,8 +35,16 @@ export class BookmarkCommand extends Command {
                 let oldZoom = BookmarkCommand.zoom;
                 BookmarkCommand.scroll = model.scroll;
                 BookmarkCommand.zoom = model.zoom;
-                model.zoom = oldZoom;
-                model.scroll = oldScroll;
+
+                if (ANIMATE_BOOKMARK) {
+                    let oldViewport = { scroll: model.scroll, zoom: model.zoom };
+                    let newViewport = { scroll: oldScroll, zoom: oldZoom }
+                    context.duration = 1000;
+                    return new ViewportAnimation(model, oldViewport, newViewport, context).start();
+                } else {
+                    model.zoom = oldZoom;
+                    model.scroll = oldScroll;
+                }
             }
         }
         return model;
