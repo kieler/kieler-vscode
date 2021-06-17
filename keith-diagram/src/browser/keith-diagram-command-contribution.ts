@@ -19,6 +19,7 @@ import { CenterAction, FitToScreenAction, RequestModelAction } from 'sprotty';
 import { diagramPadding } from '../common/constants';
 import { diagramType } from './di.config';
 import { KeithDiagramWidget } from './keith-diagram-widget';
+import { BookmarkAction } from './bookmark/bookmark'
 
 export const centerCommand: Command = {
     id: 'keith:diagram:center',
@@ -58,6 +59,13 @@ export const syncWithEditor: Command = {
 export const resizeToFit: Command = {
     id: 'keith:diagram:resize-to-fit',
     label: 'Resize to fit',
+    category: 'Diagram'
+}
+
+export const bookmark: Command = {
+    id: 'keith:diagram:bookmark',
+    label: 'Bookmark',
+    iconClass: 'fa fa-bookmark',
     category: 'Diagram'
 }
 
@@ -153,6 +161,17 @@ export class KeithDiagramCommandContribution implements CommandContribution, Tab
                 return widget.resizeToFit
             }
         });
+        registry.registerCommand(bookmark, {
+            isEnabled: () => true,
+            execute: (widget: KeithDiagramWidget) => {
+                if (widget) {
+                    widget.actionDispatcher.dispatch(new BookmarkAction())
+                }
+            },
+            isVisible: widget => {
+                return widget !== undefined && widget instanceof KeithDiagramWidget
+            }
+        });
     }
 
     registerToolbarItems(registry: TabBarToolbarRegistry): void {
@@ -182,6 +201,11 @@ export class KeithDiagramCommandContribution implements CommandContribution, Tab
             command: resizeToFit.id,
             tooltip: resizeToFit.label,
             group: diagramConfigurationGroup
+        });
+        registry.registerItem({
+            id: bookmark.id,
+            command: bookmark.id,
+            tooltip: bookmark.label
         });
     }
 

@@ -21,6 +21,8 @@ import { configureCommand, KeyTool, TYPES } from 'sprotty/lib';
 import { KeithDiagramServer } from './keith-diagram-server';
 import { PopupModelProvider } from './popup';
 
+import { BookmarkCommand } from './bookmark/bookmark'
+
 export const diagramType: string = 'keith-diagram'
 
 /**
@@ -52,6 +54,7 @@ export class KeithDiagramConfiguration implements DiagramConfiguration {
 
         configureCommand(container, DeleteWithWorkspaceEditCommand)
         configureCommand(container, WorkspaceEditCommand)
+        configureCommand(container, BookmarkCommand)
 
         container.bind(CompletionLabelEditor).toSelf().inSingletonScope();
         container.bind(RenameLabelEditor).toSelf().inSingletonScope();
