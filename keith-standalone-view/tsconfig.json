@@ -1,5 +1,0 @@
-{
-  // Default ts config used by your IDE to provide linting.
-  "extends": "./tsconfig.base.json",
-  "include": ["src", "server"]
-}
