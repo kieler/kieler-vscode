@@ -20,14 +20,19 @@ import {
 } from "vscode-languageclient";
 import { connect, NetConnectOpts, Socket } from "net";
 import { KeithErrorHandler } from "./error-handler";
-import { PerformActionHandler } from "./perform-action-handler";
-import { command } from "klighd-diagram";
+import { performActionKind, handlePerformAction } from "./perform-action-handler";
+
+//** Command identifiers that are provided by klighd-vscode. */
+const klighdCommands = {
+    setLanguageClient: "klighd-vscode.setLanguageClient",
+    addActionHandler: "klighd-vscode.addActionHandler",
+};
 
 let lsClient: LanguageClient;
 let socket: Socket;
 
 // this method is called when your extension is activated
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     const serverOptions: ServerOptions = createServerOptions(context);
 
     const clientOptions: LanguageClientOptions = {
@@ -43,20 +48,26 @@ export async function activate(context: vscode.ExtensionContext) {
     const defaultErrorHandler = lsClient.createDefaultErrorHandler();
     lsClient.clientOptions.errorHandler = new KeithErrorHandler(defaultErrorHandler);
 
-    // Inform the KLighD extension about the LS client and supported file endings
+    // Inform the KLighD extension about the LS client and supported file endings.
     const refId = await vscode.commands.executeCommand<string>(
-        command.setLanguageClient,
+        klighdCommands.setLanguageClient,
         lsClient,
         ["sctx", "elkt", "kgt", "kviz", "strl", "lus"]
     );
-    vscode.commands.executeCommand(command.addActionHandler, refId, PerformActionHandler);
+    // Intercept PerformActionActions from klighd diagrams.
+    vscode.commands.executeCommand(
+        klighdCommands.addActionHandler,
+        refId,
+        performActionKind,
+        handlePerformAction
+    );
 
     console.debug("Starting Language Server...");
     lsClient.start();
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate(): Promise<void> {
     return new Promise<void>((resolve) => {
         if (socket) {
             // Don't call lsClient.stop when we are connected via socket for development.

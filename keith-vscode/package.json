@@ -10,7 +10,7 @@
     "repository": {
         "type": "git",
         "url": "https://git.rtsys.informatik.uni-kiel.de/projects/KIELER/repos/keith",
-        "directory": "extensions/keith-vscode"
+        "directory": "keith-vscode"
     },
     "homepage": "https://rtsys.informatik.uni-kiel.de/kieler",
     "engines": {
@@ -103,27 +103,26 @@
                 "scopeName": "source.elkt",
                 "path": "./syntaxes/elkt.tmLanguage.json"
             }
-            
         ],
         "menus": {
             "editor/title": [
                 {
                     "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-diagram.diagram.open",
+                    "command": "klighd-vscode.diagram.open",
                     "group": "navigation"
                 }
             ],
             "editor/context": [
                 {
                     "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-diagram.diagram.open",
+                    "command": "klighd-vscode.diagram.open",
                     "group": "navigation"
                 }
             ],
             "explorer/context": [
                 {
                     "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-diagram.diagram.open",
+                    "command": "klighd-vscode.diagram.open",
                     "group": "navigation"
                 }
             ]
@@ -131,7 +130,7 @@
         "commands": []
     },
     "extensionDependencies": [
-        "kieler.klighd-diagram"
+        "kieler.klighd-vscode"
     ],
     "scripts": {
         "clean": "rm -rf dist",
@@ -149,7 +148,6 @@
         "webpack": "^4.44.1"
     },
     "dependencies": {
-        "vscode-languageclient": "^5.2.1",
-        "klighd-diagram": "^0.0.1"
+        "vscode-languageclient": "^5.2.1"
     }
 }
