@@ -16,6 +16,10 @@ server jars, named `kieler-language-server.{os-id}.jar`, have to placed in the `
 folder. The latest jars can be downloaded
 [here](https://rtsys.informatik.uni-kiel.de/~kieler/files/nightly/sccharts/ls/).
 
+The `keith-vscode` extension has a dependency on the
+[klighd-vscode](https://github.com/kieler/klighd-vscode) to add diagram support. You have to install
+the extension locally if VSCode is not able to install the dependency automatically.
+
 ## Scripts
 
 > All scripts that are available at the monorepo root. Run a script with `yarn <script>`.
@@ -38,8 +42,7 @@ following steps have are required to start developing.
    [workspace recommended extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
 1. Run `yarn` in the monorepo root to install all dependencies (if not already done).
 1. Run the "Launch VSC Extension" launch configuration. This also runs a task to watch all packages.
-1. A VSCode instance with the `keith-vscode` extension should be started. Ensure that you have the
-   [klighd-vscode](https://github.com/kieler/klighd-vscode) extension installed.
+1. A VSCode instance with the `keith-vscode` extension should be started.
 1. After changes to your files, run the "Reload Window" command in your dev VSCode instance.
 
 The launch configuration "Launch VSC Extension (Socket)" can be used to connect to a Language Server
