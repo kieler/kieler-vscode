@@ -143,9 +143,10 @@
     "devDependencies": {
         "@types/vscode": "^1.56.0",
         "@types/node": "^12.11.7",
-        "ts-loader": "^8.0.14",
+        "ts-loader": "^9.2.3",
         "vsce": "1.88.0",
-        "webpack": "^4.44.1"
+        "webpack": "^5.39.1",
+        "webpack-cli": "^4.7.2"
     },
     "dependencies": {
         "vscode-languageclient": "^5.2.1"
