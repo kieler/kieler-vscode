@@ -11,7 +11,7 @@ export class BookmarkAction implements Action {
     constructor() { }
 }
 
-const ANIMATE_BOOKMARK: Boolean = true
+const ANIMATE_BOOKMARK: boolean = true
 
 export class BookmarkCommand extends Command {
     static readonly KIND = BookmarkAction.KIND;
