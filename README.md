@@ -41,3 +41,8 @@ following steps have are required to start developing.
 1. A VSCode instance with the `keith-vscode` extension should be started. Ensure that you have the
    [klighd-vscode](https://github.com/kieler/klighd-vscode) extension installed.
 1. After changes to your files, run the "Reload Window" command in your dev VSCode instance.
+
+The launch configuration "Launch VSC Extension (Socket)" can be used to connect to a Language Server
+run in Eclipse. See the
+[relevant documentation](https://rtsys.informatik.uni-kiel.de/confluence/display/KIELER/Running+KEITH#RunningKEITH-SettingupyourEclipse)
+for more setup information.
