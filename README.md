@@ -36,7 +36,7 @@ following steps have are required to start developing.
 1. Fulfill the requirements above.
 1. Install all
    [workspace recommended extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
-1. Run `yarn` in the monorepo root to install all dependencies.
+1. Run `yarn` in the monorepo root to install all dependencies (if not already done).
 1. Run the "Launch VSC Extension" launch configuration. This also runs a task to watch all packages.
 1. A VSCode instance with the `keith-vscode` extension should be started. Ensure that you have the
    [klighd-vscode](https://github.com/kieler/klighd-vscode) extension installed.
@@ -46,3 +46,10 @@ The launch configuration "Launch VSC Extension (Socket)" can be used to connect 
 run in Eclipse. See the
 [relevant documentation](https://rtsys.informatik.uni-kiel.de/confluence/display/KIELER/Running+KEITH#RunningKEITH-SettingupyourEclipse)
 for more setup information.
+
+## Locally install the VSCode extension
+
+1. Fulfill the requirements above.
+1. Run `yarn` in the monorepo root to install all dependencies (if not already done).
+1. Run `yarn package`
+1. Run `code --install-extension keith-vscode/keith-vscode.vsix`
