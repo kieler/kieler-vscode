@@ -28,6 +28,13 @@ const klighdCommands = {
     addActionHandler: "klighd-vscode.addActionHandler",
 };
 
+/**
+ * All file endings of the languages that are supported by keith-vscode.
+ * The file ending should also be the language id, since it is also used to
+ * register document selectors in the language client.
+ */
+const supportedFileEndings = ["sctx", "elkt", "kgt", "kviz", "strl", "lus"];
+
 let lsClient: LanguageClient;
 let socket: Socket;
 
@@ -36,7 +43,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const serverOptions: ServerOptions = createServerOptions(context);
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: "file", language: "sctx" }],
+        documentSelector: supportedFileEndings.map((ending) => ({
+            scheme: "file",
+            language: ending,
+        })),
         synchronize: {
             fileEvents: vscode.workspace.createFileSystemWatcher("**/*.*"),
         },
@@ -52,7 +62,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const refId = await vscode.commands.executeCommand<string>(
         klighdCommands.setLanguageClient,
         lsClient,
-        ["sctx", "elkt", "kgt", "kviz", "strl", "lus"]
+        supportedFileEndings
     );
     // Intercept PerformActionActions from klighd diagrams.
     vscode.commands.executeCommand(

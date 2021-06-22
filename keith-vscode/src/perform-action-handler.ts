@@ -13,6 +13,9 @@
 
 import { window } from "vscode";
 
+// Take a look at the `klighd-vscode` extension for more documentation about action
+// handlers.
+
 // Action IDs defined by KLighD
 const openInEditorId =
     "de.cau.cs.kieler.kicool.ui.klighd.internal.model.action.OpenCodeInEditorAction";
