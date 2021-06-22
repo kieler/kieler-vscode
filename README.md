@@ -10,10 +10,10 @@ custom built [Theia IDE](https://theia-ide.org).
 
 ## Requirements
 
-Developing this project required [Node.js _v14.x_](https://nodejs.org) and
-[yarn _v1.x_](https://classic.yarnpkg.com/). Further, to develop the VSCode extension language
-server jars, named `kieler-language-server.{os-id}.jar`, have to placed in the `keith-vscode/server`
-folder. The latest jars can be downloaded
+Development of this project requires [Node.js _v14.x_](https://nodejs.org) and
+[yarn _v1.x_](https://classic.yarnpkg.com/). Further, language server jars, named
+`kieler-language-server.{os-id}.jar`, have to placed in the `keith-vscode/server` folder to develop
+the VSCode extension. The latest jars can be downloaded
 [here](https://rtsys.informatik.uni-kiel.de/~kieler/files/nightly/sccharts/ls/).
 
 The `keith-vscode` extension has a dependency on the
@@ -27,7 +27,7 @@ the extension locally if VSCode is not able to install the dependency automatica
 | Script name | Description                                                                                 |
 | :---------- | :------------------------------------------------------------------------------------------ |
 | clean       | Removes all build results in each package.                                                  |
-| lint        | Run eslint in all packages to identify style problems.                                      |
+| lint        | Runs eslint in all packages to identify style problems.                                     |
 | build       | Builds all packages for production.                                                         |
 | watch       | Builds all packages for development in watch mode.                                          |
 | package     | Builds and packages all packages for distribution. E.g. creates a `keith-vscode.vsix` file. |
