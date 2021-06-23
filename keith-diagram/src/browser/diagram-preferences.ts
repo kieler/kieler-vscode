@@ -36,7 +36,7 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
         'diagram.diagramGenerator': {
             type: 'string',
             enum: ['recursive', 'topdown'],
-            default: 'topdown',
+            default: 'recursive',
             description: 'Instructs the server which diagram generation method to use to create the SGraph',
         },
         'diagram.hierarchyDepth': {
