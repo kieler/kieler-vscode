@@ -123,7 +123,8 @@ export class KNodeView implements IView {
             }
             result.push(...children)
 
-            return <g>{...result}</g>
+            // let scaledResult = result.map(rendering => scaleRendering(rendering, node))
+            return scaleRendering(<g>{...result}</g>, node)
         }
 
         // Add renderings that are not undefined
@@ -133,9 +134,9 @@ export class KNodeView implements IView {
         if (rendering !== undefined) {
             result.push(rendering)
         } else {
-            return <g>
+            return scaleRendering(<g>
                 {ctx.renderChildren(node)}
-            </g>
+            </g>, node)
         }
         if (interactiveNodes) {
             result.push(interactiveNodes)
@@ -149,7 +150,8 @@ export class KNodeView implements IView {
         } else if (!node.areNonChildAreaChildrenRendered) {
             result.push(...ctx.renderNonChildAreaChildren(node))
         }
-        return <g>{...result}</g>
+        let scaledResult = result.map(rendering => scaleRendering(rendering, node))
+        return <g>{...scaledResult}</g>
     }
 }
 
@@ -293,4 +295,12 @@ export class KEdgeView implements IView {
             </g>
         }
     }
+}
+
+function scaleRendering(rendering: VNode, parent: SKNode) {
+    if ((parent as any).properties == undefined || (parent as any).properties.renderScale == undefined) {
+        return rendering
+    }
+    let renderScale = (parent as any).properties.renderScale
+    return <g transform={`scale (${renderScale})`}>{rendering}</g>
 }
