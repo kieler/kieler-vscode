@@ -112,7 +112,7 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
             return result;
         };
     } else {
-        console.log("Spawning to language server as a process.");
+        console.log("Spawning the language server as a process.");
         const lsPath = context.asAbsolutePath(
             `server/kieler-language-server.${getPlattformType()}.jar`
         );

@@ -1,7 +1,7 @@
 {
     "name": "keith-vscode",
-    "displayName": "KEITH VSCode",
-    "description": "KIEL Environment Integrated in VSCode",
+    "displayName": "KEITH",
+    "description": "KIEL Environment Integrated in Visual Studio Code",
     "version": "0.0.1",
     "publisher": "kieler",
     "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",

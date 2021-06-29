@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch VSC Extension",
+            "name": "Launch VS Code Extension",
             "type": "extensionHost",
             "request": "launch",
             "args": ["--extensionDevelopmentPath=${workspaceFolder}/keith-vscode"],
@@ -15,7 +15,7 @@
             "preLaunchTask": "${defaultBuildTask}"
         },
         {
-            "name": "Launch VSC Extension (Socket)",
+            "name": "Launch VS Code Extension (Socket)",
             "type": "extensionHost",
             "request": "launch",
             "args": ["--extensionDevelopmentPath=${workspaceFolder}/keith-vscode"],
