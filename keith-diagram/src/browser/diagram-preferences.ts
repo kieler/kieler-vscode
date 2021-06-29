@@ -35,22 +35,17 @@ export const DiagramPreferenceSchema: PreferenceSchema = {
         },
         'diagram.diagramGenerator': {
             type: 'string',
-            enum: ['recursive', 'topdown'],
-            default: 'recursive',
-            description: 'Instructs the server which diagram generation method to use to create the SGraph',
+            enum: ['full', 'iterative'],
+            default: 'full',
+            description: 'Instructs the server how the diagram should be sent. Full sends the entire graph \
+            at once and iterative sends the diagram in sequentially in pieces [experimental].',
         },
-        'diagram.hierarchyDepth': {
-            type: 'number',
-            description: 'Describes how many hierarchy levels should be generated when using the topdown generator. Ignored otherwise.',
-            default: 5,
-        }
     }
 }
 
 export interface DiagramConfiguration {
     'diagram.shouldSelectDiagram': boolean
     'diagram.shouldSelectText': boolean
-    'diagram.hierarchyDepth': number
     'diagram.diagramGenerator': string
 }
 
@@ -100,7 +95,6 @@ export class KeithDiagramPreferenceService {
         return {
             'diagram.shouldSelectDiagram': this.preferences['diagram.shouldSelectDiagram'],
             'diagram.shouldSelectText': this.preferences['diagram.shouldSelectText'],
-            'diagram.hierarchyDepth': this.preferences['diagram.hierarchyDepth'],
             'diagram.diagramGenerator': this.preferences['diagram.diagramGenerator']
         }
     }
