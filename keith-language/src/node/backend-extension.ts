@@ -11,7 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { isOSX, isWindows } from '@theia/core';
+import { isOSX } from '@theia/core';
 import { BaseLanguageServerContribution, IConnection, LanguageServerContribution } from '@theia/languages/lib/node';
 import { ContainerModule, injectable } from 'inversify';
 import * as net from 'net';
