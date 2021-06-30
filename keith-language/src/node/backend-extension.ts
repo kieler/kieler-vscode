@@ -19,7 +19,7 @@ import { join, resolve } from 'path';
 import { createSocketConnection } from 'vscode-ws-jsonrpc/lib/server';
 import { LS_ID, LS_NAME } from '../common';
 
-const jar = 'kieler-language-server.' + (isOSX ? 'osx' : isWindows ? 'win' : 'linux') + '.jar'
+const jar = 'kieler-language-server.jar'
 const osExtension = join('kieler', jar)
 const EXECUTABLE_JAR_PATH = resolve(join(__dirname, '..', '..', '..', '..', '..', osExtension))
 
