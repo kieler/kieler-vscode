@@ -1,6 +1,6 @@
 {
   "name": "@kieler/keith-diagram",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An extension for Theia with diagram support for KEITH",
   "author": "Kiel University https://rtsys.informatik.uni-kiel.de/kieler",
   "license": "EPL-1.0",
@@ -18,8 +18,8 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@kieler/keith-language": "0.1.0",
-    "@kieler/keith-sprotty": "0.1.0",
+    "@kieler/keith-language": "0.2.0",
+    "@kieler/keith-sprotty": "0.2.0",
     "sprotty-theia": "0.9.0"
   },
   "files": [

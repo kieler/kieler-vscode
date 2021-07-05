@@ -1,6 +1,6 @@
 {
   "name": "@kieler/keith-simulation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An extension for Theia to add simulation support for KEITH",
   "author": "Kiel University https://rtsys.informatik.uni-kiel.de/kieler",
   "license": "EPL-1.0",
@@ -18,7 +18,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@kieler/keith-kicool": "0.1.0",
+    "@kieler/keith-kicool": "0.2.0",
     "@theia/editor": "1.4.0"
   },
   "files": [
