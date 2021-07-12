@@ -13,7 +13,6 @@
         "@theia/application-package": "1.4.0",
         "@theia/core": "1.4.0",
         "@theia/editor": "1.4.0",
-        "@theia/electron": "1.4.0",
         "@theia/file-search": "1.4.0",
         "@theia/filesystem": "1.4.0",
         "@theia/getting-started": "1.4.0",

@@ -2080,20 +2080,6 @@
     "@types/base64-arraybuffer" "0.1.0"
     base64-arraybuffer "^0.1.5"
 
-"@theia/electron@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@theia/electron/-/electron-1.4.0.tgz#fa90e5e7eda056cd3c4e00226e0424b41bde7dfc"
-  integrity sha512-H/MtenIMvqsmenOgOKPsXnZxFYbI4lkcB3SJkK+Ss2nLG1yVDv8jNZ1SJ4W4Nlw9sYr3x2LBdCdZEJdSaaGflw==
-  dependencies:
-    electron "^9.0.2"
-    electron-download "^4.1.1"
-    electron-store "^5.1.1"
-    fix-path "^3.0.0"
-    native-keymap "^2.1.2"
-    node-gyp "^3.6.0"
-    unzipper "^0.9.11"
-    yargs "^11.1.0"
-
 "@theia/file-search@1.4.0", "@theia/file-search@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@theia/file-search/-/file-search-1.4.0.tgz#8ee7c8c51162cabb1cd72b35a9da178901037f0a"
