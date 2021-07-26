@@ -2,7 +2,7 @@
     "name": "keith-vscode",
     "displayName": "KEITH",
     "description": "KIEL Environment Integrated in Visual Studio Code",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "publisher": "kieler",
     "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
     "icon": "icon.png",
