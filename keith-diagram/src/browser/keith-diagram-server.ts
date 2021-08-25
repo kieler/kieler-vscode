@@ -102,10 +102,10 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
                 children.forEach(element => {
                     // FIXME: not all types of children should be added here, edges for example are already
                     //        complete as they can't have any own children
-                    this.childrenToRequestQueue.push((message.action as SetDiagramPieceAction).diagramPiece.id, element)
+                    this.childrenToRequestQueue.enqueue((message.action as SetDiagramPieceAction).diagramPiece.id, element)
                 });
             }
-            if (this.childrenToRequestQueue.peek() !== undefined) {
+            if (this.childrenToRequestQueue.front() !== undefined) {
 
                 // get viewport
                 this.actionDispatcher.dispatch(GetViewportAction.create())
@@ -225,7 +225,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
 
     handleViewportResult(action: ViewportResult) {
         this.childrenToRequestQueue.setViewport(action)
-        let child = this.childrenToRequestQueue.pop()!
+        let child = this.childrenToRequestQueue.dequeue()!
         this.actionDispatcher.dispatch(new RequestDiagramPieceAction(generateRequestId(), child.id))
     }
 

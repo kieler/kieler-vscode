@@ -18,50 +18,58 @@ import { add, Point, SModelElementSchema, ViewportResult } from "sprotty"
  * requests.
  */
 export interface IDiagramPieceRequestManager {
+    
     /**
-     * Add a diagram piece that should be requested later.
-     * @param parentId necessary to determine the position of the piece
-     * @param diagramPiece schema of diagram piece
+     * Adds a diagram piece that should be requested later.
+     * @param parentId The ID of the SModelElement that is the direct parent of
+     *                 this diagram piece. This is necessary to determine the 
+     *                 position of the piece.
+     * @param diagramPiece Schema of diagram piece.
      */
-
-    push(parentId: string, diagramPiece: SModelElementSchema): void
+    enqueue(parentId: string, diagramPiece: SModelElementSchema): void
+    
     /**
-     * Get id of next diagram piece that should be requested and remove it
+     * Returns the next diagram piece that should be requested and removes it
      * from the manager.
      */
-    pop(): SModelElementSchema | undefined
+    dequeue(): SModelElementSchema | undefined
 
     /**
-     * Reset the manager for a different diagram.
+     * Resets the manager for a different diagram.
      */
     reset(): void
 
     /**
-     * Retrieves same element as pop, but doesn't remove it.
+     * Retrieves same element as dequeue, but doesn't remove it from the manager.
      */
-    peek(): SModelElementSchema | undefined
+    front(): SModelElementSchema | undefined
 
     /**
      * Submit info about current viewport position to be used to prioritize the ordering of requests.
      */
     setViewport(viewportResult: ViewportResult): void
-    // TODO: add methods which supply info about user viewport so that the manager can
-    //       adjust the ordering of items
 }
 
+/**
+ * This implementation of {@link IDiagramPieceRequestManager} serves as a naive
+ * implementation of the interface. Diagram pieces are stored in a simple queue
+ * and requested in FIFO order. The resulting behaviour is that the pieces of a
+ * diagram are requested breadth-first. The position of the viewport is not 
+ * taken into consideration in this approach.
+ */
 export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestManager {
 
     piecesToRequest: SModelElementSchema[] = []
-    push(_parentId: string, diagramPiece: SModelElementSchema): void {
+    enqueue(_parentId: string, diagramPiece: SModelElementSchema): void {
         this.piecesToRequest.push(diagramPiece)
     }
-    pop(): SModelElementSchema | undefined {
+    dequeue(): SModelElementSchema | undefined {
         return this.piecesToRequest.shift() // FIFO, pop() would be FILO
     }
     reset(): void {
         this.piecesToRequest = []
     }
-    peek(): SModelElementSchema | undefined {
+    front(): SModelElementSchema | undefined {
         if (this.piecesToRequest.length === 0) {
             return undefined
         } else {
@@ -69,19 +77,31 @@ export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestMana
         }
     }
     setViewport(_viewportResult: ViewportResult): void {
-        // TODO: implement simple solution
         console.log("QueueDiagramPieceRequestManager.setViewport is unimplemented")
     }
 }
 
+/**
+ * This class provides a more sophisticated implementaion of 
+ * {@link IDiagramPieceRequestManager}. In order to send diagram piece requests
+ * in order of "first needed", the diagram area is divided into a grid and the
+ * locations of each piece within this grid are determined. The viewport position
+ * is then taken to determine which grid cell is currently in view and each
+ * grid cell maintains its own queue of pieces to request. When there are no
+ * more pieces in a grid cell, grid cells in a ring around that center cell are
+ * checked. And if nothing is found there either, the fallback is to go through
+ * all the grid cells and request the first piece that is discovered.
+ */
 export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManager {
 
     idToAbsolutePositions: Map<string, Point>
     // ordering of elements per grid corresponds to layer, therefore operations on it should be FIFO
     /* https://stackoverflow.com/questions/39005798/fastest-way-of-using-coordinates-as-keys-in-javascript-hashmap */
+    /**
+     * These fields are used to map the diagram piece queues to their grid cell coordinates. 
+     */
     gridToPieces: Map<number, SModelElementSchema []>
-
-    readonly MAX_16BIT_SIGNED = 32767
+    readonly MAX_16BIT_SIGNED = (1 << (16 - 1)) - 1    // 32767
 
     /**
      * Determines how many pixels wide each grid square should be.
@@ -106,6 +126,14 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
      */
     currentGridPosition = {x: 0, y: 0}
 
+    /**
+     * Transforms a coordinate pair (x,y) to a 32 bit integer. x and y must be 
+     * between 0 and 32767 which is a sufficiently large domain for this application.
+     * The value of x is stored in the first 16 bits and the value of y is stored in
+     * the last 16 bits.
+     * @param point The coordinate to be transformed to an integer encoding.
+     * @returns Integer representing the coordinate pair.
+     */
     getKey(point: Point): number {
         let x = point.x
         let y = point.y
@@ -115,15 +143,32 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         return (x << 16) | y
     }
 
+    /**
+     * Transforms a 32 bit integer to a pair (x,y). The encoding is explained in
+     * {@link GridDiagramPieceRequestManager.getKey}
+     * @param key Integer to be transformed to coordinate pair.
+     * @returns Coordinate pair in the form {x: valueX, y: valueY}.
+     */
     getCoords(key: number): Point {
         let keyX = (key >> 16)
         let keyY = (key & 0xFFFF)
         return { x: keyX, y: keyY }
     }
 
+    /**
+     * Generates coordinate pairs which form a square around the origin (0,0) with a distance n
+     * from the center in exactly one or both components of the coordinate. Or expressed more 
+     * mathematically:
+     * 
+     * All pairs must be of the form (+-n,v) or (v,+-n) with -n <= v <= n
+     * 
+     * @param n Distance of the ring from the origin.
+     * @returns List of coordinate pairs: [{x: .., y: ..}, ..]
+     */
     ringCoords(n: number): Point[] {
-        // for x and y and -n and n generate all coordinate pairs
         /*
+         * Ring with n = 2
+         *
          *     X X X X X
          *     X       X
          *     X       X
@@ -133,27 +178,28 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
 
         let result = []
         // first get all edge coordinates
-        for (let i = (-(n + 1)); i <= (n - 1); i++) {
+        for (let i = (-(n - 1)); i <= (n - 1); i++) {
             result.push({x: -n, y: i})
         }
-        for (let i = (-(n + 1)); i <= (n - 1); i++) {
+        for (let i = (-(n - 1)); i <= (n - 1); i++) {
             result.push({x: n, y: i})
         }
-        for (let i = (-(n + 1)); i <= (n - 1); i++) {
+        for (let i = (-(n - 1)); i <= (n - 1); i++) {
             result.push({x: i, y: -n})
         }
-        for (let i = (-(n + 1)); i <= (n - 1); i++) {
+        for (let i = (-(n - 1)); i <= (n - 1); i++) {
             result.push({x: i, y: n})
         }
         // push corner coordinates
         result.push({x: -n, y: -n})
         result.push({x: -n, y: n})
         result.push({x: n, y: -n})
-        result.push({x: n, y: -n})
+        result.push({x: n, y: n})
+        console.log(JSON.stringify(result))
         return result
     }
 
-    push(parentId: string, diagramPiece: SModelElementSchema): void {
+    enqueue(parentId: string, diagramPiece: SModelElementSchema): void {
         if (diagramPiece.type === "node") {
             let castPiece = diagramPiece as any
             if (this.idToAbsolutePositions.get(parentId) !== undefined) {
@@ -180,9 +226,12 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             // DO NOT DO ANYTHING WITH NON NODE ELEMENTS
             // FIXME: execution probably should reach here and should throw an error
             //        but maybe caller should not worry about this
+            
+            //        In current implementation the caller just passes all types of
+            //        elements, so we simply silently ignore wrong elements here
         }
     }
-    pop(): SModelElementSchema | undefined {
+    dequeue(): SModelElementSchema | undefined {
         // if something exists in current grid position return that
         let key = this.getKey(this.currentGridPosition)
         let list = this.gridToPieces.get(key)
@@ -227,7 +276,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         this.gridToPieces = new Map<number, SModelElementSchema[]>()
         this.currentGridPosition = {x: 0, y: 0}
     }
-    peek(): SModelElementSchema | undefined {
+    front(): SModelElementSchema | undefined {
         // if something exists in current grid position return that
         let key = this.getKey(this.currentGridPosition)
         let list = this.gridToPieces.get(key)
