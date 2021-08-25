@@ -44,7 +44,10 @@ function replaceNodeById(root: SParentElement, modelElement: SModelElement) {
     } else {
         // recurse further down otherwise
         root.children.forEach(childNode => {
-            replaceNodeById(childNode, modelElement);
+            // find correct child to descend into by pattern matching ids
+            if (id.startsWith(childNode.id)) {
+                replaceNodeById(childNode, modelElement);
+            }
         });
     }
 }
