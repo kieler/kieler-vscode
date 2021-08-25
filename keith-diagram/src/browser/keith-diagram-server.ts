@@ -18,10 +18,11 @@ import {
 } from '@kieler/keith-interactive/lib/layered/actions';
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
-    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, KeithUpdateModelAction, Pair, PerformActionAction, RefreshLayoutAction, RequestTextBoundsCommand,
-    SetSynthesesAction, SetSynthesisAction, StoreImagesAction, RequestDiagramPieceAction, SetDiagramPieceAction,
-    IncrementalRequestTextBoundsCommand,
-    IncrementalComputedTextBoundsAction
+    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, 
+    IncrementalComputedTextBoundsAction, IncrementalRequestTextBoundsCommand,
+    KeithUpdateModelAction, Pair, PerformActionAction, 
+    RefreshLayoutAction, RequestDiagramPieceAction, RequestTextBoundsCommand,
+    SetDiagramPieceAction, SetSynthesesAction, SetSynthesisAction, StoreImagesAction,
 } from '@kieler/keith-sprotty/lib/actions/actions';
 import { RequestKeithPopupModelAction } from '@kieler/keith-sprotty/lib/hover/hover';
 import { injectable } from 'inversify';
