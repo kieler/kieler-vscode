@@ -8,7 +8,7 @@
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
  *
- * This code is provided under the terms of the Eclipse Public License (EPL).
+ * This code is provided under the terms of the Eclipse Public License 2.0 (EPL-2.0).
  */
 
 import { ContainerModule } from "inversify";
