@@ -195,7 +195,6 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         result.push({x: -n, y: n})
         result.push({x: n, y: -n})
         result.push({x: n, y: n})
-        console.log(JSON.stringify(result))
         return result
     }
 
