@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "SCTX",
-  "scopeName": "text.sctx",
+  "name": "Esterel",
+  "scopeName": "text.strl",
   "patterns": [
     {
       "include": "#keywords"
@@ -20,18 +20,18 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.control.sctx",
-          "match": "\\b(Pr|_|abort|auto|bool|calls|class|clock|combine|commuting|conflicting|connector|const|dataflow|deferred|delayed|do|during|else|end|entry|enum|exit|expression|extends|extern|fby|final|float|for|fork|global|go|goto|history|host|if|immediate|import|initial|input|int|is|join|json|label|max|method|min|module|nondeterministic|none|null|ode|once|output|override|par|pause|period|policy|pre|print|private|protected|public|pure|random|randomize|ref|region|reset|return|run|scchart|schedule|scope|seq|sfby|shallow|signal|state|static|string|strong|struct|suspend|then|this|to|undefined|val|violation|void|weak|while)\\b"
+          "name": "keyword.control.strl",
+          "match": "\\b(_|abort|and|await|bool|boolean|call|case|class|combine|commuting|conflicting|const|constant|copymodule|do|double|each|else|elsif|emit|end|enum|every|exec|exit|expression|extern|fby|float|for|fork|function|global|goto|halt|handle|host|if|immediate|in|input|inputoutput|int|integer|is|join|json|label|loop|max|min|mod|module|none|not|nothing|null|or|output|par|pause|positive|pre|present|print|private|procedure|protected|public|pure|random|randomize|ref|relation|repeat|return|run|schedule|scope|sensor|sfby|signal|static|string|struct|suspend|sustain|task|then|this|tick|timeout|times|to|trap|type|unsigned|upto|val|var|void|watching|weak|when|while|with)\\b"
         }
       ]
     },
     "strings": {
-      "name": "string.quoted.double.sctx",
+      "name": "string.quoted.double.strl",
       "begin": "\"",
       "end": "\"",
       "patterns": [
         {
-          "name": "constant.character.escape.sctx",
+          "name": "constant.character.escape.strl",
           "match": "."
         }
       ]
@@ -39,7 +39,7 @@
     "annotations": {
       "patterns": [
         {
-          "name": "storage.type.annotation.sctx",
+          "name": "storage.type.annotation.strl",
           "match": "@\\w*"
         }
       ]
@@ -47,15 +47,15 @@
     "constants-and-special-vars": {
       "patterns": [
         {
-          "name": "constant.language.sctx",
+          "name": "constant.language.strl",
           "match": "\\b(true|false)\\b"
         },
         {
-          "name": "constant.numeric.integer.sctx",
+          "name": "constant.numeric.integer.strl",
           "match": "\\b(0|[1-9]([0-9_]*[0-9])?)[lL]?(?!\\w|\\.)"
         },
         {
-          "name": "constant.numeric.float.sctx",
+          "name": "constant.numeric.float.strl",
           "match": "(?x)\n\t\t\t\t\t\t(?\u003c!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t\t(?\u003e\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(0|[1-9]([0-9_]*[0-9])?)\t\t\t\t# Leading digits\n\t\t\t\t\t\t\t\t(?\u003d[eEfFdD.])\t\t\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(?\u003c\u003d[0-9])(?\u003d[eEfFdD])\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t  | \\.\n\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[0-9]([0-9_]*[0-9])?\t\t\t\t\t# Numbers after .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[eE][+-]?(0|[1-9]([0-9_]*[0-9])?)\t\t# Exponent\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t[fFdD]?\t\t\t\t\t\t\t\t\t\t# Float Type Suffix\n\t\t\t\t\t\t)\n\t\t\t\t\t\t(?!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t"
         }
       ]

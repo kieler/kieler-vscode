@@ -1,154 +1,235 @@
 {
-    "name": "keith-vscode",
-    "displayName": "KEITH",
-    "description": "KIEL Environment Integrated in Visual Studio Code",
-    "version": "0.1.0",
-    "publisher": "kieler",
-    "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
-    "icon": "icon.png",
-    "license": "EPL-2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://git.rtsys.informatik.uni-kiel.de/projects/KIELER/repos/keith",
-        "directory": "keith-vscode"
-    },
-    "homepage": "https://rtsys.informatik.uni-kiel.de/kieler",
-    "engines": {
-        "vscode": "^1.56.0"
-    },
-    "categories": [
-        "Programming Languages",
-        "Other"
-    ],
-    "activationEvents": [
-        "onLanguage:sctx",
-        "onLanguage:elkt",
-        "onLanguage:kgt",
-        "onLanguage:kviz",
-        "onLanguage:strl",
-        "onLanguage:lus"
-    ],
-    "main": "./dist/extension.js",
-    "contributes": {
-        "languages": [
-            {
-                "id": "sctx",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "SCCharts"
-                ],
-                "extensions": [
-                    ".sctx"
-                ]
-            },
-            {
-                "id": "elkt",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "Elk Graph"
-                ],
-                "extensions": [
-                    ".elkt"
-                ]
-            },
-            {
-                "id": "kgt",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "KGraph"
-                ],
-                "extensions": [
-                    ".kgt"
-                ]
-            },
-            {
-                "id": "kviz",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "Kieler Visualization"
-                ],
-                "extensions": [
-                    ".kviz"
-                ]
-            },
-            {
-                "id": "strl",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "Estrel"
-                ],
-                "extensions": [
-                    ".strl"
-                ]
-            },
-            {
-                "id": "lus",
-                "configuration": "./language-configs/basic-configuration.json",
-                "aliases": [
-                    "Lustre"
-                ],
-                "extensions": [
-                    ".lus"
-                ]
-            }
+  "name": "keith-vscode",
+  "displayName": "KEITH",
+  "description": "KIEL Environment Integrated in Visual Studio Code",
+  "version": "0.1.0",
+  "publisher": "kieler",
+  "author": "Kiel University \u003crt-kieler-devel@informatik.uni-kiel.de\u003e",
+  "icon": "icon.png",
+  "license": "EPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://git.rtsys.informatik.uni-kiel.de/projects/KIELER/repos/keith",
+    "directory": "keith-vscode"
+  },
+  "homepage": "https://rtsys.informatik.uni-kiel.de/kieler",
+  "engines": {
+    "vscode": "^1.56.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:kieler",
+    "onLanguage:sctx",
+    "onLanguage:scl",
+    "onLanguage:elkt",
+    "onLanguage:kgt",
+    "onLanguage:kviz",
+    "onLanguage:strl",
+    "onLanguage:lus"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "kgt",
+        "aliases": [
+          "KGraph",
+          "kgt"
         ],
-        "grammars": [
-            {
-                "language": "sctx",
-                "scopeName": "source.sctx",
-                "path": "./syntaxes/sctx.tmLanguage.json"
-            },
-            {
-                "language": "elkt",
-                "scopeName": "source.elkt",
-                "path": "./syntaxes/elkt.tmLanguage.json"
-            }
+        "extensions": [
+          "kgt"
         ],
-        "menus": {
-            "editor/title": [
-                {
-                    "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-vscode.diagram.open",
-                    "group": "navigation"
-                }
-            ],
-            "editor/context": [
-                {
-                    "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-vscode.diagram.open",
-                    "group": "navigation"
-                }
-            ],
-            "explorer/context": [
-                {
-                    "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
-                    "command": "klighd-vscode.diagram.open",
-                    "group": "navigation"
-                }
-            ]
-        },
-        "commands": []
-    },
-    "extensionDependencies": [
-        "kieler.klighd-vscode"
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "elkt",
+        "aliases": [
+          "Elk Graph",
+          "elkt"
+        ],
+        "extensions": [
+          "elkt"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "strl",
+        "aliases": [
+          "Esterel",
+          "strl"
+        ],
+        "extensions": [
+          "strl"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "kviz",
+        "aliases": [
+          "KiVis",
+          "kviz"
+        ],
+        "extensions": [
+          "kviz"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "lus",
+        "aliases": [
+          "Lustre",
+          "lus"
+        ],
+        "extensions": [
+          "lus"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sctx",
+        "aliases": [
+          "SCTX",
+          "sctx"
+        ],
+        "extensions": [
+          "sctx"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "scl",
+        "aliases": [
+          "SCL",
+          "scl"
+        ],
+        "extensions": [
+          "scl"
+        ],
+        "configuration": "./language-configuration.json"
+      }
     ],
-    "scripts": {
-        "clean": "rm -rf dist",
-        "lint": "eslint .",
-        "build": "webpack --mode production --devtool hidden-source-map",
-        "watch": "webpack --watch",
-        "package": "vsce package --yarn -o keith-vscode.vsix",
-        "vscode:prepublish": "yarn run build"
+    "grammars": [
+      {
+        "language": "kgt",
+        "scopeName": "text.kgt",
+        "path": "./syntaxes/kgt.tmLanguage.json"
+      },
+      {
+        "language": "elkt",
+        "scopeName": "text.elkt",
+        "path": "./syntaxes/elkt.tmLanguage.json"
+      },
+      {
+        "language": "strl",
+        "scopeName": "text.strl",
+        "path": "./syntaxes/strl.tmLanguage.json"
+      },
+      {
+        "language": "kviz",
+        "scopeName": "text.kviz",
+        "path": "./syntaxes/kviz.tmLanguage.json"
+      },
+      {
+        "language": "lus",
+        "scopeName": "text.lus",
+        "path": "./syntaxes/lus.tmLanguage.json"
+      },
+      {
+        "language": "sctx",
+        "scopeName": "text.sctx",
+        "path": "./syntaxes/sctx.tmLanguage.json"
+      },
+      {
+        "language": "scl",
+        "scopeName": "text.scl",
+        "path": "./syntaxes/scl.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+          "command": "keith-vscode.compile",
+          "title": "Compile current model with...",
+          "category": "KiCo"
+      },
+      {
+          "command": "keith-vscode.simulate",
+          "title": "Simulate current model with...",
+          "category": "Simulation"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+          {
+              "command": "keith-vscode.compile"
+          },
+          {
+              "command": "keith-vscode.simulate"
+          }
+        ]
+      },
+      "editor/title": [
+        {
+          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "command": "klighd-vscode.diagram.open",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "command": "klighd-vscode.diagram.open",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "command": "klighd-vscode.diagram.open",
+          "group": "navigation"
+        }
+      ]
     },
-    "devDependencies": {
-        "@types/vscode": "^1.56.0",
-        "@types/node": "^12.11.7",
-        "ts-loader": "^9.2.3",
-        "vsce": "1.88.0",
-        "webpack": "^5.39.1",
-        "webpack-cli": "^4.7.2"
+    "viewsContainers": {
+        "activitybar": [
+            {
+                "id": "kieler",
+                "title": "KIELER",
+                "icon": "./icon.png"
+            }
+        ]
     },
-    "dependencies": {
-        "vscode-languageclient": "^5.2.1"
-    }
+    "views": {
+      "kieler": [
+          {
+              "id": "kieler-kico",
+              "name": "KIELER Compiler"
+          }
+      ]
+  },
+  "extensionDependencies": [
+    "kieler.klighd-vscode"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "build": "webpack --mode production",
+    "watch": "webpack --watch",
+    "package": "vsce package --yarn -o keith-vscode.vsix",
+    "vscode:prepublish": "yarn run build"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.56.0",
+    "@types/node": "^12.11.7",
+    "ts-loader": "^9.2.3",
+    "vsce": "1.88.0",
+    "webpack": "^5.39.1",
+    "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "vscode-uri": "^3.0.2",
+    "vscode-languageclient": "^5.2.1"
+  }
 }

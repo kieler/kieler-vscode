@@ -21,6 +21,7 @@ import {
 import { connect, NetConnectOpts, Socket } from "net";
 import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
+import { CompilationDataProvider } from "./kico/compilation-data-provider";
 
 //** Command identifiers that are provided by klighd-vscode. */
 const klighdCommands = {
@@ -33,7 +34,7 @@ const klighdCommands = {
  * The file ending should also be the language id, since it is also used to
  * register document selectors in the language client.
  */
-const supportedFileEndings = ["sctx", "elkt", "kgt", "kviz", "strl", "lus"];
+const supportedFileEndings = ["sctx", "scl", "elkt", "kgt", "kviz", "strl", "lus"];
 
 let lsClient: LanguageClient;
 let socket: Socket;
@@ -71,6 +72,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         performActionKind,
         handlePerformAction
     );
+
+    const compilationDataProvider = new CompilationDataProvider(lsClient, context)
+
+    // Register and start kico view
+    vscode.window.registerTreeDataProvider(
+        'kieler-kico',
+        compilationDataProvider
+    );
+    vscode.window.createTreeView('kieler-kico', {
+        treeDataProvider: compilationDataProvider
+    });
 
     console.debug("Starting Language Server...");
     lsClient.start();

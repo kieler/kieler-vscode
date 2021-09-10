@@ -1,65 +1,64 @@
 {
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Elk Graph",
-  "scopeName": "source.elkt",
-  "fileTypes": ["elkt"],
+  "scopeName": "text.elkt",
   "patterns": [
-      {
-          "include": "#comments"
-      },
-      {
-          "include": "#constants"
-      },
-      {
-          "include": "#keywords"
-      },
-      {
-          "name": "string.quoted.double.sctx",
-          "begin": "\"",
-          "end": "\""
-      }
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#constants-and-special-vars"
+    }
   ],
   "repository": {
-      "comments": {
-          "patterns": [
-              {
-                  "name": "comment.line.sctx",
-                  "begin": "(^[ \\t]+)?(?=//)",
-                  "end": "(?=$)"
-              },
-              {
-                  "name": "comment.block.sctx",
-                  "begin": "/\\*(\\*)?(?!/)",
-                  "end": "\\*/"
-              }
-          ]
-      },
-      "constants": {
-          "patterns": [
-              {
-                  "name": "constant.numeric.sctx",
-                  "match": "\\b[0-9][0-9]*\\b"
-              },
-              {
-                  "name": "constant.language.sctx",
-                  "match": "\\b(true|false|DOWN|UP|LEFT|RIGHT)\\b"
-              }
-          ]
-      },
-      "keywords": {
-          "patterns": [
-              {
-                  "name": "keyword.control.sctx",
-                  "match": "\\b(node|edge)\\b"
-              },
-              {
-                  "name": "keyword.operator.sctx",
-                  "match": "\\-\\>"
-              },
-              {
-                  "name": "keyword.other.sctx",
-                  "match": "\\b(layout|label|size)\\b"
-              }
-          ]
-      }
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.elkt",
+          "match": "\\b(bends|edge|end|false|graph|incoming|label|layout|node|null|outgoing|port|position|section|size|start|true)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.elkt",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.elkt",
+          "match": "."
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "storage.type.annotation.elkt",
+          "match": "@\\w*"
+        }
+      ]
+    },
+    "constants-and-special-vars": {
+      "patterns": [
+        {
+          "name": "constant.language.elkt",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.numeric.integer.elkt",
+          "match": "\\b(0|[1-9]([0-9_]*[0-9])?)[lL]?(?!\\w|\\.)"
+        },
+        {
+          "name": "constant.numeric.float.elkt",
+          "match": "(?x)\n\t\t\t\t\t\t(?\u003c!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t\t(?\u003e\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(0|[1-9]([0-9_]*[0-9])?)\t\t\t\t# Leading digits\n\t\t\t\t\t\t\t\t(?\u003d[eEfFdD.])\t\t\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(?\u003c\u003d[0-9])(?\u003d[eEfFdD])\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t  | \\.\n\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[0-9]([0-9_]*[0-9])?\t\t\t\t\t# Numbers after .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[eE][+-]?(0|[1-9]([0-9_]*[0-9])?)\t\t# Exponent\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t[fFdD]?\t\t\t\t\t\t\t\t\t\t# Float Type Suffix\n\t\t\t\t\t\t)\n\t\t\t\t\t\t(?!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t"
+        }
+      ]
+    }
   }
 }
