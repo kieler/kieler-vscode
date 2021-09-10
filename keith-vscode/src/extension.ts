@@ -26,6 +26,7 @@ import { performActionKind, handlePerformAction } from "./perform-action-handler
 const klighdCommands = {
     setLanguageClient: "klighd-vscode.setLanguageClient",
     addActionHandler: "klighd-vscode.addActionHandler",
+    dispatchAction: "klighd-vscode.dispatchAction",
 };
 
 /**
