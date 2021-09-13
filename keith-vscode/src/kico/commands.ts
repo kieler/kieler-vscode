@@ -17,6 +17,16 @@ export const SAVE: vscode.Command = {
     title: 'Save'
 };
 
+export const SHOW_COMMAND: vscode.Command = {
+    command: 'keith-vscode.show',
+    title: 'Show Snapshot'
+}
+
+export const COMPILE_COMMAND: vscode.Command = {
+    command: 'keith-vscode.compile',
+    title: 'Compile'
+}
+
 export const SHOW_NEXT: vscode.Command = {
     command: 'kico-show_next',
     title: 'Kico: Show next'

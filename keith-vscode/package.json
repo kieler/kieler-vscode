@@ -158,17 +158,29 @@
           "command": "keith-vscode.simulate",
           "title": "Simulate current model with...",
           "category": "Simulation"
+      },
+      {
+          "command": "keith-vscode.show",
+          "title": "Show snapshot...",
+          "icon": "$(eye)",
+          "category": "KiCo"
       }
     ],
     "menus": {
+      "view/item/context": [
+        {
+          "command": "keith-vscode.show",
+          "when": "viewItem = snapshot"
+        }
+      ],
       "commandPalette": [
-          {
-            "command": "keith-vscode.compile"
-          },
-          {
-            "command": "keith-vscode.simulate"
-          }
-        ],
+        {
+          "command": "keith-vscode.compile"
+        },
+        {
+          "command": "keith-vscode.simulate"
+        }
+      ],
       "editor/title": [
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",

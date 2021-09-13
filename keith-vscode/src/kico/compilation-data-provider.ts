@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
 import { Utils } from 'vscode-uri';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
@@ -88,14 +88,21 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
         }));
-        // TODO Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
+        // Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
         const editor = vscode.window.activeTextEditor
         if (editor) {
             this.onDidChangeActiveTextEditor(editor)
         }
 
         this.context.subscriptions.push(
-            vscode.commands.registerCommand("keith-vscode.compile", async () => {
+            vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
+                console.log("Show")
+                console.log("Show", snapshot)
+                this.show(this.lastCompiledUri, snapshot.index)
+            }, this));
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(COMPILE_COMMAND.command, async () => {
                 const options = this.createQuickPick(this.systems)
                 const quickPick = vscode.window.createQuickPick();
                 quickPick.items = options;
@@ -182,7 +189,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     addCompilationSystemToCommandPalette(systems: CompilationSystem[]): void {
         // remove existing commands
         // TODO not possible do this via visibility
-        // All systems are only requested once for a model
+        // TODO All systems are only requested once for a model
         this.kicoCommands.forEach(command => {
             command.dispose();
         })
@@ -273,6 +280,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.lengthMap.set(uri as string, length)
         this.indexMap.set(uri as string, length - 1)
         if (finished) {
+            let index = 0;
             let errorOccurred = false
             this.compiling = false
             let errorString = '';
@@ -284,6 +292,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                             errorString = errorString + '\n' + error + "TODO remove" + currentIndex + maxIndex
                         })
                     }
+                    element.index = index
+                    index++
+                    element.command = {
+                        title: 'Show snapshot ' + element.label + " " + element.snapshotIndex,
+                        command: SHOW_COMMAND.command,
+                        arguments: [element]
+                    }
+                    this._onDidChangeTreeData.fire(element)
                 })
             });
             this.compilationFinishedEmitter.fire(!errorOccurred)
@@ -453,32 +469,45 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         //     keybinding: SHOW_PREVIOUS_KEYBINDING
         // })
     }
+
+    // private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>()
+    // readonly onDidChangeTreeData = this._onDidChangeTreeData.event
     private _onDidChangeTreeData: vscode.EventEmitter<CompilationData | undefined | null | void> = new vscode.EventEmitter<CompilationData | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<CompilationData | undefined | null | void> = this._onDidChangeTreeData.event;
+
     getTreeItem(element: CompilationData): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        console.log(element)
         if (element) {
-            return {
-                id: element.name + element.index + ":" + element.snapshotIndex,
-                label: element.name
-            }
+            console.log(element)
+            // Put context into element to show it in diagram
+            element.id = element.name + element.index + (!element.contextValue || element.contextValue != "parent"? ":" + element.snapshotIndex : "")
+            element.label = element.name
+            return element
         }
         // resultMap holds a CodeContainer with everything
         throw new Error('Method not implemented.');
     }
     getChildren(element?: CompilationData): vscode.ProviderResult<CompilationData[]> {
-        console.log(element)
-        if (element) {
-            let index = -1;
-            this.snapshots?.files.find(e => {
-                index++;
-                return e[0] === element
-            })
-            return this.snapshots?.files[index]
-        } else {
-            return this.snapshots?.files.map(snapshots => {
-                return snapshots[0]
-            })
+        if (this.snapshots) {
+            if (element?.contextValue == 'parent') {
+                let index = -1;
+                this.snapshots?.files.find(e => {
+                    index++;
+                    return e[0].index === element.index
+                })
+                return this.snapshots.files[index]
+            } else {
+                return this.snapshots.files.map(snapshots => {
+                    if (snapshots.length > 1) {
+                        // TODO calculate or safe what was expanded and what collapsed for each compilation systems, maybe by their name?
+                        const parentElement = new CompilationData(snapshots[0].name, '', vscode.TreeItemCollapsibleState.Collapsed, snapshots[0].name, snapshots[0].snapshotIndex,
+                        snapshots[0].index)
+                        parentElement.contextValue = 'parent'
+                        return parentElement
+                    }
+                    snapshots[0].contextValue = 'snapshot'
+                    return snapshots[0]
+                })
+            }
         }
         return []
     }
@@ -486,9 +515,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
 export class CompilationData extends vscode.TreeItem {
     constructor(
-        public readonly label: string,
+        public label: string,
         private version: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public collapsibleState: vscode.TreeItemCollapsibleState,
         name: string,
         snapshotIndex: number,
         index: number,
@@ -518,7 +547,6 @@ export class CompilationData extends vscode.TreeItem {
     errors?: string[];
     warnings?: string[];
     infos?: string[];
-
 }
 
 export class CompilationSystem {
