@@ -27,6 +27,7 @@ import { CompilationDataProvider } from "./kico/compilation-data-provider";
 const klighdCommands = {
     setLanguageClient: "klighd-vscode.setLanguageClient",
     addActionHandler: "klighd-vscode.addActionHandler",
+    dispatchAction: "klighd-vscode.dispatchAction",
 };
 
 /**
