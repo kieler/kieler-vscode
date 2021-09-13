@@ -163,13 +163,12 @@
     "menus": {
       "commandPalette": [
           {
-              "command": "keith-vscode.compile"
+            "command": "keith-vscode.compile"
           },
           {
-              "command": "keith-vscode.simulate"
+            "command": "keith-vscode.simulate"
           }
-        ]
-      },
+        ],
       "editor/title": [
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
@@ -208,6 +207,7 @@
               "name": "KIELER Compiler"
           }
       ]
+    }
   },
   "extensionDependencies": [
     "kieler.klighd-vscode"

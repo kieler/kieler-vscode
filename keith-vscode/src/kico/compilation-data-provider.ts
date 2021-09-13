@@ -13,6 +13,8 @@ export const SHOW_PREVIOUS_KEYBINDING = "alt+g"
 export const SHOW_NEXT_KEYBINDING = "alt+j"
 
 export const EDITOR_UNDEFINED_MESSAGE = "Editor is undefined"
+export const snapshotDescriptionMessageType = 'keith/kicool/compile';
+export const cancelCompilationMessageType = 'keith/kicool/cancel-compilation';
 export const compilationSystemsMessageType = 'keith/kicool/compilation-systems';
 
 export const diagramType = "keith-diagram"
@@ -22,7 +24,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     requestedSystems = false;
     systems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
-    kicoCommands: vscode.Command[] = [];
+    kicoCommands: vscode.Disposable[] = [];
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
     compileInplace = false
     showResultingModel = true
@@ -79,6 +81,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             lsClient.onNotification(compilationSystemsMessageType, (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
                 this.handleReceiveSystemDescriptions(systems, snapshotSystems)
             });
+            lsClient.onNotification(snapshotDescriptionMessageType, (snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number) => {
+                this.handleNewSnapshotDescriptions(snapshotsDescriptions, uri, finished, currentIndex, maxIndex)
+            });
         });
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
@@ -90,16 +95,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         }
 
         this.context.subscriptions.push(
-            vscode.commands.registerCommand(COMPILE, async () => {
+            vscode.commands.registerCommand("keith-vscode.compile", async () => {
                 const options = this.createQuickPick(this.systems)
                 const quickPick = vscode.window.createQuickPick();
-                quickPick.items = Object.keys(options).map(label => ({ label }));
+                quickPick.items = options;
                 quickPick.onDidChangeSelection(selection => {
                     if (selection[0]) {
-                        console.log(selection[0])
                         this.systems.forEach(system => {
                             if (system.label === selection[0].label) {
-                                console.log("Compiling", system)
                                 this.compile(system.id, this.compileInplace, this.showResultingModel, system.snapshotSystem)
                             }
                         })
@@ -180,7 +183,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         // remove existing commands
         // TODO not possible do this via visibility
         // All systems are only requested once for a model
-        this.kicoCommands = []
+        this.kicoCommands.forEach(command => {
+            command.dispose();
+        })
+        this.kicoCommands = [];
         // add new commands for original model
         systems.forEach(system => {
             const command: vscode.Command = {
@@ -188,11 +194,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 title: `KiCo: Compile ${system.snapshotSystem ? 'snapshot' : 'model'} with ${system.label}`,
                 arguments: ["inplace",]
             }
-            this.kicoCommands.push(command)
-            vscode.commands.registerCommand(command.command, (inplace: boolean, doNotShowResultingModel: boolean) => {
-                this.compile(system.id, this.compileInplace || !!inplace, !doNotShowResultingModel && this.showResultingModel, system.snapshotSystem);
-            }
-            )
+            this.kicoCommands.push(vscode.commands.registerCommand(command.command, (inplace: boolean, doNotShowResultingModel: boolean) => {
+                    this.compile(system.id, this.compileInplace || !!inplace, !doNotShowResultingModel && this.showResultingModel, system.snapshotSystem);
+                }
+            ))
         })
         const simulationSystems = systems.filter(system => system.simulation)
         // Register additional simulation commands
@@ -252,7 +257,6 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      * Handles the visualization of new snapshot descriptions send by the LS.
      */
     handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): void {
-        console.log(currentIndex, maxIndex)
         // Show next/previous command and keybinding if not already added
         if (!vscode.commands.getCommands().then(commands => {
             return commands.includes(SHOW_NEXT.command)
@@ -277,7 +281,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                     if (element.errors) {
                         element.errors.forEach(error => {
                             errorOccurred = true
-                            errorString = errorString + '\n' + error
+                            errorString = errorString + '\n' + error + "TODO remove" + currentIndex + maxIndex
                         })
                     }
                 })
@@ -311,6 +315,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             // })
         }
         // this.compilerWidget.update() TODO it updates since the compilation data of this provider changes somehow
+        this._onDidChangeTreeData.fire()
     }
 
     /**
@@ -448,16 +453,32 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         //     keybinding: SHOW_PREVIOUS_KEYBINDING
         // })
     }
-
-    onDidChangeTreeData?: vscode.Event<void | CompilationData | null | undefined> | undefined;
+    private _onDidChangeTreeData: vscode.EventEmitter<CompilationData | undefined | null | void> = new vscode.EventEmitter<CompilationData | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<CompilationData | undefined | null | void> = this._onDidChangeTreeData.event;
     getTreeItem(element: CompilationData): vscode.TreeItem | Thenable<vscode.TreeItem> {
         console.log(element)
+        if (element) {
+            return {
+                id: element.name + element.index + ":" + element.snapshotIndex,
+                label: element.name
+            }
+        }
+        // resultMap holds a CodeContainer with everything
         throw new Error('Method not implemented.');
     }
     getChildren(element?: CompilationData): vscode.ProviderResult<CompilationData[]> {
         console.log(element)
         if (element) {
-            return []
+            let index = -1;
+            this.snapshots?.files.find(e => {
+                index++;
+                return e[0] === element
+            })
+            return this.snapshots?.files[index]
+        } else {
+            return this.snapshots?.files.map(snapshots => {
+                return snapshots[0]
+            })
         }
         return []
     }
@@ -470,6 +491,7 @@ export class CompilationData extends vscode.TreeItem {
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
         name: string,
         snapshotIndex: number,
+        index: number,
         errors?: string[],
         warnings?: string[],
         infos?: string[]
@@ -479,6 +501,7 @@ export class CompilationData extends vscode.TreeItem {
         this.description = this.version;
         this.name = name
         this.snapshotIndex = snapshotIndex
+        this.index = index
         if (errors) {
             this.errors = errors;
         }
@@ -491,6 +514,7 @@ export class CompilationData extends vscode.TreeItem {
     }
     name: string;
     snapshotIndex: number;
+    index: number;
     errors?: string[];
     warnings?: string[];
     infos?: string[];
