@@ -596,6 +596,9 @@ export function renderError(rendering: KRendering): VNode {
  */
 export function getRendering(datas: KGraphData[], parent: SKGraphElement, propagatedStyles: KStyles,
         context: SKGraphModelRenderer, mListener: KeithInteractiveMouseListener): VNode | undefined {
+    if (datas === undefined) {
+        return undefined
+    }
     const kRenderingLibrary = datas.find(data => data !== null && data.type === K_RENDERING_LIBRARY)
 
     if (kRenderingLibrary !== undefined) {
