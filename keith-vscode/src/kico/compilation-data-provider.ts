@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
 import { Utils } from 'vscode-uri';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
@@ -23,38 +23,42 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     editor: vscode.TextEditor | undefined = undefined;
     requestedSystems = false;
     systems: CompilationSystem[] = [];
+    snapshotSystems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
     kicoCommands: vscode.Disposable[] = [];
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
-    compileInplace = false
-    showResultingModel = true
-    startTime = 0
-    endTime = 0
-    compiling = false
-    lastInvokedCompilation = "";
-    lastCompiledUri = ""
-    sourceModelPath = ""; // Set when editor is changed to current uri
+    compileInplace = false;
+    showResultingModel = true;
+    startTime = 0;
+    endTime = 0;
+    compiling = false;
+    lastInvokedCompilation = '';
+    lastCompiledUri = '';
+    sourceModelPath = ''; // Set when editor is changed to current uri
+    autoCompile = false;
+
+    statusbar: vscode.StatusBarItem | undefined = undefined
 
     /**
      * The file extension of the last file for which compilation systems where requested.
      */
-    public lastRequestedUriExtension = ""
+    public lastRequestedUriExtension = '';
 
     /**
      * Indicates that a compilation is currently being cancelled
      */
-    public cancellingCompilation = false
+    public cancellingCompilation = false;
 
     /**
      * Snapshots that are currently shown in the view, created during compilation.
      */
-    snapshots: CodeContainer | undefined = undefined
+    snapshots: CodeContainer | undefined = undefined;
 
-    isCompiled: Map<string, boolean> = new Map
-    sourceURI: Map<string, string> = new Map
-    resultMap: Map<string, CodeContainer> = new Map
-    indexMap: Map<string, number> = new Map
-    lengthMap: Map<string, number> = new Map
+    isCompiled: Map<string, boolean> = new Map;
+    sourceURI: Map<string, string> = new Map;
+    resultMap: Map<string, CodeContainer> = new Map;
+    indexMap: Map<string, number> = new Map;
+    lengthMap: Map<string, number> = new Map;
 
 
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
@@ -74,9 +78,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public readonly compilationFinished: vscode.Event<boolean | undefined> = this.compilationFinishedEmitter.event
     public readonly showedNewSnapshot: vscode.Event<string | undefined> = this.showedNewSnapshotEmitter.event
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
-    autoCompile: any;
 
     constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
+        // Bind notifications to receive
         lsClient.onReady().then(() => {
             lsClient.onNotification(compilationSystemsMessageType, (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
                 this.handleReceiveSystemDescriptions(systems, snapshotSystems)
@@ -85,6 +89,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 this.handleNewSnapshotDescriptions(snapshotsDescriptions, uri, finished, currentIndex, maxIndex)
             });
         });
+        // Bind to change active editor event
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
         }));
@@ -94,6 +99,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.onDidChangeActiveTextEditor(editor)
         }
 
+        // Create commands
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
                 console.log("Show")
@@ -114,12 +120,32 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                             }
                         })
                     }
+                    quickPick.hide()
                 });
                 quickPick.onDidHide(() => quickPick.dispose());
                 quickPick.show();
                 
             }));
-
+    
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(COMPILE_SNAPSHOT_COMMAND.command, async () => {
+                const options = this.createQuickPick(this.snapshotSystems)
+                const quickPick = vscode.window.createQuickPick();
+                quickPick.items = options;
+                quickPick.onDidChangeSelection(selection => {
+                    if (selection[0]) {
+                        this.snapshotSystems.forEach(system => {
+                            if (system.label === selection[0].label) {
+                                this.compile(system.id, this.compileInplace, this.showResultingModel, system.snapshotSystem)
+                            }
+                        })
+                    }
+                    quickPick.hide()
+                });
+                quickPick.onDidHide(() => quickPick.dispose());
+                quickPick.show();
+                
+            }));
     }
 
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
@@ -144,7 +170,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         // Sort all compilation systems by id
         systems.sort((a, b) => (a.id > b.id) ? 1 : -1)
         this.systems = systems
-        this.addCompilationSystemToCommandPalette(systems.concat(snapshotSystems))
+        this.snapshotSystems = snapshotSystems
+        // No longer needed
+        // this.addCompilationSystemToCommandPalette(systems.concat(snapshotSystems))
         if (this.editor) {
             this.sourceModelPath = this.editor.document.uri.toString()
             this.lastRequestedUriExtension = Utils.extname(this.editor.document.uri)
@@ -183,6 +211,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     }
 
     /**
+     * TODO is this even needed anymore?
      * Removes all old compilation systems from command palette and adds new ones.
      * @param systems compilation systems that should get a compile command
      */

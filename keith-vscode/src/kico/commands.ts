@@ -27,6 +27,11 @@ export const COMPILE_COMMAND: vscode.Command = {
     title: 'Compile'
 }
 
+export const COMPILE_SNAPSHOT_COMMAND: vscode.Command = {
+    command: 'keith-vscode.compile-snapshot',
+    title: 'Compile model in diagram'
+}
+
 export const SHOW_NEXT: vscode.Command = {
     command: 'kico-show_next',
     title: 'Kico: Show next'
