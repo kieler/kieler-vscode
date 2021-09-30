@@ -16,16 +16,28 @@
         },
         {
             "name": "Launch VS Code Extension (Socket)",
-            "type": "extensionHost",
+            "type": "pwa-extensionHost",
             "request": "launch",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}/keith-vscode"],
+            "args": [
+				"--enable-proposed-api=ms-vscode.js-debug",
+                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
+				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
+            ],
             "env": {
                 "KEITH_LS_PORT": "5007"
             },
             "sourceMaps": true,
             "smartStep": true,
-            "outFiles": ["${workspaceFolder}/keith-vscode/dist/**/*.js"],
-            "preLaunchTask": "${defaultBuildTask}"
+            "outFiles": [
+                "${workspaceFolder}/keith-vscode/dist/**/*.js",
+				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/dist/**/*.js"
+            ],
+            "preLaunchTask": "${defaultBuildTask}",
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/keith-vscode/**",
+				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/**",
+				"!**/node_modules/**"
+            ]
         }
     ]
 }
