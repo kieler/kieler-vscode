@@ -168,6 +168,12 @@
           "category": "Simulation"
       },
       {
+          "command": "keith-vscode.simulate-snapshot",
+          "title": "Simulate current diagram model with...",
+          "icon": "$(play)",
+          "category": "Simulation"
+      },
+      {
           "command": "keith-vscode.show",
           "title": "Show snapshot...",
           "icon": "$(eye)",
@@ -218,6 +224,9 @@
         },
         {
           "command": "keith-vscode.simulate"
+        },
+        {
+          "command": "keith-vscode.simulate-snapshot"
         }
       ],
       "editor/title": [
@@ -263,10 +272,14 @@
     },
     "views": {
       "kieler": [
-          {
-              "id": "kieler-kico",
-              "name": "KIELER Compiler"
-          }
+        {
+            "id": "kieler-kico",
+            "name": "KIELER Compiler"
+        },
+        {
+          "id": "kieler-simulation",
+          "name": "KIELER Simulation"
+        }
       ]
     }
   },

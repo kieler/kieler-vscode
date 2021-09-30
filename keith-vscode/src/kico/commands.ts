@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2019 by
+ * Copyright 2021 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -11,11 +11,6 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 import * as vscode from 'vscode';
-
-export const SAVE: vscode.Command = {
-    command: 'core.save',
-    title: 'Save'
-};
 
 export const SHOW_COMMAND: vscode.Command = {
     command: 'keith-vscode.show',

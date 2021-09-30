@@ -22,6 +22,7 @@ import { connect, NetConnectOpts, Socket } from "net";
 import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
+import { SimulationWebViewProvider } from "./simulation/simulation-view-provider";
 
 //** Command identifiers that are provided by klighd-vscode. */
 const klighdCommands = {
@@ -84,6 +85,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.createTreeView('kieler-kico', {
         treeDataProvider: compilationDataProvider
     });
+
+    // Register simulation view
+    const provider = new SimulationWebViewProvider(lsClient, compilationDataProvider, context);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(SimulationWebViewProvider.viewType, provider));
 
     console.debug("Starting Language Server...");
     lsClient.start();
