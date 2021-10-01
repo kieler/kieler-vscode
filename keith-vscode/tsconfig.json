@@ -2,15 +2,20 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "out",
+        "outDir": "dist",
         "lib": ["es6"],
         "sourceMap": true,
         "rootDir": "src",
         "strict": true, // enable all strict type-checking options
         /* Additional Checks */
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": false
+        "declaration": true,
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
     },
     "exclude": ["node_modules", ".vscode-test"]
 }

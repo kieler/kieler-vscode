@@ -19,25 +19,25 @@
             "type": "pwa-extensionHost",
             "request": "launch",
             "args": [
-				"--enable-proposed-api=ms-vscode.js-debug",
                 "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
 				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
             ],
             "env": {
                 "KEITH_LS_PORT": "5007"
             },
+            "skipFiles": [
+              "<node_internals>/**"
+            ],
             "sourceMaps": true,
             "smartStep": true,
+            "sourceMapPathOverrides": {
+                "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+                "webpack://?:*/*": "${workspaceFolder}/keith-vscode/*"
+            },
             "outFiles": [
                 "${workspaceFolder}/keith-vscode/dist/**/*.js",
 				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/dist/**/*.js"
             ],
-            "preLaunchTask": "${defaultBuildTask}",
-            "resolveSourceMapLocations": [
-                "${workspaceFolder}/keith-vscode/**",
-				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/**",
-				"!**/node_modules/**"
-            ]
         }
     ]
 }
