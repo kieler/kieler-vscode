@@ -11,7 +11,8 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { window } from "vscode";
+import * as vscode from "vscode";
+import { ADD_CO_SIMULATION, SIMULATE } from "./simulation/commands";
 
 // Take a look at the `klighd-vscode` extension for more documentation about action
 // handlers.
@@ -23,7 +24,7 @@ const startSimulationId = "de.cau.cs.kieler.simulation.ui.synthesis.action.Start
 const addCoSimulationId = "de.cau.cs.kieler.simulation.ui.synthesis.action.AddCoSimulationAction";
 
 /** Shape of the `PerformActionAction` object that is sent to LS by `klighd-vscode`. */
-interface PerformActionAction {
+export interface PerformActionAction {
     kind: "performAction";
     actionId: string;
 }
@@ -39,14 +40,17 @@ export async function handlePerformAction(action: PerformActionAction): Promise<
 
     switch (action.actionId) {
         case openInEditorId:
-            window.showInformationMessage("Triggered perform action to open in editor.");
+            // TODO
+            vscode.window.showInformationMessage("Triggered perform action to open in editor.");
             return false;
         case startSimulationId:
-            window.showInformationMessage("Triggered perform action to start a simulation.");
-            return false;
+            // TODO needs to be tested
+            vscode.commands.executeCommand(SIMULATE.command)
+            return true;
         case addCoSimulationId:
-            window.showInformationMessage("Triggered perform action to add a Co Simulation");
-            return false;
+            // TODO needs to be tested
+            vscode.commands.executeCommand(ADD_CO_SIMULATION.command)
+            return true;
         default:
             return true;
     }

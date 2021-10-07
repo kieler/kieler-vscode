@@ -23,6 +23,7 @@ import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
 import { SimulationWebViewProvider } from "./simulation/simulation-view-provider";
+import { OPEN_KIELER_VIEW } from "./kico/commands";
 
 //** Command identifiers that are provided by klighd-vscode. */
 const klighdCommands = {
@@ -87,9 +88,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
     // Register simulation view
-    const provider = new SimulationWebViewProvider(lsClient, compilationDataProvider, context);
+    const simulationProvider = new SimulationWebViewProvider(lsClient, compilationDataProvider, context);
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(SimulationWebViewProvider.viewType, provider));
+		vscode.window.registerWebviewViewProvider(SimulationWebViewProvider.viewType, simulationProvider));
+
+    
+    // Not working as expected    
+    context.subscriptions.push(
+        vscode.commands.registerCommand(OPEN_KIELER_VIEW.command, () => {
+            vscode.commands.executeCommand('kieler.focus')
+        })
+    )
 
     console.debug("Starting Language Server...");
     lsClient.start();

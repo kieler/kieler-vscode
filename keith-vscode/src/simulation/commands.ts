@@ -39,6 +39,11 @@ export const OPEN_EXTERNAL_KVIZ_VIEW: vscode.Command = {
     title: 'Open KViz view in external browser'
 }
 
+export const ADD_CO_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.add-co-simulation',
+    title: 'Add Co-Simulation'
+}
+
 export const SELECT_SIMULATION_CHAIN: vscode.Command = {
     command: 'select-simulation-chain',
     title: 'Select simulation chain'

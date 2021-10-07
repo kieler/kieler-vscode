@@ -81,3 +81,8 @@ export const REVEAL_COMPILATION_WIDGET: vscode.Command = {
     command: 'kico-reveal-compilation-widget',
     title: 'Kico: Reveal compilation widget'
 }
+
+export const OPEN_KIELER_VIEW: vscode.Command = {
+    command: 'keith-vscode.kieler-compiler',
+    title: 'Open KIELER view'
+}

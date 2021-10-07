@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
 import { Utils } from 'vscode-uri';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
@@ -50,7 +50,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     sourceModelPath = ''; // Set when editor is changed to current uri
     autoCompile = false;
 
-    statusbar: vscode.StatusBarItem | undefined = undefined
+    requestSystems: vscode.StatusBarItem
+    compilation: vscode.StatusBarItem
 
     /**
      * The file extension of the last file for which compilation systems where requested.
@@ -73,7 +74,6 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     indexMap: Map<string, number> = new Map;
     lengthMap: Map<string, number> = new Map;
 
-
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
     /**
      * Finish of compilation is recognized by cancel of compilation or by receiving a snapshot that is the last of the compilation system.
@@ -93,6 +93,15 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
 
     constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
+
+        // Status bar item for compilation
+        this.requestSystems = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
+        this.requestSystems.command = REQUEST_CS.command
+        this.context.subscriptions.push(this.requestSystems)
+        this.compilation = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
+        this.compilation.command = OPEN_KIELER_VIEW.command
+        this.context.subscriptions.push(this.compilation)
+
         // Bind notifications to receive
         lsClient.onReady().then(() => {
             lsClient.onNotification(compilationSystemsMessageType, (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
@@ -179,18 +188,20 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      */
     handleReceiveSystemDescriptions(systems: CompilationSystem[], snapshotSystems: CompilationSystem[]): void {
         // Remove status bar element after successfully requesting systems
-        // this.statusbar.removeElement('request-systems') TODO
+        this.requestSystems.hide()
         // Sort all compilation systems by id
         systems.sort((a, b) => (a.id > b.id) ? 1 : -1)
         this.systems = systems
         this.snapshotSystems = snapshotSystems
-        // No longer needed
-        // this.addCompilationSystemToCommandPalette(systems.concat(snapshotSystems))
         if (this.editor) {
             this.sourceModelPath = this.editor.document.uri.toString()
             this.lastRequestedUriExtension = Utils.extname(this.editor.document.uri)
         }
         this.requestedSystems = false
+
+        const simulationSystems = systems.filter(system => system.simulation)
+        // Register additional simulation commands
+        this.newSimulationCommandsEmitter.fire(simulationSystems)
     }
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
@@ -205,12 +216,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     async requestSystemDescriptions(): Promise<void> {
         if (this.editor) {
             // when systems are requested request systems status bar entry is updated
-            // this.statusbar.setElement('request-systems', {
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: requestSystemStatusPriority,
-            //     text: '$(spinner fa-pulse fa-fw) Request compilation systems',
-            //     tooltip: 'Requesting compilation systems...'
-            // })
+            this.requestSystems.text = '$(spinner) Request compilation systems',
+            this.requestSystems.tooltip ='Requesting compilation systems...'
+            this.requestSystems.show()
             this.requestedSystems = true
             const uri = this.editor.document.uri.toString()
             // Check if language client was already initialized and wait till it is
@@ -219,38 +227,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             })
         } else {
             this.systems = []
-            this.addCompilationSystemToCommandPalette(this.systems)
         }
-    }
-
-    /**
-     * TODO is this even needed anymore?
-     * Removes all old compilation systems from command palette and adds new ones.
-     * @param systems compilation systems that should get a compile command
-     */
-    addCompilationSystemToCommandPalette(systems: CompilationSystem[]): void {
-        // remove existing commands
-        // TODO not possible do this via visibility
-        // TODO All systems are only requested once for a model
-        this.kicoCommands.forEach(command => {
-            command.dispose();
-        })
-        this.kicoCommands = [];
-        // add new commands for original model
-        systems.forEach(system => {
-            const command: vscode.Command = {
-                command: system.id + (system.snapshotSystem ? '.snapshot' : ''),
-                title: `KiCo: Compile ${system.snapshotSystem ? 'snapshot' : 'model'} with ${system.label}`,
-                arguments: ["inplace",]
-            }
-            this.kicoCommands.push(vscode.commands.registerCommand(command.command, (inplace: boolean, doNotShowResultingModel: boolean) => {
-                    this.compile(system.id, this.compileInplace || !!inplace, !doNotShowResultingModel && this.showResultingModel, system.snapshotSystem);
-                }
-            ))
-        })
-        const simulationSystems = systems.filter(system => system.simulation)
-        // Register additional simulation commands
-        this.newSimulationCommandsEmitter.fire(simulationSystems)
     }
 
     /**
@@ -348,29 +325,20 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
             this.endTime = Date.now()
             // Set finished bar if the currentIndex of the processor is the maxIndex the compilation was not canceled TODO
-            // this.statusbar.setElement('compile-status', {
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: compilationStatusPriority,
-            //     text: currentIndex === maxIndex && !errorOccurred ?
-            //         `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms)` :
-            //         `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`,
-            //     tooltip: currentIndex === maxIndex ? 'Compilation finished' : 'Compilation stopped',
-            //     command: REVEAL_COMPILATION_WIDGET.id
-            // })
+            this.compilation.text = currentIndex === maxIndex && !errorOccurred ?
+                    `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms)` :
+                    `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
+            this.compilation.tooltip = currentIndex === maxIndex ? 'Compilation finished' : 'Compilation stopped'
             if (errorOccurred) {
                 // this.messageService.error('An error occurred during compilation. Check the Compiler Widget for details.' + errorString) TODO
             }
         } else {
             // Set progress bar for compilation TODO
-            // const progress = '█'.repeat(currentIndex) + '░'.repeat(maxIndex - currentIndex)
+            const progress = '█'.repeat(currentIndex) + '░'.repeat(maxIndex - currentIndex)
 
-            // this.statusbar.setElement('compile-status', {
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: compilationStatusPriority,
-            //     text: `$(spinner fa-pulse fa-fw) ${progress}`,
-            //     tooltip: 'Compiling...',
-            //     command: REVEAL_COMPILATION_WIDGET.id
-            // })
+            this.compilation.show()
+            this.compilation.text =  `$(spinner fa-pulse fa-fw) ${progress}`
+            this.compilation.tooltip = 'Compiling...'
         }
         // this.compilerWidget.update() TODO it updates since the compilation data of this provider changes somehow
         this._onDidChangeTreeData.fire()

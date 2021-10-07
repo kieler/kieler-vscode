@@ -14,8 +14,9 @@
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
-import { COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, SIMULATE } from './commands';
+import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, SIMULATE } from './commands';
 import { delay, strMapToObj } from './helper';
+import { PerformActionAction } from '../perform-action-handler'
 
 
 export const externalStepMessageType = 'keith/simulation/didStep';
@@ -135,6 +136,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             if (typeof systems !== 'undefined') {
                 this.registerSimulationCommands(systems)
             }
+            // Else case is that important enough to alert the user
         })
         kico.compilationStarted(() => {
             this.compilationStarted()
@@ -143,9 +145,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             if (typeof success !== 'undefined') {
                 this.compilationFinished(success)
             }
-        })
-        kico.newSimulationCommands.bind((systems: CompilationSystem[]) => {
-            this.registerSimulationCommands(systems)
+            // Else case is that important enough to alert the user
         })
         kico.compilationFinished.bind((successful: boolean) => {
             this.compilationFinished(successful)
@@ -165,10 +165,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                 this.handleSimulationStarted(message)
             });
         })
-        // Register for sprotty actions https://github.com/kieler/klighd-vscode/tree/main/applications/klighd-vscode#intercepting-messages
-        // startSimulation(this.handleSimulationStartAction.bind(this)) TODO
-        // addCoSimulation(this.handleAddCoSimulation.bind(this)) TODO
-
 
         // TODO Create commands
         this.context.subscriptions.push(
@@ -177,7 +173,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             }, this));
 
 
-        // Simulation quickpix commands
+        // Simulation quickpick commands
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(COMPILE_AND_SIMULATE.command, async () => {
@@ -218,6 +214,16 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                 quickPick.show();
                 
             }));
+        
+        // Kviz commands
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(OPEN_INTERNAL_KVIZ_VIEW.command, this.openInternalKVizView, this));
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(OPEN_EXTERNAL_KVIZ_VIEW.command, this.openExternalKVizView, this));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(ADD_CO_SIMULATION.command, this.handleAddCoSimulation, this)
+        )
     }
 
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
@@ -241,8 +247,36 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 				this.context.extensionUri
 			]
 		};
+        // TODO does not work, add table with simulation data
+		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-		// TODO do stuff
+		webviewView.webview.onDidReceiveMessage(data => {
+			switch (data.type) {
+				case 'colorSelected':
+					{
+						vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`#${data.value}`));
+						break;
+					}
+			}
+		});
+    }
+
+    _getHtmlForWebview(webview: vscode.Webview): string {
+        webview
+        return `<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				
+				<title>Simulation</title>
+			</head>
+			<body>
+				<table>
+                    <th>FUn</th>
+                </table>
+			</body>
+			</html>`;
     }
 
     /**
@@ -260,23 +294,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             }
         });
         // this.statusbar.removeElement('simulation-status') TODO
-        // remove existing commands
-        // this.simulationCommands.forEach(command => {
-        //     this.commandRegistry.unregisterCommand(command)
-        // })
-        // add new commands
-        // systems.forEach((system: CompilationSystem) => {
-        //     const command: Command = {
-        //         id: simulationCommandPrefix + system.id + (system.snapshotSystem ? '.snapshot' : ''),
-        //         label: `Simulate ${system.snapshotSystem ? 'snapshot' : 'model'} via ${system.label}`, category: 'Simulation'}
-        //     this.simulationCommands.push(command)
-        //     const handler: CommandHandler = {
-        //         execute: () => {
-        //             this.compileAndStartSimulation(system)
-        //         }
-        //     }
-        //     this.commandRegistry.registerCommand(command, handler)
-        // })
     }
 
     /**
@@ -299,6 +316,23 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             }
         } else {
             // TODO this.update()
+        }
+    }
+
+    async handleAddCoSimulation(action: PerformActionAction): Promise<void> {
+        action
+        // Uri of simulation file TODO
+        const executableUri = await vscode.window.showOpenDialog({
+            title: 'Select CoSimulation executable',
+            canSelectFolders: false,
+            canSelectFiles: true,
+            canSelectMany: false
+
+        });
+        if (executableUri) {
+            const lClient = await this.lsClient
+            lClient.sendNotification('keith/simulation/addCoSimulation', ['keith-diagram_sprotty',
+                 executableUri[0].path.toString()])
         }
     }
 
@@ -515,11 +549,12 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     }
 
     openInternalKVizView(): void {
-        // vscode.commands.executeCommand(MiniBrowserCommands.OPEN_URL.id, 'http://localhost:5010/visualization') TODO
+        // TODO not possible without extention
     }
 
     openExternalKVizView(): void {
-        // vscode.window. openNewWindow('http://localhost:5010/visualization') TODO
+        // TODO test
+        vscode.env.openExternal(vscode.Uri.parse('http://localhost:5010/visualization'))
     }
 
 }
