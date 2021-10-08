@@ -10,7 +10,6 @@
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
@@ -240,11 +239,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         _token
 		webviewView.webview.options = {
 			// Allow scripts in the webview
-			enableScripts: true,
-
-			localResourceRoots: [
-				this.getExtensionFileUri("dist")
-			],
+			enableScripts: true
 		};
         this.update()
 	}
