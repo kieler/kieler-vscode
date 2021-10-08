@@ -311,10 +311,12 @@
     "views": {
       "kieler": [
         {
+            "type": "tree",
             "id": "kieler-kico",
             "name": "KIELER Compiler"
         },
         {
+					"type": "webview",
           "id": "kieler-simulation",
           "name": "KIELER Simulation"
         }

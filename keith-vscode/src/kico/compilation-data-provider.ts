@@ -73,6 +73,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     resultMap: Map<string, CodeContainer> = new Map;
     indexMap: Map<string, number> = new Map;
     lengthMap: Map<string, number> = new Map;
+    /**
+     * Show some option toggle buttons
+     */
+    public showButtons = false
 
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
     /**

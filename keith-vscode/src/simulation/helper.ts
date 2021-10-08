@@ -43,3 +43,12 @@ export function reverse(array: any[]): any[] {
         return array[array.length - 1 - idx]
     })
 }
+
+export function getNonce(): string {
+	let text = '';
+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	for (let i = 0; i < 32; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
+}

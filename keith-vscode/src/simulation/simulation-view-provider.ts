@@ -10,14 +10,14 @@
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, SIMULATE } from './commands';
 import { delay, strMapToObj } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
-
+import { SimulationWebView } from './simulation-view';
 
 export const externalStepMessageType = 'keith/simulation/didStep';
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep';
@@ -86,7 +86,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     /**
      * Indicates whether the input/output column should be displayed.
      */
-    protected inputOutputColumnEnabled = true
+    public inputOutputColumnEnabled = true
 
     /**
      * Indicates whether a simulation is currently running.
@@ -96,7 +96,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     /**
      * Show internal variables of simulation (e.g. guards, ...)
      */
-    protected showInternalVariables = false
+    public showInternalVariables = false
 
     /**
      * Categories of variables with their respective members.
@@ -117,8 +117,9 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'kieler-simulation';
 
 	private _view?: vscode.WebviewView;
+	private simulationView: SimulationWebView;
 
-    private kico: CompilationDataProvider
+    public kico: CompilationDataProvider
 
     private lsClient: LanguageClient
 
@@ -127,8 +128,9 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     private snapshotSystems: CompilationSystem[] = []
 
 
-	constructor(lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
+	constructor(private readonly _extensionUri: vscode.Uri, lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
         console.log('Simulation view is created')
+        this.simulationView = new SimulationWebView(this)
         // TODO
         this.lsClient = lsClient
         this.kico = kico
@@ -226,6 +228,33 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         )
     }
 
+
+
+	public resolveWebviewView(
+		webviewView: vscode.WebviewView,
+		context: vscode.WebviewViewResolveContext,
+		_token: vscode.CancellationToken,
+	): void {
+		this._view = webviewView;
+        context
+        _token
+		webviewView.webview.options = {
+			// Allow scripts in the webview
+			enableScripts: true,
+
+			localResourceRoots: [
+				this.getExtensionFileUri("dist")
+			],
+		};
+        this.update()
+	}
+
+    public update(): void {
+        if (this._view) {
+            this._view.webview.html = this.simulationView.getHtmlForSimulationView(this._view.webview);
+        }
+    }
+
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
         const quickPicks: vscode.QuickPickItem[] = []
         systems.forEach(system => {
@@ -234,49 +263,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             })
         });
         return quickPicks;
-    }
-
-    resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
-		this._view = webviewView;
-        console.log(context, token)
-		webviewView.webview.options = {
-			// Allow scripts in the webview
-			enableScripts: true,
-
-			localResourceRoots: [
-				this.context.extensionUri
-			]
-		};
-        // TODO does not work, add table with simulation data
-		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
-		webviewView.webview.onDidReceiveMessage(data => {
-			switch (data.type) {
-				case 'colorSelected':
-					{
-						vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`#${data.value}`));
-						break;
-					}
-			}
-		});
-    }
-
-    _getHtmlForWebview(webview: vscode.Webview): string {
-        webview
-        return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				
-				<title>Simulation</title>
-			</head>
-			<body>
-				<table>
-                    <th>FUn</th>
-                </table>
-			</body>
-			</html>`;
     }
 
     /**
@@ -421,10 +407,8 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         })
         this.simulationRunning = true
         this.simulationStep = 0
-        // const widget = await this.front.shell.revealWidget(simulationWidgetId) TODO
-        // if (widget) {
-        //     widget.update()
-        // }
+        // TODO show simulation view
+        this.update()
     }
 
     /**
@@ -564,20 +548,12 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
  */
  export class SimulationData {
     constructor(
-        data: any[],
-        input: boolean,
-        output: boolean,
-        categories: string[]
+        public data: any[],
+        public input: boolean,
+        public output: boolean,
+        public categories: string[]
     ) {
-        this.data = data
-        this.input = input
-        this.output = output
-        this.categories = categories
     }
-    data: any[]
-    input: boolean
-    output: boolean
-    categories: string[]
 }
 
 /**

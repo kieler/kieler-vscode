@@ -88,17 +88,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
     // Register simulation view
-    const simulationProvider = new SimulationWebViewProvider(lsClient, compilationDataProvider, context);
+    const simulationProvider = new SimulationWebViewProvider(context.extensionUri, lsClient, compilationDataProvider, context);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(SimulationWebViewProvider.viewType, simulationProvider));
-
-    
-    // Not working as expected    
-    context.subscriptions.push(
-        vscode.commands.registerCommand(OPEN_KIELER_VIEW.command, () => {
-            vscode.commands.executeCommand('kieler.focus')
-        })
-    )
 
     console.debug("Starting Language Server...");
     lsClient.start();
