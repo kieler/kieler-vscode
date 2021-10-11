@@ -277,7 +277,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         const uri = this.sourceModelPath
 
         if (!this.autoCompile) {
-            // this.messageService.info("Compiling " + uri + " with " + command) TODO log?
+            // TODO too much information? Test this for visual clutter
+            vscode.window.showInformationMessage("Compiling " + uri + " with " + command)
         }
         this.lsClient.onReady().then(() => {
             this.lsClient.sendNotification(COMPILE, [uri, diagramType + '_sprotty', command, inplace, showResultingModel, snapshot])
@@ -494,7 +495,6 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     getTreeItem(element: CompilationData): vscode.TreeItem | Thenable<vscode.TreeItem> {
         if (element) {
-            console.log(element)
             // Put context into element to show it in diagram
             element.id = element.name + element.index + (!element.contextValue || element.contextValue != "parent"? ":" + element.snapshotIndex : "")
             element.label = element.name
@@ -514,7 +514,18 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 })
                 return this.snapshots.files[index]
             } else {
-                return this.snapshots.files.map(snapshots => {
+                const originalElement = new CompilationData(
+                    'Original',
+                    '',
+                    vscode.TreeItemCollapsibleState.None,
+                    'Original', 0,
+                    -1, [], [], [])
+                originalElement.command =  {
+                    title: 'Show original ',
+                    command: SHOW_COMMAND.command,
+                    arguments: [originalElement]
+                }
+                return [originalElement].concat(this.snapshots.files.map(snapshots => {
                     if (snapshots.length > 1) {
                         // TODO calculate or safe what was expanded and what collapsed for each compilation systems, maybe by their name?
                         const parentElement = new CompilationData(snapshots[0].name, '', vscode.TreeItemCollapsibleState.Collapsed, snapshots[0].name, snapshots[0].snapshotIndex,
@@ -524,7 +535,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                     }
                     snapshots[0].contextValue = 'snapshot'
                     return snapshots[0]
-                })
+                }))
             }
         }
         return []

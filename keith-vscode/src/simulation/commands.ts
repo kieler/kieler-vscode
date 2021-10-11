@@ -15,7 +15,7 @@ import * as vscode from 'vscode';
  * Command to restart a simulation.
  */
  export const SIMULATE: vscode.Command = {
-    command: 'keith-vscode.restart-simulation',
+    command: 'keith-vscode.simulation-restart',
     title: 'Restart simulation'
 }
 
@@ -30,29 +30,23 @@ export const COMPILE_AND_SIMULATE_SNAPSHOT: vscode.Command = {
 }
 
 export const STOP_SIMULATION: vscode.Command = {
-    command: 'keith-vscode.simulate-stop',
+    command: 'keith-vscode.simulation-stop',
     title: 'Stop simulation'
 }
 
 export const STEP_SIMULATION: vscode.Command = {
-    command: 'keith-vscode.simulate-step',
+    command: 'keith-vscode.simulation-step',
     title: 'Execute simulation step'
 }
 
 export const PAUSE_SIMULATION: vscode.Command = {
-    command: 'keith-vscode.simulate-pause',
+    command: 'keith-vscode.simulation-pause',
     title: 'Pause simulation'
 }
 
 export const RUN_SIMULATION: vscode.Command = {
-    command: 'keith-vscode.simulate-run',
+    command: 'keith-vscode.simulation-run',
     title: 'Run simulation'
-}
-
-// Not sure if needed, restart should to everything
-export const START_SIMULATION: vscode.Command = {
-    command: 'keith-vscode.simulate-start',
-    title: 'Start simulation'
 }
 
 export const OPEN_INTERNAL_KVIZ_VIEW: vscode.Command = {
