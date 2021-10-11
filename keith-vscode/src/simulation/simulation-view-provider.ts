@@ -11,6 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, SIMULATE } from './commands';
@@ -127,7 +128,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     private snapshotSystems: CompilationSystem[] = []
 
 
-	constructor(private readonly _extensionUri: vscode.Uri, lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
+	constructor(public readonly _extensionUri: vscode.Uri, lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
         console.log('Simulation view is created')
         this.simulationView = new SimulationWebView(this)
         // TODO
@@ -171,7 +172,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SIMULATE.command, async () => {
                 this.simulate()
-            }, this));
+            }));
 
 
         // Simulation quickpick commands
@@ -186,6 +187,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                         this.systems.forEach(system => {
                             if (system.label === selection[0].label) {
                                 kico.compile(system.id, true, false, system.snapshotSystem)
+                                this.compilingSimulation = true
                             }
                         })
                     }
@@ -227,8 +229,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         )
     }
 
-
-
 	public resolveWebviewView(
 		webviewView: vscode.WebviewView,
 		context: vscode.WebviewViewResolveContext,
@@ -239,14 +239,18 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         _token
 		webviewView.webview.options = {
 			// Allow scripts in the webview
-			enableScripts: true
+			enableScripts: true,
+            // localResourceRoots: [vscode.Uri.joinPath(this._extensionUri,'simulation/index.css')]
 		};
         this.update()
 	}
 
     public update(): void {
         if (this._view) {
-            this._view.webview.html = this.simulationView.getHtmlForSimulationView(this._view.webview);
+            const vnode = this.simulationView.getHtmlForSimulationView(this._view.webview)
+            // const html = toHTML(vnode)
+            console.log('test', vnode)
+            this._view.webview.html = vnode
         }
     }
 
@@ -534,6 +538,11 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     openExternalKVizView(): void {
         // TODO test
         vscode.env.openExternal(vscode.Uri.parse('http://localhost:5010/visualization'))
+    }
+
+    getExtensionFileUri(...segments: string[]): vscode.Uri {
+        return vscode.Uri
+            .file(path.join(this.context.extensionPath, ...segments));
     }
 
 }

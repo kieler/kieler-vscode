@@ -1,0 +1,350 @@
+/*
+ * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
+ *
+ * http://rtsys.informatik.uni-kiel.de/kieler
+ *
+ * Copyright 2021 by
+ * + Kiel University
+ *   + Department of Computer Science
+ *     + Real-Time and Embedded Systems Group
+ *
+ * This code is provided under the terms of the Eclipse Public License (EPL).
+ */
+/** @jsx svg */
+import { svg } from 'snabbdom-jsx'; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as React from 'react';
+import { VNode } from 'snabbdom/vnode'
+import * as vscode from 'vscode';
+import { isInternal, reverse } from './helper';
+import { SimulationData, SimulationDataBlackList, SimulationWebViewProvider } from './simulation-view-provider';
+import { SELECT_SIMULATION_CHAIN, SIMULATE } from './commands';
+
+
+export class SimulationWebView {
+
+    private webview?: vscode.Webview
+
+    constructor(private readonly viewProvider: SimulationWebViewProvider) {}
+
+    getHtmlForSimulationView(webview: vscode.Webview): VNode {
+        this.webview = webview
+        this.viewProvider.simulationRunning = true
+        this.viewProvider.kico.showButtons = true
+        // return `
+        // <!DOCTYPE html>
+        // <html lang="en">
+        //     <head>
+        //         <meta charset="UTF-8">
+        //         <meta name="viewport" content="width=device-width, height=device-height">
+        //         <title>Simulation</title>
+        //         <link
+        //             rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+        //             integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+        //             crossorigin="anonymous">
+        //     </head>
+        //     <body>
+        //         <div id="simulation_container" style="height: 100%;"></div>
+        //         <div>${!this.viewProvider.kico ? `<div></div>` :
+        //         `<div>
+        //             <div className="simulation-panel">
+        //                 ${this.renderSimulationPanel()}
+        //                 ${!this.viewProvider.kico.showButtons ||
+        //                     this.viewProvider.kico.compiling ||
+        //                     this.viewProvider.simulationRunning || this.viewProvider .compilingSimulation ? "" : this.renderSimulationButton()}
+        //                 ${!!this.viewProvider.kico.showButtons &&
+        //                     this.viewProvider.kico.lastInvokedCompilation.includes("simulation") &&
+        //                     !this.viewProvider.simulationRunning && !this.viewProvider .compilingSimulation ? this.renderRestartButton() : ""}
+        //                 ${this.viewProvider .simulationRunning ? this.renderStepCounter() : ""}
+        //             </div>
+        //             <div key="table" className="simulation-table">${this.renderSimulationData()}</div>
+        //         </div>`}</div>
+        //     </body>
+        // </html>`
+        // TODO
+        // this.webview = webview
+        if (!this.viewProvider.kico) {
+            return <div></div>
+        } else {
+            return <div>
+                {this.renderSimulationPanel()}
+                <div key="table" className="simulation-table">{this.renderSimulationData()}</div>
+            </div>
+        }
+    }
+
+    /**
+     * Renders the control panel of the simulation widget.
+     * The play/pause button is shown whenever a simulation is running.
+     * Step, stop, and IO button are only shown if a simulation is running.
+     * The simulation type selectbox and simulation speed input box are always shown.
+     * The simulation compilation system selectbox and the compile button are only shown if no simulation is running.
+     * The restart button is only shown if the last invoked compilation system is a simulation compilation system.
+     * The step counter is only shown, if the simulation is running.
+     */
+    renderSimulationPanel(): VNode {
+        return <div><div className="simulation-panel">
+            {this.viewProvider.simulationRunning ? this.renderPlayPauseButton() : ""}
+            {this.viewProvider .simulationRunning ? this.renderStepButton() : ""}
+            {this.viewProvider .simulationRunning ? this.renderStopButton() : ""}
+            {this.viewProvider .simulationRunning ? this.renderIOButton() : ""}
+            {this.viewProvider .simulationRunning ? this.renderShowInternalButton() : ""}
+            {!this.viewProvider .kico.showButtons ||
+                this.viewProvider .kico.compiling ||
+                this.viewProvider .simulationRunning || this.viewProvider .compilingSimulation ? "" : this.renderSimulationButton()}
+            {!!this.viewProvider .kico.showButtons &&
+                this.viewProvider .kico.lastInvokedCompilation.includes("simulation") &&
+                !this.viewProvider .simulationRunning && !this.viewProvider .compilingSimulation ? this.renderRestartButton() : ""}
+            {this.viewProvider .simulationRunning ? this.renderStepCounter() : ""}
+        </div></div>
+    }
+
+    renderPlayPauseButton(): VNode {
+        return <div title={this.viewProvider.play ? "Pause" : "Play"} key="play-pause-button" className={'preference-button'}
+            onClick={() => this.viewProvider.startOrPauseSimulation()}>
+            <div className={'icon fa ' + (this.viewProvider.play ? 'fa-pause-circle' : 'fa-play-circle')}/>
+        </div>
+    }
+
+    renderStepButton(): VNode {
+        return <div title="Step" key="step-button" className={'preference-button'}
+            onClick={() => this.viewProvider.executeSimulationStep()}>
+            <div className={'icon fa fa-step-forward'}/>
+        </div>
+    }
+
+    renderStopButton(): VNode {
+        return <div title="Stop" key="stop-button" className={'preference-button'}
+            onClick={() => this.viewProvider.stopSimulation()}>
+            <div className={'icon fa fa-stop'}/>
+        </div>
+    }
+
+    renderIOButton(): VNode {
+        return <div title={"IO"}
+            key="io-button" className={'preference-button' + (this.viewProvider.inputOutputColumnEnabled ? '' : ' off')}
+            onClick={() => this.toggleIODisplayButton()}>
+            <div className={'icon fa fa-exchange'}/>
+        </div>
+    }
+
+    toggleIODisplayButton(): void {
+        this.viewProvider.inputOutputColumnEnabled = !this.viewProvider.inputOutputColumnEnabled
+        this.viewProvider.update()
+    }
+
+    renderShowInternalButton(): VNode {
+        return <div title={this.viewProvider.showInternalVariables ? "Disable internal variables" : "Show internal variables"}
+            key="toggle-internal-button" className={'preference-button' + (this.viewProvider.showInternalVariables ? '' : ' off')}
+            onClick={() => this.toggleShowInternal()}>
+            <div className={'icon fa fa-cog'}/>
+        </div>
+    }
+
+    toggleShowInternal(): void {
+        this.viewProvider.showInternalVariables = !this.viewProvider.showInternalVariables
+        this.viewProvider.update()
+    }
+
+    renderSimulationButton(): VNode {
+        return <div className={'compile-button'} title="Simulate"
+            onClick={() => {
+                vscode.commands.executeCommand(SELECT_SIMULATION_CHAIN.command)
+            }}>
+            <div className='icon fa fa-play-circle'> </div>
+        </div>
+    }
+
+    renderRestartButton(): VNode {
+        return <div className={'compile-button'} title="Restart"
+            onClick={() => {
+                vscode.commands.executeCommand(SIMULATE.command)
+            }}>
+            <div className='icon rotate180 fa fa-reply'> </div>
+        </div>
+    }
+
+    renderSimulationData(): VNode {
+        const list: VNode[] = []
+        this.viewProvider.simulationData.set("fun", new SimulationData([1, 2, 3], true, true, ['free', 'fun', 'facts']))
+        if (this.viewProvider.simulationData.size === 0) {
+            return <table></table>
+        } else {
+            this.viewProvider.simulationData.forEach((data, key) => {
+                const onBlackList = SimulationDataBlackList.includes(key)
+                // only add data that if input, output or internal data should be shown
+                if (!onBlackList && (this.viewProvider.showInternalVariables || !isInternal(data))) {
+                    // nextStep is never undefined
+                    const nextStep = this.viewProvider.valuesForNextStep.get(key)
+                    let node: VNode;
+                    if (typeof nextStep === "boolean") { // boolean values are rendered as buttons
+                        node = <tr key={key} className="simulation-data-row">
+                            {this.renderInputOutputColumn(data)}
+                            {this.renderLabelColumn(key)}
+                            {this.renderLastValueColumn(data)}
+                            <td key="input" className="simulation-data-truncate simulation-td">
+                                <div>
+                                    <input id={"input-box-" + key}
+                                        title={JSON.stringify(nextStep)}
+                                        value={JSON.stringify(nextStep)}
+                                        className={"simulation-data-button"}
+                                        type='button'
+                                        onClick={() => { this.setBooleanInput("input-box-" + key, key, nextStep as boolean) }}
+                                        placeholder="" readOnly={!data.input} size={1}/>
+                                </div>
+                            </td>
+                            {this.renderValueForNextStepColumn(nextStep)}
+                            {this.renderHistoryColumn(data, key)}
+                        </tr>
+                    } else {
+                        node = <tr key={key} className="simulation-data-row">
+                            {this.renderInputOutputColumn(data)}
+                            {this.renderLabelColumn(key)}
+                            {this.renderLastValueColumn(data)}
+                            <td key="input" className="simulation-data-truncate simulation-td">
+                                <div>
+                                    <input id={"input-box-content" + key}
+                                        className={"simulation-data-inputbox" + (!data.input ? " inactive-input-box" : "")}
+                                        type='text'
+                                        onClick={() => {
+                                            // If the value is not an input. Nothing should happen on clicking the text field
+                                            if (!data.input) {
+                                                return
+                                            }
+                                            this.setContentOfInputbox("input-box-content" + key, key, nextStep)
+                                        }}
+                                        placeholder="" readOnly={!data.input} size={1}/>
+                                </div>
+                            </td>
+                            {this.renderValueForNextStepColumn(nextStep)}
+                            {this.renderHistoryColumn(data, key)}
+                        </tr>
+                    }
+                    list.push(node)
+                }
+            })
+            return <table className={"simulation-data-table"}>
+                <thead>
+                    <tr key="headings" className="simulation-data-row">
+                        {this.renderInputOutputColumnHeader()}
+                        <th key="label" className="simulation-data-truncate setwidth" align="left" ><div className="simulation-div">Symbol</div></th>
+
+                        <th key="value" className="simulation-data-truncate setwidth" align="left"><div className="simulation-div">Last</div></th>
+
+                        <th key="input" className="simulation-data-truncate setwidth" align="left"><div>Input</div></th>
+
+                        <th key="next-step" className="simulation-data-truncate setwidth" align="left"><div className="simulation-div">Next</div></th>
+
+                        <th key="history" className="simulation-data-truncate history setwidth-h" align="left"><div className="simulation-div">History</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {list}
+                </tbody>
+            </table>
+        }
+    }
+
+    renderInputOutputColumn(data: SimulationData): VNode {
+        if (this.viewProvider.inputOutputColumnEnabled) {
+            return <td key="input-output" className="simulation-data-truncate simulation-td" align="left">
+                    <div>
+                        {data.input ? `<div className='icon fa fa-sign-in'></div>` : ""}
+                        {data.output ? `<div className='icon fa fa-sign-out'></div>` : ""}
+                        {data.categories}
+                    </div>
+                </td>
+        } else {
+            return <td></td>
+        }
+    }
+
+    renderLabelColumn(key: string): VNode {
+        return <th key="label" className="simulation-data-truncate" align="left"><div>{key}</div></th>
+    }
+
+    renderLastValueColumn(data: SimulationData): VNode {
+        return <td key="value" className="simulation-data-truncate simulation-td">
+            {data.data ? JSON.stringify(data.data[data.data.length - 1]) : ""}
+        </td>
+    }
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    renderValueForNextStepColumn(nextStep: any): VNode {
+        return <td key="next-step" className="simulation-data-truncate simulation-td"><div>{JSON.stringify(nextStep)}</div></td>
+    }
+
+    renderHistoryColumn(data: SimulationData, key: string): VNode {
+        return <td key="history" className="simulation-data-truncate history simulation-td">
+            <div>
+                <input id={"input-box-history" + key}
+                        className={"simulation-history-inputbox inactive-input-box"}
+                        type='text'
+                        value={data.data ? JSON.stringify(reverse(data.data)) : ""}
+                        placeholder={""} readOnly size={1}/>
+            </div></td>
+    }
+
+    renderInputOutputColumnHeader(): VNode {
+        if (this.viewProvider.inputOutputColumnEnabled) {
+            return <th key="input-output" className="simulation-data-truncate setwidth" align="left"><div className="simulation-div">I/O</div></th>
+        } else {
+            return <th></th>
+        }
+    }
+
+    renderStepCounter(): VNode {
+        return <div title="Step Counter">
+            <div className='step-counter'>{this.viewProvider.simulationStep}</div>
+        </div>
+    }
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    setBooleanInput(id: string, key: string,  value: any/*, data: any*/): void {
+        if (this.viewProvider.valuesForNextStep.has(key)) {
+            // if the value is a boolean just toggle it on click
+            this.viewProvider.valuesForNextStep.set(key, !value)
+            this.viewProvider.changedValuesForNextStep.set(key, !value)
+            this.viewProvider.update()
+        }
+    }
+
+
+    /**
+     * Set in values in the next step. On click the current nextValue is set as value of the inputbox.
+     * One can be sure that the LS handles the type checking.
+     */
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    setContentOfInputbox(id: string, key: string,  currentNextValue: any) {
+        const elem = document.getElementById(id) as HTMLInputElement
+        // set value that is the current value that will be set next tick as value of inputbox
+        // Add event listener for inputbox
+        // on enter the current value of the inputbox should be set as value for the next step
+        const eventListenerRegistered = this.viewProvider.eventListenerRegistered.get(key)
+        if (!eventListenerRegistered) {
+            elem.value = JSON.stringify(currentNextValue)
+            elem.addEventListener("keyup", (event) => {
+                if (event.keyCode === 13) {
+                    // prevents enter from doing things it should not do
+                    event.preventDefault()
+                    // parse value as JSON
+                    let parsedValue
+                    try {
+                        parsedValue = JSON.parse(elem.value);
+                    } catch (error: any) {
+                        // return if not parsable
+                        const currentNextValue = this.viewProvider.valuesForNextStep.get(key)
+                        elem.value = JSON.stringify(currentNextValue)
+                        // this.webview?.postMessage(error.toString())
+                        return
+                    }
+                    // always assume that the parsed value is valid
+                    this.viewProvider.valuesForNextStep.set(key, parsedValue)
+                    this.viewProvider.changedValuesForNextStep.set(key, parsedValue)
+                    elem.placeholder = JSON.stringify(parsedValue)
+                    this.viewProvider.update()
+                }
+            })
+        }
+    }
+
+}

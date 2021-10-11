@@ -23,7 +23,7 @@ import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
 import { SimulationWebViewProvider } from "./simulation/simulation-view-provider";
-import { OPEN_KIELER_VIEW } from "./kico/commands";
+// import 'simulation/index.css'
 
 //** Command identifiers that are provided by klighd-vscode. */
 const klighdCommands = {

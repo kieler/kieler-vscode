@@ -24,18 +24,22 @@ const config = {
     },
     resolve: {
         // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-        extensions: [".ts", ".js"],
+        extensions: [".tsx", ".ts", ".js"],
     },
     module: {
         rules: [
             {
-                test: /\.ts$/,
+                test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: [
                     {
                         loader: "ts-loader",
                     },
                 ],
+            },
+            {
+                test: /\.css$/,
+                use: ["style-loader", "css-loader"],
             },
         ],
     },

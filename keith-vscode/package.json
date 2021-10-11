@@ -337,12 +337,20 @@
   "devDependencies": {
     "@types/vscode": "^1.56.0",
     "@types/node": "^12.11.7",
+    "@types/react": "^17.0.27",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "css-loader": "^5.2.4",
+    "mini-css-extract-plugin": "^1.6.0",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "es6-shim": "^0.35.6",
+    "react": "^17.0.2",
+    "snabbdom-jsx": "^0.4.2",
+    "snabbdom-to-html": "^7.0.0",
     "vscode-uri": "^3.0.2",
     "vscode-languageclient": "^5.2.1"
   }
