@@ -27,9 +27,9 @@ export class SimulationWebView {
 
     getHtmlForSimulationView(webview: vscode.Webview): string {
         this.webview = webview
-        this.viewProvider.simulationRunning = true
         this.viewProvider.kico.showButtons = true
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/simulation/style', 'index.css'));
+		const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
         return `
         <!DOCTYPE html>
         <html lang="en">
@@ -42,6 +42,7 @@ export class SimulationWebView {
                     integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
                     crossorigin="anonymous">
                     <link href="${styleMainUri}" rel="stylesheet">
+                    <link href="${compilerStyĺeUri}" rel="stylesheet">
             </head>
             <body>
                 <div id="simulation_container" style="height: 100%;"></div>

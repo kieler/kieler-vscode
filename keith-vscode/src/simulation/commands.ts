@@ -29,6 +29,32 @@ export const COMPILE_AND_SIMULATE_SNAPSHOT: vscode.Command = {
     title: 'Simulate snapshot'
 }
 
+export const STOP_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulate-stop',
+    title: 'Stop simulation'
+}
+
+export const STEP_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulate-step',
+    title: 'Execute simulation step'
+}
+
+export const PAUSE_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulate-pause',
+    title: 'Pause simulation'
+}
+
+export const RUN_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulate-run',
+    title: 'Run simulation'
+}
+
+// Not sure if needed, restart should to everything
+export const START_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulate-start',
+    title: 'Start simulation'
+}
+
 export const OPEN_INTERNAL_KVIZ_VIEW: vscode.Command = {
     command: 'keith-vscode.open-kviz-internal',
     title: 'Open KViz view in internal browser preview'

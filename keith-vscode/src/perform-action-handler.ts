@@ -46,11 +46,11 @@ export async function handlePerformAction(action: PerformActionAction): Promise<
         case startSimulationId:
             // TODO needs to be tested
             vscode.commands.executeCommand(SIMULATE.command)
-            return true;
+            return false;
         case addCoSimulationId:
             // TODO needs to be tested
             vscode.commands.executeCommand(ADD_CO_SIMULATION.command)
-            return true;
+            return false;
         default:
             return true;
     }

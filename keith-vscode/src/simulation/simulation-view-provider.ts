@@ -14,7 +14,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
-import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, SIMULATE } from './commands';
+import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
 import { delay, strMapToObj } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
@@ -127,13 +127,21 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 
     private snapshotSystems: CompilationSystem[] = []
 
+    private simulationStatus: vscode.StatusBarItem
+
 
 	constructor(public readonly _extensionUri: vscode.Uri, lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
         console.log('Simulation view is created')
+        // Create corresponding web view for provider
         this.simulationView = new SimulationWebView(this)
         // TODO
         this.lsClient = lsClient
         this.kico = kico
+        this.simulationStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
+        // this.simulationStatus.command = TODO reveal view on command
+        this.context.subscriptions.push(this.simulationStatus)
+
+        // Bind to events
         kico.newSimulationCommands(systems => {
             if (typeof systems !== 'undefined') {
                 this.registerSimulationCommands(systems)
@@ -153,6 +161,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             this.compilationFinished(successful)
         })
 
+        // Bind to LSP messages
         lsClient.onReady().then(() => {
             lsClient.onNotification(externalStepMessageType, (message: SimulationStepMessage) => {
                 this.handleStepMessage(message)
@@ -172,6 +181,26 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SIMULATE.command, async () => {
                 this.simulate()
+            }));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(STOP_SIMULATION.command, async () => {
+                this.stopSimulation()
+            }));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(STEP_SIMULATION.command, async () => {
+                this.executeSimulationStep()
+            }));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(PAUSE_SIMULATION.command, async () => {
+                this.startOrPauseSimulation()
+            }));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(RUN_SIMULATION.command, async () => {
+                this.startOrPauseSimulation()
             }));
 
 
@@ -278,7 +307,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                 this.systems.push(system)
             }
         });
-        // this.statusbar.removeElement('simulation-status') TODO
+        this.simulationStatus.hide()
     }
 
     /**
@@ -333,22 +362,14 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             this.lsClient.onReady().then(() => {
                 this.lsClient.sendNotification('keith/simulation/start', [uri, this.simulationType])
             })
-            // this.statusbar.setElement('simulation-status', { TODO
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: simulationStatusPriority,
-            //     text: '$(spinner fa-pulse fa-fw) Starting simulation...',
-            //     tooltip: 'Starting simulation...',
-            //     command: REVEAL_SIMULATION_WIDGET.id
-            // })
+            this.simulationStatus.text = '$(spinner) Starting simulation...',
+            this.simulationStatus.tooltip ='Starting simulation...'
+            this.simulationStatus.show()
             
         } else {
-            // this.statusbar.setElement('simulation-status', { TODO
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: simulationStatusPriority,
-            //     text: `$(times) ${this.kicoolContribution.editor ? 'Simulation already running' : 'No editor defined'}`,
-            //     tooltip: 'Did not simulate.',
-            //     command: REVEAL_SIMULATION_WIDGET.id
-            // })
+            this.simulationStatus.text = `$(times) ${this.kico.editor ? 'Simulation already running' : 'No editor defined'}`,
+            this.simulationStatus.tooltip ='Did not simulate.'
+            this.simulationStatus.show()
         }
     }
 
@@ -359,21 +380,15 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         this.endTime = Date.now()
         if (!startMessage.successful) {
             this.startTime = Date.now()
+            this.simulationStatus.text = `$(cross) (${(this.endTime - this.startTime).toPrecision(3)}ms) Simulation could not be started`,
+            this.simulationStatus.tooltip ='Did not simulate.'
+            this.simulationStatus.show()
             // this.messageService.error(startMessage.error) TODO
-            // this.statusbar.setElement('simulation-status', {
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: simulationStatusPriority,
-            //     text: `$(cross) (${(this.endTime - this.startTime).toPrecision(3)}ms) Simulation could not be started`,
-            //     command: REVEAL_SIMULATION_WIDGET.id
-            // })
             return
         } else {
-            // this.statusbar.setElement('simulation-status', { TODO
-            //     alignment: StatusBarAlignment.LEFT,
-            //     priority: simulationStatusPriority,
-            //     text: `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms) Simulating...`,
-            //     command: REVEAL_SIMULATION_WIDGET.id
-            // })
+            this.simulationStatus.text = `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms) Simulating...`,
+            this.simulationStatus.tooltip =''
+            this.simulationStatus.show()
         }
 
         // Get the start configuration for the simulation
@@ -427,25 +442,18 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      */
     public async stopSimulation(): Promise<void> {
         this.setValuesToStopSimulation()
-        // this.statusbar.setElement('simulation-status', {
-        //     alignment: StatusBarAlignment.LEFT,
-        //     priority: simulationStatusPriority,
-        //     text: '$(spinner fa-pulse fa-fw) Stopping simulation...',
-        //     tooltip: 'Request to stop the simulation is about to be send',
-        //     command: REVEAL_SIMULATION_WIDGET.id
-        // })
+        this.simulationStatus.text = '$(spinner) Stopping simulation...',
+        this.simulationStatus.tooltip = 'Request to stop the simulation is about to be send'
+        this.simulationStatus.show()
         const lClient = await this.lsClient
         const message: SimulationStoppedMessage = await lClient.sendRequest('keith/simulation/stop') as SimulationStoppedMessage
         if (!message.successful) {
             // this.messageService.error(message.message) TODO
         }
         // this.simulationWidget.update() TODO
-        // this.statusbar.setElement('simulation-status', { TODO
-        //     alignment: StatusBarAlignment.LEFT,
-        //     priority: simulationStatusPriority,
-        //     text: 'Stopped simulation',
-        //     command: REVEAL_SIMULATION_WIDGET.id
-        // })
+        this.simulationStatus.text = 'Stopped simulation',
+        this.simulationStatus.tooltip = ''
+        this.simulationStatus.show()
     }
 
     private setValuesToStopSimulation(): void {

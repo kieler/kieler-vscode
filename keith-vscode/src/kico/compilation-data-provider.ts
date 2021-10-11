@@ -98,6 +98,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
 
+        // TODO call treeview.reveal(item, {focus: true}); to reveal tree view after compilation finished
+        // The item that is revealed should maybe be the last one. Also this provider may need access to the tree view.
+
         // Status bar item for compilation
         this.requestSystems = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
         this.requestSystems.command = REQUEST_CS.command
@@ -501,6 +504,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         throw new Error('Method not implemented.');
     }
     getChildren(element?: CompilationData): vscode.ProviderResult<CompilationData[]> {
+        // TODO somehow show the original model in there too
         if (this.snapshots) {
             if (element?.contextValue == 'parent') {
                 let index = -1;
