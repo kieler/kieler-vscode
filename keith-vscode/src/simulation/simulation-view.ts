@@ -170,7 +170,7 @@ export class SimulationWebView {
             return `<table></table>`
         } else {
             this.viewProvider.simulationData.forEach((data, key) => {
-                const onBlackList = SimulationDataBlackList.includes(key)
+                const onBlackList = SimulationDataBlackList.includes(key) || key.startsWith('_')
                 // only add data that if input, output or internal data should be shown
                 if (!onBlackList && (this.viewProvider.showInternalVariables || !isInternal(data))) {
                     // nextStep is never undefined

@@ -131,8 +131,6 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         // Create commands
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
-                console.log("Show")
-                console.log("Show", snapshot)
                 this.show(this.lastCompiledUri, snapshot.index)
             }, this));
 
@@ -247,7 +245,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.indexMap.set(uri, index)
             this.lsClient.sendRequest(SHOW, [uri, diagramType + '_sprotty', index])
             // original model must not fire this emitter.
-            this.showedNewSnapshotEmitter.fire("Success")
+            if (index !== -1) {
+                this.showedNewSnapshotEmitter.fire("Success")
+            }
             return true
         })
     }

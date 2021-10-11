@@ -277,8 +277,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     public update(): void {
         if (this._view) {
             const vnode = this.simulationView.getHtmlForSimulationView(this._view.webview)
-            // const html = toHTML(vnode)
-            console.log('test', vnode)
             this._view.webview.html = vnode
         }
     }
@@ -314,7 +312,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      * Called after a compilation process was started
      */
     compilationStarted(): void {
-        // this.simulationWidget.update() TODO
+        this.update()
     }
 
     /**
@@ -324,12 +322,12 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         if (this.compilingSimulation) {
             // If a simulation systems is currently compiling one has to simulate it afterwards
             this.compilingSimulation = false
-            // TODO this.update()
+            this.update()
             if (successful) {
                 vscode.commands.executeCommand(SIMULATE.command)
             }
         } else {
-            // TODO this.update()
+            this.update()
         }
     }
 
@@ -434,7 +432,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         const jsonObject = strMapToObj(this.changedValuesForNextStep)
         lClient.sendNotification('keith/simulation/step', [jsonObject, 'Manual'])
         // TODO Update data to indicate that a step is in process
-        // this.simulationWidget.update() TODO
+        this.update()
     }
 
     /**
@@ -450,7 +448,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         if (!message.successful) {
             // this.messageService.error(message.message) TODO
         }
-        // this.simulationWidget.update() TODO
+        this.update()
         this.simulationStatus.text = 'Stopped simulation',
         this.simulationStatus.tooltip = ''
         this.simulationStatus.show()
@@ -471,7 +469,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      */
     async startOrPauseSimulation(): Promise<void> {
         this.play = !this.play
-        // this.simulationWidget.update() TODO
+        this.update()
         if (this.play) {
             await this.waitForNextStep()
         }
@@ -510,7 +508,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                     // This should not happen. An unexpected value was send by the server.
                     this.stopSimulation()
                     // this.messageService.error("Unexpected value for " + key + "in simulation data, stopping simulation") TODO
-                    // this.simulationWidget.update()
+                    this.update()
                     // TODO how to stop this correctly?
                 }
             });
@@ -522,7 +520,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         }
         this.simulationStep++
         this.changedValuesForNextStep.clear()
-        // this.simulationWidget.update() TODO
+        this.update()
         return true
     }
 
