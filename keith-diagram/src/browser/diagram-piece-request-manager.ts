@@ -18,16 +18,16 @@ import { add, Point, SModelElementSchema, ViewportResult } from "sprotty"
  * requests.
  */
 export interface IDiagramPieceRequestManager {
-    
+
     /**
      * Adds a diagram piece that should be requested later.
      * @param parentId The ID of the SModelElement that is the direct parent of
-     *                 this diagram piece. This is necessary to determine the 
+     *                 this diagram piece. This is necessary to determine the
      *                 position of the piece.
      * @param diagramPiece Schema of diagram piece.
      */
     enqueue(parentId: string, diagramPiece: SModelElementSchema): void
-    
+
     /**
      * Returns the next diagram piece that should be requested and removes it
      * from the manager.
@@ -54,7 +54,7 @@ export interface IDiagramPieceRequestManager {
  * This implementation of {@link IDiagramPieceRequestManager} serves as a naive
  * implementation of the interface. Diagram pieces are stored in a simple queue
  * and requested in FIFO order. The resulting behaviour is that the pieces of a
- * diagram are requested breadth-first. The position of the viewport is not 
+ * diagram are requested breadth-first. The position of the viewport is not
  * taken into consideration in this approach.
  */
 export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestManager {
@@ -82,7 +82,7 @@ export class QueueDiagramPieceRequestManager implements IDiagramPieceRequestMana
 }
 
 /**
- * This class provides a more sophisticated implementaion of 
+ * This class provides a more sophisticated implementaion of
  * {@link IDiagramPieceRequestManager}. In order to send diagram piece requests
  * in order of "first needed", the diagram area is divided into a grid and the
  * locations of each piece within this grid are determined. The viewport position
@@ -98,9 +98,9 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
     // ordering of elements per grid corresponds to layer, therefore operations on it should be FIFO
     /* https://stackoverflow.com/questions/39005798/fastest-way-of-using-coordinates-as-keys-in-javascript-hashmap */
     /**
-     * These fields are used to map the diagram piece queues to their grid cell coordinates. 
+     * These fields are used to map the diagram piece queues to their grid cell coordinates.
      */
-    gridToPieces: Map<number, SModelElementSchema []>
+    gridToPieces: Map<number, SModelElementSchema[]>
     readonly MAX_16BIT_SIGNED = (1 << (16 - 1)) - 1    // 32767
 
     /**
@@ -124,10 +124,10 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
     /**
      * The last known grid position of the viewport.
      */
-    currentGridPosition = {x: 0, y: 0}
+    currentGridPosition = { x: 0, y: 0 }
 
     /**
-     * Transforms a coordinate pair (x,y) to a 32 bit integer. x and y must be 
+     * Transforms a coordinate pair (x,y) to a 32 bit integer. x and y must be
      * between 0 and 32767 which is a sufficiently large domain for this application.
      * The value of x is stored in the first 16 bits and the value of y is stored in
      * the last 16 bits.
@@ -157,11 +157,11 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
 
     /**
      * Generates coordinate pairs which form a square around the origin (0,0) with a distance n
-     * from the center in exactly one or both components of the coordinate. Or expressed more 
+     * from the center in exactly one or both components of the coordinate. Or expressed more
      * mathematically:
-     * 
+     *
      * All pairs must be of the form (+-n,v) or (v,+-n) with -n <= v <= n
-     * 
+     *
      * @param n Distance of the ring from the origin.
      * @returns List of coordinate pairs: [{x: .., y: ..}, ..]
      */
@@ -179,22 +179,22 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         let result = []
         // first get all edge coordinates
         for (let i = (-(n - 1)); i <= (n - 1); i++) {
-            result.push({x: -n, y: i})
+            result.push({ x: -n, y: i })
         }
         for (let i = (-(n - 1)); i <= (n - 1); i++) {
-            result.push({x: n, y: i})
+            result.push({ x: n, y: i })
         }
         for (let i = (-(n - 1)); i <= (n - 1); i++) {
-            result.push({x: i, y: -n})
+            result.push({ x: i, y: -n })
         }
         for (let i = (-(n - 1)); i <= (n - 1); i++) {
-            result.push({x: i, y: n})
+            result.push({ x: i, y: n })
         }
         // push corner coordinates
-        result.push({x: -n, y: -n})
-        result.push({x: -n, y: n})
-        result.push({x: n, y: -n})
-        result.push({x: n, y: n})
+        result.push({ x: -n, y: -n })
+        result.push({ x: -n, y: n })
+        result.push({ x: n, y: -n })
+        result.push({ x: n, y: n })
         return result
     }
 
@@ -225,7 +225,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
             // DO NOT DO ANYTHING WITH NON NODE ELEMENTS
             // FIXME: execution probably should reach here and should throw an error
             //        but maybe caller should not worry about this
-            
+
             //        In current implementation the caller just passes all types of
             //        elements, so we simply silently ignore wrong elements here
         }
@@ -273,7 +273,7 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
     reset(): void {
         this.idToAbsolutePositions = new Map<string, Point>()
         this.gridToPieces = new Map<number, SModelElementSchema[]>()
-        this.currentGridPosition = {x: 0, y: 0}
+        this.currentGridPosition = { x: 0, y: 0 }
     }
     front(): SModelElementSchema | undefined {
         // if something exists in current grid position return that
@@ -312,6 +312,6 @@ export class GridDiagramPieceRequestManager implements IDiagramPieceRequestManag
         let canvasBounds = viewportResult.canvasBounds
         let gridX = Math.floor((viewport.scroll.x + (canvasBounds.width / 2) / viewport.zoom) / this.gridResolution)
         let gridY = Math.floor((viewport.scroll.y + (canvasBounds.height / 2) / viewport.zoom) / this.gridResolution)
-        this.currentGridPosition = {x: gridX, y: gridY}
+        this.currentGridPosition = { x: gridX, y: gridY }
     }
 }

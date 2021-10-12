@@ -18,9 +18,9 @@ import {
 } from '@kieler/keith-interactive/lib/layered/actions';
 import { RectPackDeletePositionConstraintAction, RectPackSetPositionConstraintAction, SetAspectRatioAction } from '@kieler/keith-interactive/lib/rect-packing/actions';
 import {
-    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction, 
+    CheckedImagesAction, CheckImagesAction, ComputedTextBoundsAction,
     IncrementalComputedTextBoundsAction, IncrementalRequestTextBoundsCommand,
-    KeithUpdateModelAction, Pair, PerformActionAction, 
+    KeithUpdateModelAction, Pair, PerformActionAction,
     RefreshLayoutAction, RequestDiagramPieceAction, RequestTextBoundsCommand,
     SetDiagramPieceAction, SetSynthesesAction, SetSynthesisAction, StoreImagesAction,
 } from '@kieler/keith-sprotty/lib/actions/actions';
@@ -182,7 +182,7 @@ export class KeithDiagramServer extends LSTheiaDiagramServer {
         for (let image of (action as CheckImagesAction).images) {
             const id = KeithDiagramServer.imageToSessionStorageString(image.bundleName, image.imagePath)
             if (isNullOrUndefined(sessionStorage.getItem(id))) {
-                notCached.push({k: image.bundleName, v: image.imagePath})
+                notCached.push({ k: image.bundleName, v: image.imagePath })
             }
         }
         this.actionDispatcher.dispatch(new CheckedImagesAction(notCached))
