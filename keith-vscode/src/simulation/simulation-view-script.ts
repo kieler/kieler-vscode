@@ -21,18 +21,19 @@ export class SimulationViewStarter {
 
     constructor() {
         this.sendReadyMessage();
-        this.acceptDiagramIdentifier();
+        this.waitForStuff();
     }
 
     protected sendReadyMessage(): void {
+        console.log('I am ready')
         vscodeApi.postMessage({ readyMessage: 'Simulation view ready' } as any);
     }
 
-    protected acceptDiagramIdentifier(): void {
-        console.log('Waiting for diagram identifier...');
+    protected waitForStuff(): void {
+        console.log('Waiting stuff...');
         const eventListener = (message: any) => {
             // TODO
-            message
+            console.log(message)
         };
         window.addEventListener('message', eventListener);
     }

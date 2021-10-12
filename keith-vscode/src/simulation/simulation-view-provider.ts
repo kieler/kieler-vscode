@@ -18,6 +18,7 @@ import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT,
 import { delay, strMapToObj } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
+import { isWebviewReadyMessage, WebviewReadyMessage } from './message';
 
 export const externalStepMessageType = 'keith/simulation/didStep';
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep';
@@ -133,6 +134,9 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     private snapshotSystems: CompilationSystem[] = []
 
     private simulationStatus: vscode.StatusBarItem
+
+    private resolveWebviewReady: () => void;
+    private readonly webviewReady = new Promise<void>((resolve) => this.resolveWebviewReady = resolve);
 
 
 	constructor(public readonly _extensionUri: vscode.Uri, lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext) {
@@ -285,7 +289,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         if (this._view) {
             this.context.subscriptions.push(this.newSimulationData(event => {
                 if (event._view && event._view.visible) {
-                    // TDO
+                    // TODO
                 }
                 // this.setWebviewActiveContext(event.webviewPanel.active); TODO
             }));
@@ -293,9 +297,25 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
                 // this.extension.didCloseWebview(this.diagramIdentifier); TODO
                 // this.disposables.forEach(disposable => disposable.dispose());
             }));
-            this.context.subscriptions.push(this._view.webview.onDidReceiveMessage(message => /*this.receiveFromWebview(message)*/ console.log('TODO')));
-            // await this.ready(); TODO
+            this.context.subscriptions.push(this._view.webview.onDidReceiveMessage(message => this.receiveFromWebview(message)));
+            await this.ready();
         }
+    }
+    /**
+     * @return true if the message should be propagated, e.g. to a language server
+     */
+     protected receiveFromWebview(message: WebviewReadyMessage | undefined): Thenable<boolean> {
+         console.log('Got message', message)
+        if (isWebviewReadyMessage(message)) {
+            console.log('message means ready')
+            this.resolveWebviewReady();
+            return Promise.resolve(false);
+        }
+        return Promise.resolve(false);
+    }
+
+    protected ready(): Promise<void> {
+        return this.webviewReady;
     }
 
     public update(): void {

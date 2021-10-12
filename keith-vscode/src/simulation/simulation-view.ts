@@ -31,7 +31,7 @@ export class SimulationWebView {
         this.viewProvider.kico.showButtons = true
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/simulation/style', 'index.css'));
 		const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
-		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist/simulation', 'simulation-view.js'));
+		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist', 'simulation-view.js'));
         return `
         <!DOCTYPE html>
         <html lang="en">
