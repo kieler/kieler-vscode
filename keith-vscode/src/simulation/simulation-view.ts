@@ -14,8 +14,8 @@
 // import { svg } from 'snabbdom-jsx'; // eslint-disable-line @typescript-eslint/no-unused-vars
 // import * as React from 'react';
 import * as vscode from 'vscode';
-import { isInternal, reverse } from './helper';
-import { SimulationData, SimulationDataBlackList, SimulationWebViewProvider } from './simulation-view-provider';
+import { SimulationData, SimulationDataBlackList, isInternal, reverse } from './helper';
+import { SimulationWebViewProvider } from './simulation-view-provider';
 import { SELECT_SIMULATION_CHAIN, SIMULATE } from './commands';
 
 
@@ -30,8 +30,8 @@ export class SimulationWebView {
         this.webview = webview
         this.viewProvider.kico.showButtons = true
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/simulation/style', 'index.css'));
-		const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
-		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist', 'simulation-view.js'));
+		// const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
+		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist', 'simulation-view-script.js'));
         return `
         <!DOCTYPE html>
         <html lang="en">
@@ -44,22 +44,13 @@ export class SimulationWebView {
                     integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
                     crossorigin="anonymous">
                     <link href="${styleMainUri}" rel="stylesheet">
-                    <link href="${compilerStyĺeUri}" rel="stylesheet">
             </head>
             <body>
                 <script src="${script}"></script>
                 <div id="simulation_container" style="height: 100%;"></div>
                 <div>${!this.viewProvider.kico ? `<div></div>` :
                 `<div class="simulation-widget">
-                        ${this.renderSimulationPanel()}
-                        ${!this.viewProvider.kico.showButtons ||
-                            this.viewProvider.kico.compiling ||
-                            this.viewProvider.simulationRunning || this.viewProvider .compilingSimulation ? `` : this.renderSimulationButton()}
-                        ${!!this.viewProvider.kico.showButtons &&
-                            this.viewProvider.kico.lastInvokedCompilation.includes("simulation") &&
-                            !this.viewProvider.simulationRunning && !this.viewProvider .compilingSimulation ? this.renderRestartButton() : ``}
-                        ${this.viewProvider .simulationRunning ? this.renderStepCounter() : ``}
-                    <div key="table" class="simulation-table">${this.renderSimulationData()}</div>
+                    <div id="simulation-table-out" class="simulation-table">${this.renderSimulationData()}</div>
                 </div>`}</div>
             </body>
         </html>`
@@ -180,42 +171,32 @@ export class SimulationWebView {
                     const nextStep = this.viewProvider.valuesForNextStep.get(key)
                     let node: string;
                     if (typeof nextStep === "boolean") { // boolean values are rendered as buttons
-                        node = `<tr key=${key} class="simulation-data-row">
+                        node = `<tr id="${key}" key="${key}" class="simulation-data-row">
                             ${this.renderInputOutputColumn(data)}
                             ${this.renderLabelColumn(key)}
                             ${this.renderLastValueColumn(data)}
                             <td key="input" class="simulation-data-truncate simulation-td">
                                 <div>
-                                    <input id=${"input-box-" + key}
-                                        title=${JSON.stringify(nextStep)}
-                                        value=${JSON.stringify(nextStep)}
+                                    <button id=${"input-box-" + key}
+                                        title="input"
                                         class=${"simulation-data-button"}
-                                        type='button'
-                                        onClick="${() => { this.setBooleanInput("input-box-" + key, key, nextStep as boolean) }}"
-                                        placeholder="" readOnly=${!data.input} size=${1}><input>
+                                        onClick="newInputFor(${key})" readOnly="${!data.input}" size="1">Input</button>
                                 </div>
                             </td>
                             ${this.renderValueForNextStepColumn(nextStep)}
                             ${this.renderHistoryColumn(data, key)}
                         </tr>`
                     } else {
-                        node = `<tr key=${key} class="simulation-data-row">
+                        node = `<tr id="${key}" key="${key}" class="simulation-data-row">
                             ${this.renderInputOutputColumn(data)}
                             ${this.renderLabelColumn(key)}
                             ${this.renderLastValueColumn(data)}
                             <td key="input" class="simulation-data-truncate simulation-td">
                                 <div>
-                                    <input id=${"input-box-content" + key}
-                                        class=${"simulation-data-inputbox" + (!data.input ? " inactive-input-box" : "")}
-                                        type='text'
-                                        onClick="${() => {
-                                            // If the value is not an input. Nothing should happen on clicking the text field
-                                            if (!data.input) {
-                                                return
-                                            }
-                                            this.setContentOfInputbox("input-box-content" + key, key, nextStep)
-                                        }}"
-                                        placeholder="" readOnly=${!data.input} size=${1}></input>
+                                    <button id=${"input-box-" + key}
+                                        title="input"
+                                        class=${"simulation-data-button"}
+                                        onClick="newInputFor(${key})" readOnly="${!data.input}" size="1">Input</button>
                                 </div>
                             </td>
                             ${this.renderValueForNextStepColumn(nextStep)}
@@ -225,8 +206,8 @@ export class SimulationWebView {
                     list.push(node)
                 }
             })
-            return `<table class=${"simulation-data-table"}>
-                <thead>
+            return `<table id='simulation-table' class=${"simulation-data-table"}>
+                <thead id='simulation-table-head'>
                     <tr key="headings" class="simulation-data-row">
                         ${this.renderInputOutputColumnHeader()}
                         <th key="label" class="simulation-data-truncate setwidth" align="left" ><div class="simulation-div">Symbol</div></th>
@@ -240,7 +221,7 @@ export class SimulationWebView {
                         <th key="history" class="simulation-data-truncate history setwidth-h" align="left"><div class="simulation-div">History</div></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id='simulation-table-body'>
                     ${list}
                 </tbody>
             </table>`
@@ -282,8 +263,7 @@ export class SimulationWebView {
                 <input id=${"input-box-history" + key}
                         class=${"simulation-history-inputbox inactive-input-box"}
                         type='text'
-                        value=${data.data ? JSON.stringify(reverse(data.data)) : ""}
-                        placeholder=${""} readOnly size=${1}></input>
+                        value=${data.data ? JSON.stringify(reverse(data.data)) : ""} readOnly size="1"></input>
             </div></td>`
     }
 

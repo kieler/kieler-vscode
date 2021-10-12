@@ -53,7 +53,7 @@ const simulationScriptConfig = {
     entry: path.resolve(__dirname, "src/simulation/simulation-view-script.ts"), // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "simulation-view.js"
+        filename: "simulation-view-script.js"
     },
     devtool: "nosources-source-map",
     resolve: {

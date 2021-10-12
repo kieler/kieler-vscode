@@ -94,6 +94,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     console.debug("Starting Language Server...");
     lsClient.start();
+
+    // TODO save stuff in context e.g. commands.executeCommand("setContext", "var", value);
 }
 
 // this method is called when your extension is deactivated

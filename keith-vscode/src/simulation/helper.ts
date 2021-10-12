@@ -11,8 +11,6 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { SimulationData } from "./simulation-view-provider";
-
 /**
  * In an asynchronous context this method can be called to wait for some time.
  * @param ms wait time in ms
@@ -52,3 +50,57 @@ export function getNonce(): string {
 	}
 	return text;
 }
+
+/**
+ * Internal data structure to save all data required to display a simulation in the siulation view.
+ */
+ export class SimulationData {
+    constructor(
+        public data: any[],
+        public input: boolean,
+        public output: boolean,
+        public categories: string[]
+    ) {
+    }
+}
+
+/**
+ * Message send by the LS when a simulation is started.
+ */
+export class SimulationStartedMessage {
+    constructor(
+        public successful: boolean,
+        public error: string,
+        public dataPool: Record<string, unknown>,
+        public propertySet: Map<string, string[]>
+    ) {}
+}
+
+export class Category {
+    constructor(
+        public name: string,
+        public symbols: string[]
+    ) {
+    }
+}
+
+/**
+ * Message is used as a request and response parameter for a simulation step.
+ */
+export class SimulationStepMessage {
+    constructor(
+        public values: Record<string, unknown>
+    ) {}
+}
+
+/**
+ * Message send by the LS whenever a simulation is stopped.
+ */
+export class SimulationStoppedMessage {
+    constructor(
+        public successful: boolean,
+        public message: string
+    ) {}
+}
+
+export const SimulationDataBlackList: string[]  = ["#interface"]

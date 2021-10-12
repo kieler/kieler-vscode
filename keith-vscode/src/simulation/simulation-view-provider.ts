@@ -15,7 +15,7 @@ import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
-import { delay, strMapToObj } from './helper';
+import { delay, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
 import { isWebviewReadyMessage, WebviewReadyMessage } from './message';
@@ -122,7 +122,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'kieler-simulation';
 
-	private _view?: vscode.WebviewView;
+	private _view: vscode.WebviewView;
 	private simulationView: SimulationWebView;
 
     public kico: CompilationDataProvider
@@ -280,7 +280,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 			enableScripts: true,
             // localResourceRoots: [vscode.Uri.joinPath(this._extensionUri,'simulation/index.css')]
 		};
-        this.update()
+        this.initialize()
         // TODO connect messages
         this.connect()
 	}
@@ -318,10 +318,21 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         return this.webviewReady;
     }
 
-    public update(): void {
+    public initialize(): void {
         if (this._view) {
             const vnode = this.simulationView.getHtmlForSimulationView(this._view.webview)
             this._view.webview.html = vnode
+        }
+    }
+
+    public update(): void {
+        if (this._view) {
+            for (const key in this.simulationData.keys) {
+                this._view.webview.postMessage({key: key, data: this.simulationData.get(key), valuesForNextStep: this.valuesForNextStep.get(key), inputOutputColumnEnabled: this.inputOutputColumnEnabled})
+            }
+            this._view.show()
+            // FIXME maps cannot be send by postMessage
+            // this._view.webview.postMessage({data: this.simulationData, valuesForNextStep: this.valuesForNextStep, inputOutputColumnEnabled: this.inputOutputColumnEnabled})
         }
     }
 
@@ -356,7 +367,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      * Called after a compilation process was started
      */
     compilationStarted(): void {
-        this.update()
+        // this.update()
     }
 
     /**
@@ -366,7 +377,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         if (this.compilingSimulation) {
             // If a simulation systems is currently compiling one has to simulate it afterwards
             this.compilingSimulation = false
-            this.update()
+            // this.update()
             if (successful) {
                 vscode.commands.executeCommand(SIMULATE.command)
             }
@@ -596,57 +607,3 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     }
 
 }
-
-/**
- * Internal data structure to save all data required to display a simulation in the siulation view.
- */
- export class SimulationData {
-    constructor(
-        public data: any[],
-        public input: boolean,
-        public output: boolean,
-        public categories: string[]
-    ) {
-    }
-}
-
-/**
- * Message send by the LS when a simulation is started.
- */
-export class SimulationStartedMessage {
-    constructor(
-        public successful: boolean,
-        public error: string,
-        public dataPool: Record<string, unknown>,
-        public propertySet: Map<string, string[]>
-    ) {}
-}
-
-export class Category {
-    constructor(
-        public name: string,
-        public symbols: string[]
-    ) {
-    }
-}
-
-/**
- * Message is used as a request and response parameter for a simulation step.
- */
-export class SimulationStepMessage {
-    constructor(
-        public values: Record<string, unknown>
-    ) {}
-}
-
-/**
- * Message send by the LS whenever a simulation is stopped.
- */
-export class SimulationStoppedMessage {
-    constructor(
-        public successful: boolean,
-        public message: string
-    ) {}
-}
-
-export const SimulationDataBlackList: string[]  = ["#interface"]
