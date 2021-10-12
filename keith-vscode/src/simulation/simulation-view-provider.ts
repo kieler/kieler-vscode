@@ -26,7 +26,14 @@ export const startedSimulationMessageType = 'keith/simulation/started';
 
 export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 
+
+    public readonly newSimulationDataEmitter = new vscode.EventEmitter<this>()
+
+    public readonly newSimulationData: vscode.Event<this> = this.newSimulationDataEmitter.event
+
     protected readonly onRequestSimulationSystemsEmitter = new vscode.EventEmitter<this | undefined>()
+
+    readonly onDidChangeOpenStateEmitter = new vscode.EventEmitter<boolean>()
 
     /**
      * Trace for each symbol.
@@ -74,8 +81,6 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      * The value of this attribute is simulation type selected by default.
      */
     public simulationType = "Periodic"
-
-    readonly onDidChangeOpenStateEmitter = new vscode.EventEmitter<boolean>()
 
     /**
      * Set by SimulationContribution after a simulation is started or stopped.
@@ -272,7 +277,26 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
             // localResourceRoots: [vscode.Uri.joinPath(this._extensionUri,'simulation/index.css')]
 		};
         this.update()
+        // TODO connect messages
+        this.connect()
 	}
+
+    protected async connect(): Promise<void> {
+        if (this._view) {
+            this.context.subscriptions.push(this.newSimulationData(event => {
+                if (event._view && event._view.visible) {
+                    // TDO
+                }
+                // this.setWebviewActiveContext(event.webviewPanel.active); TODO
+            }));
+            this.context.subscriptions.push(this._view.onDidDispose(() => {
+                // this.extension.didCloseWebview(this.diagramIdentifier); TODO
+                // this.disposables.forEach(disposable => disposable.dispose());
+            }));
+            this.context.subscriptions.push(this._view.webview.onDidReceiveMessage(message => /*this.receiveFromWebview(message)*/ console.log('TODO')));
+            // await this.ready(); TODO
+        }
+    }
 
     public update(): void {
         if (this._view) {

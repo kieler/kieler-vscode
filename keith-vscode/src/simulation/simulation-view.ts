@@ -23,13 +23,15 @@ export class SimulationWebView {
 
     private webview?: vscode.Webview
 
-    constructor(private readonly viewProvider: SimulationWebViewProvider) {}
+    constructor(private readonly viewProvider: SimulationWebViewProvider) {
+    }
 
     getHtmlForSimulationView(webview: vscode.Webview): string {
         this.webview = webview
         this.viewProvider.kico.showButtons = true
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/simulation/style', 'index.css'));
 		const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
+		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist/simulation', 'simulation-view.js'));
         return `
         <!DOCTYPE html>
         <html lang="en">
@@ -45,6 +47,7 @@ export class SimulationWebView {
                     <link href="${compilerStyĺeUri}" rel="stylesheet">
             </head>
             <body>
+                <script src="${script}"></script>
                 <div id="simulation_container" style="height: 100%;"></div>
                 <div>${!this.viewProvider.kico ? `<div></div>` :
                 `<div class="simulation-widget">
