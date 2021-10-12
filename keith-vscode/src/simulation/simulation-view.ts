@@ -47,6 +47,13 @@ export class SimulationWebView {
             </head>
             <body>
                 <script src="${script}"></script>
+                <script>
+                    const vscode = acquireVsCodeApi(); 
+                    function newInputFor(key){
+                        // This works
+                        vscode.postMessage({key: JSON.parse(JSON.stringify(key)), type: 'input'});
+                    }
+                </script>
                 <div id="simulation_container" style="height: 100%;"></div>
                 <div>${!this.viewProvider.kico ? `<div></div>` :
                 `<div class="simulation-widget">

@@ -26,9 +26,9 @@ export function isWebviewReadyMessage(object: any): object is WebviewReadyMessag
 
 export interface SimulationTableData {
     key: string
-    data: SimulationData
+    data: Map<string, SimulationData>
     inputOutputColumnEnabled: boolean
-    valuesForNextStep: any
+    valuesForNextStep: Map<string, any>
 }
 
 export function isSimulationData(object: any): object is SimulationTableData {

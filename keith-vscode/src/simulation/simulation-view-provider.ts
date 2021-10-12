@@ -278,7 +278,7 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.options = {
 			// Allow scripts in the webview
 			enableScripts: true,
-            // localResourceRoots: [vscode.Uri.joinPath(this._extensionUri,'simulation/index.css')]
+            enableCommandUris: true
 		};
         this.initialize()
         // TODO connect messages
@@ -327,12 +327,12 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
 
     public update(): void {
         if (this._view) {
-            for (const key in this.simulationData.keys) {
-                this._view.webview.postMessage({key: key, data: this.simulationData.get(key), valuesForNextStep: this.valuesForNextStep.get(key), inputOutputColumnEnabled: this.inputOutputColumnEnabled})
-            }
-            this._view.show()
+            // for (const key in this.simulationData.keys) {
+            //     this._view.webview.postMessage({key: key, data: this.simulationData.get(key), valuesForNextStep: this.valuesForNextStep.get(key), inputOutputColumnEnabled: this.inputOutputColumnEnabled})
+            // }
+            // this._view.show()
             // FIXME maps cannot be send by postMessage
-            // this._view.webview.postMessage({data: this.simulationData, valuesForNextStep: this.valuesForNextStep, inputOutputColumnEnabled: this.inputOutputColumnEnabled})
+            this._view.webview.postMessage({data: JSON.stringify(this.simulationData), valuesForNextStep: JSON.stringify(this.valuesForNextStep), inputOutputColumnEnabled: this.inputOutputColumnEnabled})
         }
     }
 

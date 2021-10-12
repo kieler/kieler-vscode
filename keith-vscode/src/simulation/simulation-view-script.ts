@@ -14,9 +14,13 @@
 import { reverse, SimulationData } from "./helper";
 import { isSimulationData } from "./message";
 
-// @ts-ignore
-const vscodeApi = acquireVsCodeApi();
+// declare const acquireVsCodeApi: any;
+// const vscodeApi = acquireVsCodeApi();
 
+
+// export function newInputFor(key: string): void {
+//     vscodeApi.postMessage({key: key, type: "input"})
+// }
 
 /**
  * Use webpack to build a js file from this that is included in the html of the SimulationWebView
@@ -26,81 +30,58 @@ export class SimulationViewStarter {
 
 
 /* eslint @typescript-eslint/no-unused-vars: 0*/
- newInputFor(): void {
-    vscodeApi.postMessage({type: "input"})
-}
 
     constructor() {
-        this.sendReadyMessage();
+        // this.sendReadyMessage();
         this.waitForStuff();
     }
 
-    protected sendReadyMessage(): void {
-        console.log('I am ready')
-        vscodeApi.postMessage({ readyMessage: 'Simulation view ready' } as any);
-    }
+    // protected sendReadyMessage(): void {
+    //     console.log('I am ready')
+    //     vscodeApi.postMessage({ readyMessage: 'Simulation view ready' } as any);
+    // }
 
     protected waitForStuff(): void {
         console.log('Waiting stuff...');
         const eventListener = (message: MessageEvent) => {
             console.log("A fun message that is handled", message)
             if (isSimulationData(message.data)) {
-                console.log("A fun message that is handled further as simulation data", message)
-                const element = document.getElementById(message.data.key)
-                if (element) {
-                    const key = message.data.key
-                    const data = message.data.data
-                    element.innerHTML = `<tr id="${key}" key="${key}" class="simulation-data-row">
-                                ${this.renderInputOutputColumn(data)}
-                                ${this.renderLabelColumn(key)}
-                                <td key="input" class="simulation-data-truncate simulation-td">
-                                    <div>
-                                        <button id=${"input-box-" + key}
-                                            title="input"
-                                            class=${"simulation-data-button"}
-                                            onClick="this.newInputFor()" readOnly="${!data.input}" size="1">Input</button>
-                                    </div>
-                                </td>
-                                ${this.renderLastValueColumn(data)}
-                                ${this.renderHistoryColumn(data, key)}
-                            </tr>`
-                }
-                // const table = document.getElementById('simulation-table')
-                // if (table) {
-                //     // table.innerHTML = "trst" //renderSimulationData()
-                //     const head = table.children[0]
-                //     const body = table.children[1]
-                //     console.log(head, body)
-                //     if (!body) return;
-                //     console.log("Starting with body")
-                //     for (let i = 0; i < body.children.length; i++) {
-                //         const element = body.children[i]
-                //         console.log(element.id, "message.data", message.data)
-                //         console.log(message.data.data.get(element.id))
-                //         // if (true || typeof message.data.get(element.id) === "boolean") {
-                //             const key = element.id
-                //             const data = message.data.data.get(key) as SimulationData
-                //             element.innerHTML = `<tr id="${key}" key="${key}" class="simulation-data-row">
-                //             ${this.renderInputOutputColumn(data)}
-                //             ${this.renderLabelColumn(key)}
-                //             <td key="input" class="simulation-data-truncate simulation-td">
-                //                 <div>
-                //                     <button id=${"input-box-" + key}
-                //                         title="input"
-                //                         class=${"simulation-data-button"}
-                //                         onClick="this.newInputFor()" readOnly="${!data.input}" size="1">Input</button>
-                //                 </div>
-                //             </td>
-                //             ${this.renderLastValueColumn(data)}
-                //             ${this.renderHistoryColumn(data, key)}
-                //         </tr>`
-                //         // }
-                //         for (let j = 0; j < element.children.length; j++) {
-                //             // Always six children
+                const table = document.getElementById('simulation-table')
+                if (table) {
+                    // table.innerHTML = "trst" //renderSimulationData()
+                    const head = table.children[0]
+                    const body = table.children[1]
+                    console.log(head, body)
+                    if (!body) return;
+                    console.log("Starting with body")
+                    for (let i = 0; i < body.children.length; i++) {
+                        const element = body.children[i]
+                        console.log(element.id, "message.data", message.data)
+                        console.log(message.data.data.get(element.id))
+                        // if (true || typeof message.data.get(element.id) === "boolean") {
+                            const key = element.id
+                            const data = message.data.data.get(key) as SimulationData
+                            element.innerHTML = `<tr id="${key}" key="${key}" class="simulation-data-row">
+                            ${this.renderInputOutputColumn(data)}
+                            ${this.renderLabelColumn(key)}
+                            <td key="input" class="simulation-data-truncate simulation-td">
+                                <div>
+                                    <button id=${"input-box-" + key}
+                                        title="input"
+                                        class="newInputFor(${key})" 
+                                        onClick="console.log(${key})")} readOnly="${!data.input}" size="1">Input</button>
+                                </div>
+                            </td>
+                            ${this.renderLastValueColumn(data)}
+                            ${this.renderHistoryColumn(data, key)}
+                        </tr>`
+                        // }
+                        for (let j = 0; j < element.children.length; j++) {
+                            // Always six children
                             
 
-                //         }
-                //     }
+                        }
+                    }
                     // for (let item of body.children) {
                     // }
                         // console.log('node name', node)
@@ -110,9 +91,9 @@ export class SimulationViewStarter {
                         // 
                     //     console.log("Test", node, message.data)
                     // })
-            //     } else {
-            //         console.log('no table', message.data)
-            //     }
+                } else {
+                    console.log('no table', message.data)
+                }
             } else  {
             // TODO
             }
