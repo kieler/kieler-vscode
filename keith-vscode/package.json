@@ -250,6 +250,16 @@
           "category": "Simulation"
       },
       {
+          "command": "keith-vscode.simulation-save-trace",
+          "title": "Save trace",
+          "category": "Simulation"
+      },
+      {
+          "command": "keith-vscode.simulation-load-trace",
+          "title": "Load trace",
+          "category": "Simulation"
+      },
+      {
           "command": "keith-vscode.kieler-compiler",
           "title": "Open KIELER view",
           "category": "Kieler"
@@ -310,6 +320,12 @@
         },
         {
           "command": "keith-vscode.simulation-restart"
+        },
+        {
+          "command": "keith-vscode.simulation-save-trace"
+        },
+        {
+          "command": "keith-vscode.simulation-load-trace"
         },
         {
           "command": "keith-vscode.open-kviz-internal"

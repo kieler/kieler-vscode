@@ -14,8 +14,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
-import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
-import { delay, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj } from './helper';
+import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
+import { delay, LoadedTraceMessage, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
 import { isWebviewReadyMessage, WebviewReadyMessage } from './message';
@@ -108,6 +108,11 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
      * Categories of variables with their respective members.
      */
     public categories: string[] = []
+
+    /**
+     * The trace that is loaded for the current model.
+     */
+    public currentTrace: Trace
 
     public simulationStep = -1
 
@@ -210,6 +215,16 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_SIMULATION.command, async () => {
                 this.startOrPauseSimulation()
+            }));
+        
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SAVE_TRACE.command, async () => {
+                this.saveTrace()
+            }));
+    
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(LOAD_TRACE.command, async () => {
+                this.loadTrace()
             }));
 
 
@@ -528,6 +543,30 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         if (this.play) {
             await this.waitForNextStep()
         }
+    }
+
+    async saveTrace(): Promise<void> {
+        // TODO:
+        console.log("saving trace")
+    }
+
+    async loadTrace(): Promise<void> {
+        console.log("loading trace")
+        // Loading the trace file.
+        const uris = await vscode.window.showOpenDialog({
+            canSelectMany: false, 
+            filters: {'KTrace': ['ktrace']}
+        })
+        if (uris === undefined) {
+            return
+        }
+        const document = await vscode.workspace.openTextDocument(uris[0].path)
+        const text = document.getText()
+        console.log(text)
+
+        const lClient = await this.lsClient
+        const message = await lClient.sendRequest('keith/simulation/loadTrace', text) as LoadedTraceMessage
+        this.currentTrace = message.trace
     }
 
     /**

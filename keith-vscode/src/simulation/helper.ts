@@ -104,3 +104,33 @@ export class SimulationStoppedMessage {
 }
 
 export const SimulationDataBlackList: string[]  = ["#interface"]
+
+/**
+ * Message sent by the LS as a response to a load trace message, containing the structure of the loaded trace.
+ */
+export class LoadedTraceMessage {
+    constructor(
+        public trace: Trace
+    ) {}
+}
+
+/**
+ * A simulation trace as defined by the ktrace language.
+ */
+export class Trace {
+    ticks: Tick[]
+}
+
+/**
+ * Data during a single tick for in/outputs of a trace.
+ */
+export class Tick {
+    name: string
+    inputs: Assignment[]
+    outputs: Assignment[]
+    goto: Tick // TODO: this probably needs to be converted to some ID instead (the name for example if that is unique or the index in its trace)
+}
+
+export class Assignment {
+    // and so on... // TODO:
+}

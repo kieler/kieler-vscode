@@ -49,6 +49,16 @@ export const RUN_SIMULATION: vscode.Command = {
     title: 'Run simulation'
 }
 
+export const SAVE_TRACE: vscode.Command = {
+    command: 'keith-vscode.simulation-save-trace',
+    title: 'Save trace'
+}
+
+export const LOAD_TRACE: vscode.Command = {
+    command: 'keith-vscode.simulation-load-trace',
+    title: 'Load trace'
+}
+
 export const OPEN_INTERNAL_KVIZ_VIEW: vscode.Command = {
     command: 'keith-vscode.open-kviz-internal',
     title: 'Open KViz view in internal browser preview'
