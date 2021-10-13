@@ -315,16 +315,16 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             let errorString = '';
             snapshotsDescriptions.files.forEach(array => {
                 array.forEach(element => {
-                    if (element.infos) {
-                        element.iconPath = `$(info)`
+                    if (element.infos && element.infos.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('info');
                         this.output.appendLine("[INFO]" + element.infos.reduce((x, y) => x + '\n' + y))
                     }
-                    if (element.warnings) {
-                        element.iconPath = `$(warning)`
+                    if (element.warnings && element.warnings.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('warning');
                         this.output.appendLine("[WARN]" + element.warnings.reduce((x, y) => x + '\n' + y))
                     }
-                    if (element.errors) {
-                        element.iconPath = `$(error)`
+                    if (element.errors && element.errors.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('error');
                         errorString = element.errors.reduce((x, y) => x + '\n' + y)
                         errorOccurred = true
                         this.output.appendLine("[ERROR]" + errorString)
