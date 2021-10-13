@@ -22,7 +22,7 @@ import { connect, NetConnectOpts, Socket } from "net";
 import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
-import { SimulationWebViewProvider } from "./simulation/simulation-view-provider";
+import { SimulationTreeDataProvider } from "./simulation/simulation-tree-data-provider";
 // import 'simulation/index.css'
 
 //** Command identifiers that are provided by klighd-vscode. */
@@ -87,10 +87,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         treeDataProvider: compilationDataProvider
     });
 
-    // Register simulation view
-    const simulationProvider = new SimulationWebViewProvider(context.extensionUri, lsClient, compilationDataProvider, context);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(SimulationWebViewProvider.viewType, simulationProvider));
+
+    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context)
+    // Register and start simulation tree view
+    vscode.window.registerTreeDataProvider(
+        'kieler-simulation-tree',
+        simulationTreeDataProvider
+    );
+    vscode.window.createTreeView('kieler-simulation-tree', {
+        treeDataProvider: simulationTreeDataProvider
+    });
 
     console.debug("Starting Language Server...");
     lsClient.start();
