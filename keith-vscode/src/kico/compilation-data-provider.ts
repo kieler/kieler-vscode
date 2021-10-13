@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE } from './commands';
 import { Utils } from 'vscode-uri';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
@@ -122,6 +122,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
         }));
+
+        this.context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this)));
         // Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
         const editor = vscode.window.activeTextEditor
         if (editor) {
@@ -129,6 +131,27 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         }
 
         // Create commands
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: "true",
+                picked: this.autoCompile
+            }, {
+                label: "false",
+                picked: !this.autoCompile
+            }]
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.autoCompile = selection[0]?.label == "true";
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
                 this.show(this.lastCompiledUri, snapshot.index)
@@ -216,6 +239,12 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 this.requestSystemDescriptions()
             })
         }
+    }
+
+    onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
+        // don't autocompile, if autocompile is off, document is not saved or it is not the last compiled file
+        if (!this.autoCompile || event.document.isDirty || event.document.uri.toString() !== this.lastCompiledUri) return;
+        this.compile(this.lastInvokedCompilation, this.compileInplace, this.showResultingModel, false);
     }
 
     async requestSystemDescriptions(): Promise<void> {
