@@ -52,6 +52,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     requestSystems: vscode.StatusBarItem
     compilation: vscode.StatusBarItem
+    output: vscode.OutputChannel
 
     /**
      * The file extension of the last file for which compilation systems where requested.
@@ -97,6 +98,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
 
     constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
+
+        // Output channel
+		this.output = vscode.window.createOutputChannel('KIELER Compilation');
 
         // TODO call treeview.reveal(item, {focus: true}); to reveal tree view after compilation finished
         // The item that is revealed should maybe be the last one. Also this provider may need access to the tree view.
@@ -261,16 +265,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public async compile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): Promise<void> {
         this.startTime = Date.now()
         this.compiling = true
-        // this.compilerWidget.update() TODO not necessary, however I might need an event for this
         await this.executeCompile(command, inplace, showResultingModel, snapshot)
         this.lastInvokedCompilation = command
         this.lastCompiledUri = this.sourceModelPath
-        // this.compilerWidget.update() TODO not necessary, however I might need an event for this
     }
 
     executeCompile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): void {
         if (!this.editor) {
-            // this.messageService.error(EDITOR_UNDEFINED_MESSAGE) TODO log error somewhere
+            vscode.window.showErrorMessage(EDITOR_UNDEFINED_MESSAGE)
             return;
         }
 
@@ -313,11 +315,19 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             let errorString = '';
             snapshotsDescriptions.files.forEach(array => {
                 array.forEach(element => {
+                    if (element.infos) {
+                        element.iconPath = `$(info)`
+                        this.output.appendLine("[INFO]" + element.infos.reduce((x, y) => x + '\n' + y))
+                    }
+                    if (element.warnings) {
+                        element.iconPath = `$(warning)`
+                        this.output.appendLine("[WARN]" + element.warnings.reduce((x, y) => x + '\n' + y))
+                    }
                     if (element.errors) {
-                        element.errors.forEach(error => {
-                            errorOccurred = true
-                            errorString = errorString + '\n' + error + "TODO remove" + currentIndex + maxIndex
-                        })
+                        element.iconPath = `$(error)`
+                        errorString = element.errors.reduce((x, y) => x + '\n' + y)
+                        errorOccurred = true
+                        this.output.appendLine("[ERROR]" + errorString)
                     }
                     element.index = index
                     index++
@@ -338,14 +348,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                     `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
             this.compilation.tooltip = currentIndex === maxIndex ? 'Compilation finished' : 'Compilation stopped'
             if (errorOccurred) {
-                // this.messageService.error('An error occurred during compilation. Check the Compiler Widget for details.' + errorString) TODO
+                vscode.window.showErrorMessage('An error occurred during compilation. Check the output channel for details.' + errorString)
             }
         } else {
             // Set progress bar for compilation TODO
             const progress = '█'.repeat(currentIndex) + '░'.repeat(maxIndex - currentIndex)
 
             this.compilation.show()
-            this.compilation.text =  `$(spinner fa-pulse fa-fw) ${progress}`
+            this.compilation.text =  `$(spinner) ${progress}`
             this.compilation.tooltip = 'Compiling...'
         }
         // this.compilerWidget.update() TODO it updates since the compilation data of this provider changes somehow
