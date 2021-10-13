@@ -150,115 +150,125 @@
     ],
     "commands": [
       {
-          "command": "keith-vscode.compile",
-          "title": "Compile current model with...",
-          "icon": "$(server-process)",
-          "category": "KiCo"
+        "command": "keith-vscode.compile",
+        "title": "Compile current model with...",
+        "icon": "$(server-process)",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.compile-snapshot",
-          "title": "Compile diagram model with...",
-          "icon": "$(server-process)",
-          "category": "KiCo"
+        "command": "keith-vscode.compile-snapshot",
+        "title": "Compile diagram model with...",
+        "icon": "$(server-process)",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.show",
-          "title": "Show snapshot...",
-          "icon": "$(eye)",
-          "category": "KiCo"
+        "command": "keith-vscode.show",
+        "title": "Show snapshot...",
+        "icon": "$(eye)",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.auto-compile",
-          "title": "Set auto-compile to ...",
-          "category": "KiCo"
+        "command": "keith-vscode.auto-compile",
+        "title": "Set auto-compile to ...",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.show-private-systems",
-          "title": "Show private systems?",
-          "category": "KiCo"
+        "command": "keith-vscode.show-private-systems",
+        "title": "Show private systems?",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.inplace",
-          "title": "Set inplace compilation to ...",
-          "category": "KiCo"
+        "command": "keith-vscode.inplace",
+        "title": "Set inplace compilation to ...",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.request-compilation-systems",
-          "title": "Request compilation systems",
-          "category": "KiCo"
+        "command": "keith-vscode.request-compilation-systems",
+        "title": "Request compilation systems",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.compilation-time",
-          "title": "Show compilation duration ...",
-          "category": "KiCo"
+        "command": "keith-vscode.compilation-time",
+        "title": "Show compilation duration ...",
+        "category": "KiCo"
       },
       {
-          "command": "keith-vscode.simulate",
-          "title": "Simulate current model with...",
-          "icon": "$(play)",
-          "category": "Simulation"
+        "command": "keith-vscode.simulate",
+        "title": "Simulate current model with...",
+        "icon": "$(play)",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulate-snapshot",
-          "title": "Simulate current diagram model with...",
-          "icon": "$(play)",
-          "category": "Simulation"
+        "command": "keith-vscode.simulate-snapshot",
+        "title": "Simulate current diagram model with...",
+        "icon": "$(play)",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.open-kviz-internal",
-          "title": "Open KIELER visualization preview",
-          "category": "Simulation"
+        "command": "keith-vscode.open-kviz-internal",
+        "title": "Open KIELER visualization preview",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.open-kviz-external",
-          "title": "Open KIELER visualization in browser",
-          "category": "Simulation"
+        "command": "keith-vscode.open-kviz-external",
+        "title": "Open KIELER visualization in browser",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.add-co-simulation",
-          "title": "Add Co-Simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.add-co-simulation",
+        "title": "Add Co-Simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-stop",
-          "title": "Stop simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-stop",
+        "title": "Stop simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-step",
-          "title": "Execute simulation step",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-step",
+        "title": "Execute simulation step",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-run",
-          "title": "Run simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-run",
+        "title": "Run simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-pause",
-          "title": "Pause simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-pause",
+        "title": "Pause simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-start",
-          "title": "Start simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-start",
+        "title": "Start simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.simulation-restart",
-          "title": "Restart simulation",
-          "category": "Simulation"
+        "command": "keith-vscode.simulation-restart",
+        "title": "Restart simulation",
+        "category": "Simulation"
       },
       {
-          "command": "keith-vscode.kieler-compiler",
-          "title": "Open KIELER view",
-          "category": "Kieler"
+        "command": "keith-vscode.simulation-new-value",
+        "title": "New value for ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.kieler-compiler",
+        "title": "Open KIELER view",
+        "category": "Kieler"
       }
     ],
     "menus": {
       "view/item/context": [
         {
+          "when": "viewItem == snapshot",
           "command": "keith-vscode.show"
+        },
+        {
+          "when": "viewItem == simulation:data:input || viewItem == simulation:history:input",
+          "command": "keith-vscode.simulation-new-value"
         }
       ],
       "commandPalette": [
@@ -345,28 +355,6 @@
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
-      ],
-      "kieler-simulation/title": [
-        {
-          "command": "keith-vscode.simulation-step",
-          "group": "navigation"
-        },
-        {
-          "command": "keith-vscode.simulation-stop",
-          "group": "navigation"
-        },
-        {
-          "command": "keith-vscode.simulation-restart",
-          "group": "navigation"
-        },
-        {
-          "command": "keith-vscode.simulation-pause",
-          "group": "navigation"
-        },
-        {
-          "command": "keith-vscode.simulation-run",
-          "group": "navigation"
-        }
       ]
     },
     "viewsContainers": {
@@ -386,9 +374,9 @@
             "name": "KIELER Compiler"
         },
         {
-					"type": "webview",
-          "id": "kieler-simulation",
-          "name": "KIELER Simulation"
+					"type": "tree",
+          "id": "kieler-simulation-tree",
+          "name": "KIELER Simulation Tree"
         }
       ]
     }
