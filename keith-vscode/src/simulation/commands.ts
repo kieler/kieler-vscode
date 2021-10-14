@@ -59,6 +59,11 @@ export const LOAD_TRACE: vscode.Command = {
     title: 'Load trace'
 }
 
+export const NEW_VALUE_SIMULATION: vscode.Command = {
+    command: 'keith-vscode.simulation-new-value',
+    title: 'New value for ...'
+}
+
 export const OPEN_INTERNAL_KVIZ_VIEW: vscode.Command = {
     command: 'keith-vscode.open-kviz-internal',
     title: 'Open KViz view in internal browser preview'

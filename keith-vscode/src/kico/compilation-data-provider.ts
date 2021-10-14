@@ -13,8 +13,9 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE } from './commands';
 import { Utils } from 'vscode-uri';
+import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
 export const CANCEL_COMPILATION = "keith/kicool/cancel-compilation"
@@ -39,6 +40,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     snapshotSystems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
     kicoCommands: vscode.Disposable[] = [];
+    storage: StorageService;
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
     compileInplace = false;
     showResultingModel = true;
@@ -48,10 +50,11 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     lastInvokedCompilation = '';
     lastCompiledUri = '';
     sourceModelPath = ''; // Set when editor is changed to current uri
-    autoCompile = false;
+    autoCompile: boolean;
 
     requestSystems: vscode.StatusBarItem
     compilation: vscode.StatusBarItem
+    output: vscode.OutputChannel
 
     /**
      * The file extension of the last file for which compilation systems where requested.
@@ -98,6 +101,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
 
+        // Output channel
+		this.output = vscode.window.createOutputChannel('KIELER Compilation');
+
         // TODO call treeview.reveal(item, {focus: true}); to reveal tree view after compilation finished
         // The item that is revealed should maybe be the last one. Also this provider may need access to the tree view.
 
@@ -108,6 +114,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compilation = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
         this.compilation.command = OPEN_KIELER_VIEW.command
         this.context.subscriptions.push(this.compilation)
+
+        this.storage = new StorageService(context.workspaceState);
+        this.autoCompile = this.storage.get("keith.vscode.compilation.auto", false);
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
@@ -122,6 +131,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
         }));
+
+        this.context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this)));
         // Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
         const editor = vscode.window.activeTextEditor
         if (editor) {
@@ -129,6 +140,28 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         }
 
         // Create commands
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: "true",
+                picked: this.autoCompile
+            }, {
+                label: "false",
+                picked: !this.autoCompile
+            }]
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.autoCompile = selection[0]?.label == "true";
+                    this.storage.put("keith.vscode.compilation.auto", this.autoCompile);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
                 this.show(this.lastCompiledUri, snapshot.index)
@@ -210,12 +243,19 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     }
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
-        if (editor && editor.document.uri.scheme !== "user_storage") {
+        if (editor && editor.document.uri.scheme === "file") {
             this.lsClient.onReady().then(() => {
+                console.log()
                 this.editor = editor
                 this.requestSystemDescriptions()
             })
         }
+    }
+
+    onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
+        // don't autocompile, if autocompile is off, document is not saved or it is not the last compiled file
+        if (!this.autoCompile || event.document.isDirty || event.document.uri.toString() !== this.lastCompiledUri) return;
+        this.compile(this.lastInvokedCompilation, this.compileInplace, this.showResultingModel, false);
     }
 
     async requestSystemDescriptions(): Promise<void> {
@@ -261,16 +301,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public async compile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): Promise<void> {
         this.startTime = Date.now()
         this.compiling = true
-        // this.compilerWidget.update() TODO not necessary, however I might need an event for this
         await this.executeCompile(command, inplace, showResultingModel, snapshot)
         this.lastInvokedCompilation = command
         this.lastCompiledUri = this.sourceModelPath
-        // this.compilerWidget.update() TODO not necessary, however I might need an event for this
     }
 
     executeCompile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): void {
         if (!this.editor) {
-            // this.messageService.error(EDITOR_UNDEFINED_MESSAGE) TODO log error somewhere
+            vscode.window.showErrorMessage(EDITOR_UNDEFINED_MESSAGE)
             return;
         }
 
@@ -313,11 +351,22 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             let errorString = '';
             snapshotsDescriptions.files.forEach(array => {
                 array.forEach(element => {
-                    if (element.errors) {
-                        element.errors.forEach(error => {
-                            errorOccurred = true
-                            errorString = errorString + '\n' + error + "TODO remove" + currentIndex + maxIndex
-                        })
+                    if (element.infos && element.infos.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('info');
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        this.output.appendLine("[INFO]\t" + element.infos.reduce((x, y) => x + '\n\t\t' + y))
+                    }
+                    if (element.warnings && element.warnings.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('warning');
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        this.output.appendLine("[WARN]\t" + element.warnings.reduce((x, y) => x + '\n\t\t' + y))
+                    }
+                    if (element.errors && element.errors.length > 0) {
+                        element.iconPath = new vscode.ThemeIcon('error');
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        errorString = element.errors.reduce((x, y) => x + '\n\t\t' + y)
+                        errorOccurred = true
+                        this.output.appendLine("[ERROR]\t" + errorString)
                     }
                     element.index = index
                     index++
@@ -338,14 +387,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                     `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
             this.compilation.tooltip = currentIndex === maxIndex ? 'Compilation finished' : 'Compilation stopped'
             if (errorOccurred) {
-                // this.messageService.error('An error occurred during compilation. Check the Compiler Widget for details.' + errorString) TODO
+                vscode.window.showErrorMessage('An error occurred during compilation. Check the output channel for details.' + errorString)
             }
         } else {
             // Set progress bar for compilation TODO
             const progress = '█'.repeat(currentIndex) + '░'.repeat(maxIndex - currentIndex)
 
             this.compilation.show()
-            this.compilation.text =  `$(spinner fa-pulse fa-fw) ${progress}`
+            this.compilation.text =  `$(spinner) ${progress}`
             this.compilation.tooltip = 'Compiling...'
         }
         // this.compilerWidget.update() TODO it updates since the compilation data of this provider changes somehow
@@ -531,6 +580,24 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                         const parentElement = new CompilationData(snapshots[0].name, '', vscode.TreeItemCollapsibleState.Collapsed, snapshots[0].name, snapshots[0].snapshotIndex,
                         snapshots[0].index)
                         parentElement.contextValue = 'parent'
+                        let error = false
+                        let warn = false
+                        let info = false
+                        snapshots.forEach(element => {
+                            if (element.infos && element.infos.length > 0) {
+                                info = true
+                            }
+                            if (element.warnings && element.warnings.length > 0) {
+                                warn = true
+                            }
+                            if (element.errors && element.errors.length > 0) {
+                                error = true
+                            }
+                        })
+                        parentElement.iconPath = error ? new vscode.ThemeIcon('error') : warn ? new vscode.ThemeIcon('warning') : info ? new vscode.ThemeIcon('info') : ''
+                        if (info || warn || error) {
+                            parentElement.tooltip = 'Check the KIELER Compiler output channel for details'
+                        }
                         return parentElement
                     }
                     snapshots[0].contextValue = 'snapshot'
@@ -555,7 +622,7 @@ export class CompilationData extends vscode.TreeItem {
         infos?: string[]
     ) {
         super(label, collapsibleState);
-        this.tooltip = `${this.label}-${this.version}`;
+        this.tooltip = `${this.label}`;
         this.description = this.version;
         this.name = name
         this.snapshotIndex = snapshotIndex

@@ -68,9 +68,9 @@ export const TOGGLE_PRIVATE_SYSTEMS: vscode.Command = {
     title: 'Kico: Toggle show private systems'
 }
 export const TOGGLE_AUTO_COMPILE: vscode.Command = {
-    command: 'kico-toggle-auto-compile',
-    title: 'Kico: Toggle auto compile'
-}
+    command: 'keith-vscode.auto-compile',
+    title: 'Toggle auto compile'
+};
 
 export const TOGGLE_BUTTON_MODE: vscode.Command = {
     command: 'kico-toggle-button-mode',
