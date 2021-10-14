@@ -13,8 +13,9 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE } from './commands';
 import { Utils } from 'vscode-uri';
+import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
 export const CANCEL_COMPILATION = "keith/kicool/cancel-compilation"
@@ -39,6 +40,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     snapshotSystems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
     kicoCommands: vscode.Disposable[] = [];
+    storage: StorageService;
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
     compileInplace = false;
     showResultingModel = true;
@@ -48,7 +50,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     lastInvokedCompilation = '';
     lastCompiledUri = '';
     sourceModelPath = ''; // Set when editor is changed to current uri
-    autoCompile = false;
+    autoCompile: boolean;
 
     requestSystems: vscode.StatusBarItem
     compilation: vscode.StatusBarItem
@@ -109,6 +111,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compilation.command = OPEN_KIELER_VIEW.command
         this.context.subscriptions.push(this.compilation)
 
+        this.storage = new StorageService(context.workspaceState);
+        this.autoCompile = this.storage.get("keith.vscode.compilation.auto", false);
+
         // Bind notifications to receive
         lsClient.onReady().then(() => {
             lsClient.onNotification(compilationSystemsMessageType, (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
@@ -122,6 +127,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
             this.onDidChangeActiveTextEditor(editor)
         }));
+
+        this.context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this)));
         // Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
         const editor = vscode.window.activeTextEditor
         if (editor) {
@@ -129,6 +136,28 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         }
 
         // Create commands
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: "true",
+                picked: this.autoCompile
+            }, {
+                label: "false",
+                picked: !this.autoCompile
+            }]
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.autoCompile = selection[0]?.label == "true";
+                    this.storage.put("keith.vscode.compilation.auto", this.autoCompile);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
                 this.show(this.lastCompiledUri, snapshot.index)
@@ -216,6 +245,12 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 this.requestSystemDescriptions()
             })
         }
+    }
+
+    onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
+        // don't autocompile, if autocompile is off, document is not saved or it is not the last compiled file
+        if (!this.autoCompile || event.document.isDirty || event.document.uri.toString() !== this.lastCompiledUri) return;
+        this.compile(this.lastInvokedCompilation, this.compileInplace, this.showResultingModel, false);
     }
 
     async requestSystemDescriptions(): Promise<void> {
