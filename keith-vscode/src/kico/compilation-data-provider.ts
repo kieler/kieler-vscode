@@ -318,17 +318,20 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 array.forEach(element => {
                     if (element.infos && element.infos.length > 0) {
                         element.iconPath = new vscode.ThemeIcon('info');
-                        this.output.appendLine("[INFO]" + element.infos.reduce((x, y) => x + '\n' + y))
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        this.output.appendLine("[INFO]\t" + element.infos.reduce((x, y) => x + '\n\t\t' + y))
                     }
                     if (element.warnings && element.warnings.length > 0) {
                         element.iconPath = new vscode.ThemeIcon('warning');
-                        this.output.appendLine("[WARN]" + element.warnings.reduce((x, y) => x + '\n' + y))
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        this.output.appendLine("[WARN]\t" + element.warnings.reduce((x, y) => x + '\n\t\t' + y))
                     }
                     if (element.errors && element.errors.length > 0) {
                         element.iconPath = new vscode.ThemeIcon('error');
-                        errorString = element.errors.reduce((x, y) => x + '\n' + y)
+                        element.tooltip = 'Check the KIELER Compiler output channel for details'
+                        errorString = element.errors.reduce((x, y) => x + '\n\t\t' + y)
                         errorOccurred = true
-                        this.output.appendLine("[ERROR]" + errorString)
+                        this.output.appendLine("[ERROR]\t" + errorString)
                     }
                     element.index = index
                     index++
@@ -542,6 +545,24 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                         const parentElement = new CompilationData(snapshots[0].name, '', vscode.TreeItemCollapsibleState.Collapsed, snapshots[0].name, snapshots[0].snapshotIndex,
                         snapshots[0].index)
                         parentElement.contextValue = 'parent'
+                        let error = false
+                        let warn = false
+                        let info = false
+                        snapshots.forEach(element => {
+                            if (element.infos && element.infos.length > 0) {
+                                info = true
+                            }
+                            if (element.warnings && element.warnings.length > 0) {
+                                warn = true
+                            }
+                            if (element.errors && element.errors.length > 0) {
+                                error = true
+                            }
+                        })
+                        parentElement.iconPath = error ? new vscode.ThemeIcon('error') : warn ? new vscode.ThemeIcon('warning') : info ? new vscode.ThemeIcon('info') : ''
+                        if (info || warn || error) {
+                            parentElement.tooltip = 'Check the KIELER Compiler output channel for details'
+                        }
                         return parentElement
                     }
                     snapshots[0].contextValue = 'snapshot'
@@ -566,7 +587,7 @@ export class CompilationData extends vscode.TreeItem {
         infos?: string[]
     ) {
         super(label, collapsibleState);
-        this.tooltip = `${this.label}-${this.version}`;
+        this.tooltip = `${this.label}`;
         this.description = this.version;
         this.name = name
         this.snapshotIndex = snapshotIndex
