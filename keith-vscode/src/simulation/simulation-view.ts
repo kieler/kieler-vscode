@@ -14,7 +14,7 @@
 // import { svg } from 'snabbdom-jsx'; // eslint-disable-line @typescript-eslint/no-unused-vars
 // import * as React from 'react';
 import * as vscode from 'vscode';
-import { SimulationData, SimulationDataBlackList, isInternal, reverse } from './helper';
+import { SimulationData, SimulationDataBlackList, isInternal, reverse, getNonce } from './helper';
 import { SimulationWebViewProvider } from './simulation-view-provider';
 import { SELECT_SIMULATION_CHAIN, SIMULATE } from './commands';
 
@@ -22,6 +22,8 @@ import { SELECT_SIMULATION_CHAIN, SIMULATE } from './commands';
 export class SimulationWebView {
 
     private webview?: vscode.Webview
+
+    private nonce: string
 
     constructor(private readonly viewProvider: SimulationWebViewProvider) {
     }
@@ -32,45 +34,31 @@ export class SimulationWebView {
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/simulation/style', 'index.css'));
 		// const compilerStyĺeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'src/kico/style', 'index.css'));
 		const script = webview.asWebviewUri(vscode.Uri.joinPath(this.viewProvider._extensionUri, 'dist', 'simulation-view-script.js'));
-        return `
-        <!DOCTYPE html>
+
+		// Use a nonce to only allow specific scripts to be run
+		this.nonce = getNonce();
+        return `<!DOCTYPE html>
         <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, height=device-height">
-                <title>Simulation</title>
-                <link
-                    rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-                    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-                    crossorigin="anonymous">
-                    <link href="${styleMainUri}" rel="stylesheet">
-            </head>
-            <body>
-                <script src="${script}"></script>
-                <script>
-                    const vscode = acquireVsCodeApi(); 
-                    function newInputFor(key){
-                        // This works
-                        vscode.postMessage({key: JSON.parse(JSON.stringify(key)), type: 'input'});
-                    }
-                </script>
-                <div id="simulation_container" style="height: 100%;"></div>
-                <div>${!this.viewProvider.kico ? `<div></div>` :
-                `<div class="simulation-widget">
-                    <div id="simulation-table-out" class="simulation-table">${this.renderSimulationData()}</div>
-                </div>`}</div>
-            </body>
-        </html>`
-        // TODO
-        // this.webview = webview
-        // if (!this.viewProvider.kico) {
-        //     return <div></div>
-        // } else {
-        //     return <div>
-        //         {this.renderSimulationPanel()}
-        //         <div key="table" class="simulation-table">{this.renderSimulationData()}</div>
-        //     </div>
-        // }
+        <head>
+            <meta charset="UTF-8">
+            <!--
+                Use a content security policy to only allow loading images from https or from our extension directory,
+                and only allow scripts that have a specific nonce.
+            -->
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${this.nonce}';">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link href="${styleMainUri}" rel="stylesheet">
+            <title>Cat Coding</title>
+        </head>
+        <body>
+            <div id="simulation_container" style="height: 100%;"></div>
+            <div>${!this.viewProvider.kico ? `<div></div>` :
+            `<div class="simulation-widget">
+                <div id="simulation-table-out" class="simulation-table">${this.renderSimulationData()}</div>
+            </div>`}</div>
+            <script nonce="${this.nonce}" src="${script}"></script>
+        </body>
+        </html>`;
     }
 
     /**
@@ -184,10 +172,10 @@ export class SimulationWebView {
                             ${this.renderLastValueColumn(data)}
                             <td key="input" class="simulation-data-truncate simulation-td">
                                 <div>
-                                    <button id=${"input-box-" + key}
+                                    <button key="${key}" nonce="${this.nonce}" id=${"input-box-" + key}
                                         title="input"
                                         class=${"simulation-data-button"}
-                                        onClick="newInputFor(${key})" readOnly="${!data.input}" size="1">Input</button>
+                                        readOnly="${!data.input}" size="1">Input</button>
                                 </div>
                             </td>
                             ${this.renderValueForNextStepColumn(nextStep)}
@@ -200,10 +188,10 @@ export class SimulationWebView {
                             ${this.renderLastValueColumn(data)}
                             <td key="input" class="simulation-data-truncate simulation-td">
                                 <div>
-                                    <button id=${"input-box-" + key}
+                                    <button key="${key}" nonce="${this.nonce}" id=${"input-box-" + key}
                                         title="input"
                                         class=${"simulation-data-button"}
-                                        onClick="newInputFor(${key})" readOnly="${!data.input}" size="1">Input</button>
+                                        readOnly="${!data.input}" size="1">Input</button>
                                 </div>
                             </td>
                             ${this.renderValueForNextStepColumn(nextStep)}

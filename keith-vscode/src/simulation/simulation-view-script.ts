@@ -14,13 +14,24 @@
 import { reverse, SimulationData } from "./helper";
 import { isSimulationData } from "./message";
 
-// declare const acquireVsCodeApi: any;
-// const vscodeApi = acquireVsCodeApi();
+declare const acquireVsCodeApi: any;
+const vscodeApi = acquireVsCodeApi();
 
 
-// export function newInputFor(key: string): void {
-//     vscodeApi.postMessage({key: key, type: "input"})
-// }
+export function newInputFor(key: string): void {
+    vscodeApi.postMessage({key: key, type: "input"})
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.getElementsByTagName('button')
+    for (let i = 0; i < buttons.length; i++) {
+        const key = buttons[i].getAttribute('key')
+        if (key) {
+            buttons[i].addEventListener('click', () => newInputFor(key))
+        }
+    }
+});
 
 /**
  * Use webpack to build a js file from this that is included in the html of the SimulationWebView
