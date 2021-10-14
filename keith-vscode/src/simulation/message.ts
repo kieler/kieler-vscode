@@ -23,7 +23,15 @@ export function isWebviewReadyMessage(object: any): object is WebviewReadyMessag
     /*eslint no-prototype-builtins: "off"*/
     return object !== undefined && object.hasOwnProperty('readyMessage');
 }
+export interface WebviewInputMessage {
+    key: string
+    type: string
+}
 
+export function isWebviewInputMessage(object: any): object is WebviewInputMessage {
+    /*eslint no-prototype-builtins: "off"*/
+    return object !== undefined && object.hasOwnProperty('type') && object.hasOwnProperty('key');
+}
 export interface SimulationTableData {
     key: string
     data: Map<string, SimulationData>

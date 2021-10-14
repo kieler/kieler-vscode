@@ -46,23 +46,23 @@ const config = {
 
 /**@type {import('webpack').Configuration}*/
 const simulationScriptConfig = {
-    target: "web", // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-    mode: "none", // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
-
-
-    entry: path.resolve(__dirname, "src/simulation/simulation-view-script.ts"), // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
+    mode: 'none',
+    entry: path.resolve(__dirname, "src/simulation/simulation-view-script.tsx"), // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "simulation-view-script.js"
     },
     devtool: "nosources-source-map",
     resolve: {
-        extensions: [".ts", ".js"],
+        extensions: [".tsx", ".ts", ".js"],
+    },
+    externals: {
+        React: 'react',
     },
     module: {
         rules: [
             {
-                test: /\.ts$/,
+                test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: [
                     {
@@ -76,5 +76,10 @@ const simulationScriptConfig = {
             },
         ],
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('development')
+        })
+    ],
 };
 module.exports = [simulationScriptConfig, config];

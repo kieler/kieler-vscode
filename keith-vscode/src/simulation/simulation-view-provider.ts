@@ -18,7 +18,7 @@ import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT,
 import { delay, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
-import { isWebviewReadyMessage, WebviewReadyMessage } from './message';
+import { isWebviewInputMessage, isWebviewReadyMessage, WebviewInputMessage, WebviewReadyMessage } from './message';
 
 export const externalStepMessageType = 'keith/simulation/didStep';
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep';
@@ -304,14 +304,32 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
     /**
      * @return true if the message should be propagated, e.g. to a language server
      */
-     protected receiveFromWebview(message: WebviewReadyMessage | undefined): Thenable<boolean> {
+     protected receiveFromWebview(message: WebviewReadyMessage | WebviewInputMessage | undefined): Thenable<boolean> {
          console.log('Got message', message)
         if (isWebviewReadyMessage(message)) {
             console.log('message means ready')
             this.resolveWebviewReady();
             return Promise.resolve(false);
+        } else if (isWebviewInputMessage(message)) {
+            if (message.type === 'input') {
+                this.setBooleanInput(message.key);
+            } else if (message.type === 'activate') {
+                // this.setContentOfInputbox(message.key)
+            }
+            return Promise.resolve(false)
         }
+        
         return Promise.resolve(false);
+    }
+
+    setBooleanInput(key: string): void {
+        if (this.valuesForNextStep.has(key)) {
+            // if the value is a boolean just toggle it on click
+            const oldValue = this.valuesForNextStep.get(key)
+            this.valuesForNextStep.set(key, !oldValue)
+            this.changedValuesForNextStep.set(key, !oldValue)
+            this.update()
+        }
     }
 
     protected ready(): Promise<void> {
