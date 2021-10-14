@@ -214,8 +214,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     }
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
-        if (editor && editor.document.uri.scheme !== "user_storage") {
+        if (editor && editor.document.uri.scheme === "file") {
             this.lsClient.onReady().then(() => {
+                console.log()
                 this.editor = editor
                 this.requestSystemDescriptions()
             })
