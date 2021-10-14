@@ -110,7 +110,26 @@ export const SimulationDataBlackList: string[]  = ["#interface"]
  */
 export class LoadedTraceMessage {
     constructor(
-        public trace: Trace
+        /* The trace object loaded into the system. */
+        public trace: Trace,
+        /* If loading the trace was successful. */
+        public successful: boolean,
+        /* Human-readable reason why loading failed (if it failed). */
+        public reason: string,
+    ) {}
+}
+
+/**
+ * Message sent by the LS as a response to send the content of the trace file to be saved by the client.
+ */
+ export class SavedTraceMessage {
+    constructor(
+        /* The trace object loaded into the system. */
+        public fileContent: string,
+        /* If saving the trace was successful. */
+        public successful: boolean,
+        /* Human-readable reason why saving failed (if it failed). */
+        public reason: string,
     ) {}
 }
 

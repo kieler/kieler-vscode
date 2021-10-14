@@ -15,7 +15,7 @@ import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
-import { delay, LoadedTraceMessage, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
+import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationData, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SimulationWebView } from './simulation-view';
 import { isWebviewReadyMessage, WebviewReadyMessage } from './message';
@@ -545,27 +545,60 @@ export class SimulationWebViewProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    /**
+     * Asks the user for a file to store the simulation trace from the current simulation in a file.
+     */
     async saveTrace(): Promise<void> {
-        // TODO:
         console.log("saving trace")
+        // Request the LS to serialize the current trace into a savable string.
+        const lsClient = await this.lsClient
+        const message = await lsClient.sendRequest('keith/simulation/saveTrace') as SavedTraceMessage
+        if (!message.successful) {
+            console.log('could not save trace: ' + message.reason)
+            return
+        }
+        
+        // Ask the user where to save this trace
+        const uri = await vscode.window.showSaveDialog({
+            filters: {'KTrace': ['ktrace']},
+            title: 'Save current KTrace to...',
+        })
+        if (uri === undefined) {
+            // The user did not pick any file to save to.
+            return
+        }
+
+        // Save the file on the file system.
+        await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(message.fileContent))
     }
 
+    /**
+     * Asks the user for a file to load simulation trace from and loads that onto the client and server.
+     */
     async loadTrace(): Promise<void> {
         console.log("loading trace")
         // Loading the trace file.
         const uris = await vscode.window.showOpenDialog({
             canSelectMany: false, 
-            filters: {'KTrace': ['ktrace']}
+            filters: {'KTrace': ['ktrace']},
         })
         if (uris === undefined) {
+            // The user did not pick any file to load.
             return
         }
+        // If a document was selected, read its content from the workspace.
         const document = await vscode.workspace.openTextDocument(uris[0].path)
         const text = document.getText()
-        console.log(text)
 
+        // Send the trace file content to the server to convert it into a Trace model and to synchronize it.
         const lClient = await this.lsClient
         const message = await lClient.sendRequest('keith/simulation/loadTrace', text) as LoadedTraceMessage
+
+        if (!message.successful) {
+            console.log('could not load trace: ' + message.reason)
+            return
+        }
+        // Store the trace model here as well.
         this.currentTrace = message.trace
     }
 
