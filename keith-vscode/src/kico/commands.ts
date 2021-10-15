@@ -52,8 +52,8 @@ export const REQUEST_CS: vscode.Command = {
     title: 'Kico: Request compilation systems'
 }
 export const TOGGLE_INPLACE: vscode.Command = {
-    command: 'kico-toggle-inplace',
-    title: 'Kico: Toggle inplace compilation'
+    command: 'keith-vscode.inplace',
+    title: 'Toggle inplace compilation'
 }
 /**
  * Show the resulting model after compile.

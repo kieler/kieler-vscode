@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_INPLACE } from './commands';
 import { Utils } from 'vscode-uri';
 import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
@@ -40,9 +40,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     snapshotSystems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
     kicoCommands: vscode.Disposable[] = [];
-    storage: StorageService;
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
-    compileInplace = false;
+    compileInplace: boolean;
     showResultingModel = true;
     startTime = 0;
     endTime = 0;
@@ -99,7 +98,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public readonly showedNewSnapshot: vscode.Event<string | undefined> = this.showedNewSnapshotEmitter.event
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
 
-    constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
+    constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext, private readonly storage: StorageService) {
 
         // Output channel
 		this.output = vscode.window.createOutputChannel('KIELER Compilation');
@@ -115,8 +114,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compilation.command = OPEN_KIELER_VIEW.command
         this.context.subscriptions.push(this.compilation)
 
-        this.storage = new StorageService(context.workspaceState);
         this.autoCompile = this.storage.get("keith.vscode.compilation.auto", false);
+        this.compileInplace = this.storage.get("keith.vscode.compilation.inplace", false);
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
@@ -147,13 +146,35 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             }, {
                 label: "false",
                 picked: !this.autoCompile
-            }]
+            }];
             const quickPick = vscode.window.createQuickPick();
             quickPick.items = options;
             quickPick.onDidChangeSelection(selection => {
                 if (selection[0]) {
                     this.autoCompile = selection[0]?.label == "true";
                     this.storage.put("keith.vscode.compilation.auto", this.autoCompile);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_INPLACE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: "true",
+                picked: this.compileInplace
+            }, {
+                label: "false",
+                picked: !this.compileInplace
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.compileInplace = selection[0]?.label == "true";
+                    this.storage.put("keith.vscode.compilation.inplace", this.compileInplace);
                 }
                 quickPick.hide();
             })
