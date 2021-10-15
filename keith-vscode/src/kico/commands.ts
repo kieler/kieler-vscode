@@ -60,8 +60,8 @@ export const TOGGLE_INPLACE: vscode.Command = {
  * Never done on false or for simulation, done on compile if true.
  */
 export const TOGGLE_SHOW_RESULTING_MODEL: vscode.Command = {
-    command: 'kico-toggle-show-resulting-model',
-    title: 'Kico: Toggle show model after compile'
+    command: 'keith-vscode.show-resulting-model',
+    title: 'Toggle show model after compile'
 }
 export const TOGGLE_PRIVATE_SYSTEMS: vscode.Command = {
     command: 'kico-toggle-private-systems',

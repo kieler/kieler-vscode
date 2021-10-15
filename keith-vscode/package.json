@@ -173,6 +173,11 @@
         "category": "KiCo"
       },
       {
+        "command": "keith-vscode.show-resulting-model",
+        "title": "Show model after compile?",
+        "category": "KiCo"
+      },
+      {
         "command": "keith-vscode.show-private-systems",
         "title": "Show private systems?",
         "category": "KiCo"
@@ -284,6 +289,9 @@
         },
         {
             "command": "keith-vscode.auto-compile"
+        },
+        {
+          "command": "keith-vscode.show-resulting-model"
         },
         {
             "command": "keith-vscode.show-private-systems"
