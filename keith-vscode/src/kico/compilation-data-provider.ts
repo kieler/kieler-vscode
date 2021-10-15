@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_INPLACE, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
 import { Utils } from 'vscode-uri';
 import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
@@ -81,7 +81,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     /**
      * Show some option toggle buttons
      */
-    public showButtons = false
+    public showButtons: boolean;
 
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
     /**
@@ -117,9 +117,11 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compilation.command = OPEN_KIELER_VIEW.command
         this.context.subscriptions.push(this.compilation)
 
+        // TODO lme: maybe introduce SettingsProvider
         this.autoCompile = this.storage.get('keith.vscode.compilation.auto', false);
         this.compileInplace = this.storage.get('keith.vscode.compilation.inplace', false);
         this.showResultingModel = this.storage.get('keith.vscode.compilation.showResultingModel', true);
+        this.showButtons = this.storage.get('keith.vscode.compilation.showButtons', false);
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
@@ -142,6 +144,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.onDidChangeActiveTextEditor(editor)
         }
 
+        // TODO lme: maybe re-order commands to fit order in commands.ts
         // Create commands
         this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
             const options: vscode.QuickPickItem[] = [{
@@ -204,6 +207,31 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 }
                 quickPick.hide();
             })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_BUTTON_MODE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.showButtons
+            }, {
+                label: 'false',
+                picked: !this.showButtons
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.showButtons = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.showButtons', this.showButtons);
+                }
+                quickPick.hide();
+                vscode.window.showInformationMessage(`Setting "ShowButtons" to ${this.showButtons}`);
+            })
+
 
             quickPick.onDidHide(() => quickPick.dispose());
             quickPick.show();

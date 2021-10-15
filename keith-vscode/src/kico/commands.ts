@@ -73,8 +73,8 @@ export const TOGGLE_AUTO_COMPILE: vscode.Command = {
 };
 
 export const TOGGLE_BUTTON_MODE: vscode.Command = {
-    command: 'kico-toggle-button-mode',
-    title: 'Kico: Toggle button mode'
+    command: 'keith-vscode.button-mode',
+    title: 'Toggle button mode'
 }
 
 export const REVEAL_COMPILATION_WIDGET: vscode.Command = {

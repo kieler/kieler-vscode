@@ -188,6 +188,11 @@
         "category": "KiCo"
       },
       {
+        "command": "keith-vscode.button-mode",
+        "title": "Show buttons in compilation widget ...",
+        "category": "KiCo"
+      },
+      {
         "command": "keith-vscode.request-compilation-systems",
         "title": "Request compilation systems",
         "category": "KiCo"
@@ -288,22 +293,22 @@
           "command": "keith-vscode.compile-snapshot"
         },
         {
-            "command": "keith-vscode.auto-compile"
+          "command": "keith-vscode.auto-compile"
         },
         {
           "command": "keith-vscode.show-resulting-model"
         },
         {
-            "command": "keith-vscode.show-private-systems"
+          "command": "keith-vscode.show-private-systems"
         },
         {
-            "command": "keith-vscode.inplace"
+          "command": "keith-vscode.inplace"
         },
         {
-            "command": "keith-vscode.request-compilation-systems"
+          "command": "keith-vscode.request-compilation-systems"
         },
         {
-            "command": "keith-vscode.compilation-time"
+          "command": "keith-vscode.compilation-time"
         },
         {
           "command": "keith-vscode.simulate"
