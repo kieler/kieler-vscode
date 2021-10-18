@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_PRIVATE_SYSTEMS, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
 import { Utils } from 'vscode-uri';
 import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
@@ -46,6 +46,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     compileInplace: boolean;
     showResultingModel: boolean;
     autoCompile: boolean;
+    showPrivateSystems: boolean;
 
     startTime = 0;
     endTime = 0;
@@ -122,6 +123,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compileInplace = this.storage.get('keith.vscode.compilation.inplace', false);
         this.showResultingModel = this.storage.get('keith.vscode.compilation.showResultingModel', true);
         this.showButtons = this.storage.get('keith.vscode.compilation.showButtons', false);
+        this.showPrivateSystems = this.storage.get('keith.vscode.compilation.showPrivateSystems', false);
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
@@ -168,6 +170,11 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             quickPick.show();
         }));
 
+        this.context.subscriptions.push(vscode.commands.registerCommand(REQUEST_CS.command, async () => {
+            await this.requestSystemDescriptions();
+            vscode.window.showInformationMessage("Registered compilation system");
+        }))
+
         this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_INPLACE.command, () => {
             const options: vscode.QuickPickItem[] = [{
                 label: 'true',
@@ -212,6 +219,28 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             quickPick.show();
         }));
 
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_PRIVATE_SYSTEMS.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.showPrivateSystems
+            }, {
+                label: 'false',
+                picked: !this.showPrivateSystems
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.showPrivateSystems = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.showPrivateSystems', this.showPrivateSystems);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }))
+
 
         this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_BUTTON_MODE.command, () => {
             const options: vscode.QuickPickItem[] = [{
@@ -244,7 +273,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(COMPILE_COMMAND.command, async () => {
-                const options = this.createQuickPick(this.systems)
+                const options = this.createQuickPick(this.systems.filter(system => system.isPublic || this.showPrivateSystems));
                 const quickPick = vscode.window.createQuickPick();
                 quickPick.items = options;
                 quickPick.onDidChangeSelection(selection => {

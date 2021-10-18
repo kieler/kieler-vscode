@@ -48,8 +48,8 @@ export const SELECT_SNAPSHOT_COMPILATION_CHAIN: vscode.Command = {
     title: 'Kico: Select snapshot compilation chain'
 }
 export const REQUEST_CS: vscode.Command = {
-    command: 'kico-request-compilation-systems',
-    title: 'Kico: Request compilation systems'
+    command: 'keith-vscode.request-compilation-systems',
+    title: 'Request compilation systems'
 }
 export const TOGGLE_INPLACE: vscode.Command = {
     command: 'keith-vscode.inplace',
@@ -64,8 +64,8 @@ export const TOGGLE_SHOW_RESULTING_MODEL: vscode.Command = {
     title: 'Toggle show model after compile'
 }
 export const TOGGLE_PRIVATE_SYSTEMS: vscode.Command = {
-    command: 'kico-toggle-private-systems',
-    title: 'Kico: Toggle show private systems'
+    command: 'keith-vscode.show-private-systems',
+    title: 'Toggle show private systems'
 }
 export const TOGGLE_AUTO_COMPILE: vscode.Command = {
     command: 'keith-vscode.auto-compile',
