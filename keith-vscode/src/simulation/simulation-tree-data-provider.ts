@@ -577,11 +577,11 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      * Asks the user for a file to store the simulation trace from the current simulation in a file.
      */
     async saveTrace(): Promise<void> {
-        console.log("saving trace")
         // Request the LS to serialize the current trace into a savable string.
         const lsClient = await this.lsClient
         const message = await lsClient.sendRequest('keith/simulation/saveTrace') as SavedTraceMessage
         if (!message.successful) {
+            // TODO: better logging of error state
             console.log('could not save trace: ' + message.reason)
             return
         }
@@ -604,7 +604,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      * Asks the user for a file to load simulation trace from and loads that onto the client and server.
      */
     async loadTrace(): Promise<void> {
-        console.log("loading trace")
         // Loading the trace file.
         const uris = await vscode.window.showOpenDialog({
             canSelectMany: false, 
@@ -623,6 +622,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         const message = await lClient.sendRequest('keith/simulation/loadTrace', text) as LoadedTraceMessage
 
         if (!message.successful) {
+            // TODO: better logging of error state
             console.log('could not load trace: ' + message.reason)
             return
         }
