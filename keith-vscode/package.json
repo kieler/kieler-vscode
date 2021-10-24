@@ -263,11 +263,6 @@
         "command": "keith-vscode.simulation-new-value",
         "title": "New value for ...",
         "category": "Simulation"
-      },
-      {
-        "command": "keith-vscode.kieler-compiler",
-        "title": "Open KIELER view",
-        "category": "Kieler"
       }
     ],
     "menus": {

@@ -11,6 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 import * as vscode from 'vscode';
+import { config } from '../constants';
 
 export const SHOW_COMMAND: vscode.Command = {
     command: 'keith-vscode.show',
@@ -77,12 +78,23 @@ export const TOGGLE_BUTTON_MODE: vscode.Command = {
     title: 'Toggle button mode'
 }
 
+
+/**
+ * Utility commands for focussing different views of the extension.
+ * They are provided by default in the command palette, since VSCode automatically retrieves provided views from package.json.
+ */
+
 export const REVEAL_COMPILATION_WIDGET: vscode.Command = {
-    command: 'kico-reveal-compilation-widget',
-    title: 'Kico: Reveal compilation widget'
+    command: `${config.views.kieler.compiler.id}.focus`,
+    title: `Focus on ${config.views.kieler.compiler.name} View`
+}
+
+export const REVEAL_SIMULATION_WIDGET: vscode.Command = {
+    command: `${config.views.kieler.simulation.id}.focus`,
+    title: `Focus on ${config.views.kieler.simulation.name} View`
 }
 
 export const OPEN_KIELER_VIEW: vscode.Command = {
-    command: 'keith-vscode.kieler-compiler',
-    title: 'Open KIELER view'
+    command: `workbench.view.extension.${config.name}`,
+    title: 'Show KIELER'
 }
