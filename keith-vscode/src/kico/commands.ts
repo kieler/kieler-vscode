@@ -29,12 +29,12 @@ export const COMPILE_SNAPSHOT_COMMAND: vscode.Command = {
 }
 
 export const SHOW_NEXT: vscode.Command = {
-    command: 'kico-show_next',
-    title: 'Kico: Show next'
+    command: 'keith-vscode.show-next',
+    title: 'Show next'
 }
 export const SHOW_PREVIOUS: vscode.Command = {
-    command: 'kico-show_previous',
-    title: 'Kico: Show previous'
+    command: 'keith-vscode.show-previous',
+    title: 'Show previous'
 }
 export const COMPILER: vscode.Command = {
     command: 'kico-compiler:toggle',

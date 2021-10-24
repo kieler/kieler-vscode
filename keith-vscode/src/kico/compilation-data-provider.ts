@@ -432,11 +432,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     /**
      * Handles the visualization of new snapshot descriptions send by the LS.
      */
-    handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): void {
+    async handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): Promise<void> {
         // Show next/previous command and keybinding if not already added
-        if (!vscode.commands.getCommands().then(commands => {
-            return commands.includes(SHOW_NEXT.command)
-        })) {
+        if (!(await vscode.commands.getCommands()).includes(SHOW_NEXT.command)) {
             this.registerShowNext()
             this.registerShowPrevious()
         }
