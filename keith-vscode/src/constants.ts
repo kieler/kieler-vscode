@@ -1,24 +1,32 @@
+export const extensionName = 'kieler';
+
 /**
  * Object holding all information about the views of this extension.
  * view.id has to be the same as specified in package.json. 
  */
-const views = {
+export const views = {
     compiler: {
-        id: "kieler-kico",
-        name: "KIELER Compiler",
+        id: 'kieler-kico',
+        name: 'KIELER Compiler',
     },
     simulation: {
-        id: "kieler-simulation-tree",
-        name: "KIELER Simulation Tree",
+        id: 'kieler-simulation-tree',
+        name: 'KIELER Simulation Tree',
     },
 };
 
 /**
- * Config holding all information, which have to be the same across the entire extension (e.g. views or other constants).
+ * Key, under which the settings for this extension are accessible.
  */
-export const config = {
-    name: "kieler",
-    views: {
-        kieler: views,
-    },
-};
+export const settingsKey = 'keith-vscode';
+
+/**
+ * Keys for all settings under the 'keith-vscode' namespace with their corresponding type.
+ */
+export type Settings = {
+    'autocompile.enabled': boolean;
+    'compileInplace.enabled': boolean;
+    'showResultingModel.enabled': boolean;
+    'showButtons.enabled': boolean;
+    'showPrivateSystems.enabled': boolean;
+}
