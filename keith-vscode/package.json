@@ -387,6 +387,36 @@
           "name": "KIELER Simulation Tree"
         }
       ]
+    },
+    "configuration": {
+      "title": "KIELER",
+      "properties": {
+        "keith-vscode.autocompile.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether compilations shall happen on save."
+        },
+        "keith-vscode.compileInplace.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether compilations shall happen in place."
+        },
+        "keith-vscode.showResultingModel.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Specifies whether the model of the compilation shall be shown after compilation."
+        },
+        "keith-vscode.showButtons.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether buttons in the compilation widget shall be shown."
+        },
+        "keith-vscode.showPrivateSystems.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether private compilation systems shall be shown."
+        }
+      }
     }
   },
   "extensionDependencies": [
