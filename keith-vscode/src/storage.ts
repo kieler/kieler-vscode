@@ -1,7 +1,11 @@
 import { Memento } from "vscode";
 
 type STORAGE_ITEMS = {
-    "keith.vscode.compilation.auto": boolean;
+    'keith.vscode.compilation.auto': boolean;
+    'keith.vscode.compilation.inplace': boolean;
+    'keith.vscode.compilation.showResultingModel': boolean;
+    'keith.vscode.compilation.showButtons': boolean;
+    'keith.vscode.compilation.showPrivateSystems': boolean;
 };
 
 /**

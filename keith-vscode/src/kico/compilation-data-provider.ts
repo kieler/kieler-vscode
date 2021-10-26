@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE } from './commands';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_PRIVATE_SYSTEMS, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
 import { Utils } from 'vscode-uri';
 import { StorageService } from '../storage';
 export const compilerWidgetId = "compiler-widget"
@@ -40,17 +40,20 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     snapshotSystems: CompilationSystem[] = [];
     quickpickSystems: vscode.QuickPickItem[] = [];
     kicoCommands: vscode.Disposable[] = [];
-    storage: StorageService;
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
-    compileInplace = false;
-    showResultingModel = true;
+    
+    // settings, which can be toggled via commands
+    compileInplace: boolean;
+    showResultingModel: boolean;
+    autoCompile: boolean;
+    showPrivateSystems: boolean;
+
     startTime = 0;
     endTime = 0;
     compiling = false;
     lastInvokedCompilation = '';
     lastCompiledUri = '';
     sourceModelPath = ''; // Set when editor is changed to current uri
-    autoCompile: boolean;
 
     requestSystems: vscode.StatusBarItem
     compilation: vscode.StatusBarItem
@@ -79,7 +82,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     /**
      * Show some option toggle buttons
      */
-    public showButtons = false
+    public showButtons: boolean;
 
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
     /**
@@ -99,7 +102,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public readonly showedNewSnapshot: vscode.Event<string | undefined> = this.showedNewSnapshotEmitter.event
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
 
-    constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext) {
+    constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext, private readonly storage: StorageService) {
 
         // Output channel
 		this.output = vscode.window.createOutputChannel('KIELER Compilation');
@@ -115,8 +118,12 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.compilation.command = OPEN_KIELER_VIEW.command
         this.context.subscriptions.push(this.compilation)
 
-        this.storage = new StorageService(context.workspaceState);
-        this.autoCompile = this.storage.get("keith.vscode.compilation.auto", false);
+        // TODO lme: maybe introduce SettingsProvider
+        this.autoCompile = this.storage.get('keith.vscode.compilation.auto', false);
+        this.compileInplace = this.storage.get('keith.vscode.compilation.inplace', false);
+        this.showResultingModel = this.storage.get('keith.vscode.compilation.showResultingModel', true);
+        this.showButtons = this.storage.get('keith.vscode.compilation.showButtons', false);
+        this.showPrivateSystems = this.storage.get('keith.vscode.compilation.showPrivateSystems', false);
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
@@ -139,24 +146,121 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.onDidChangeActiveTextEditor(editor)
         }
 
+        // TODO lme: maybe re-order commands to fit order in commands.ts
         // Create commands
         this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
             const options: vscode.QuickPickItem[] = [{
-                label: "true",
+                label: 'true',
                 picked: this.autoCompile
             }, {
-                label: "false",
+                label: 'false',
                 picked: !this.autoCompile
-            }]
+            }];
             const quickPick = vscode.window.createQuickPick();
             quickPick.items = options;
             quickPick.onDidChangeSelection(selection => {
                 if (selection[0]) {
-                    this.autoCompile = selection[0]?.label == "true";
-                    this.storage.put("keith.vscode.compilation.auto", this.autoCompile);
+                    this.autoCompile = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.auto', this.autoCompile);
                 }
                 quickPick.hide();
             })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(REQUEST_CS.command, async () => {
+            await this.requestSystemDescriptions();
+            vscode.window.showInformationMessage("Registered compilation system");
+        }))
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_INPLACE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.compileInplace
+            }, {
+                label: 'false',
+                picked: !this.compileInplace
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.compileInplace = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.inplace', this.compileInplace);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_SHOW_RESULTING_MODEL.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.showResultingModel
+            }, {
+                label: 'false',
+                picked: !this.showResultingModel
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.showResultingModel = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.showResultingModel', this.showResultingModel);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }));
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_PRIVATE_SYSTEMS.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.showPrivateSystems
+            }, {
+                label: 'false',
+                picked: !this.showPrivateSystems
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.showPrivateSystems = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.showPrivateSystems', this.showPrivateSystems);
+                }
+                quickPick.hide();
+            })
+
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.show();
+        }))
+
+
+        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_BUTTON_MODE.command, () => {
+            const options: vscode.QuickPickItem[] = [{
+                label: 'true',
+                picked: this.showButtons
+            }, {
+                label: 'false',
+                picked: !this.showButtons
+            }];
+            const quickPick = vscode.window.createQuickPick();
+            quickPick.items = options;
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    this.showButtons = selection[0]?.label == 'true';
+                    this.storage.put('keith.vscode.compilation.showButtons', this.showButtons);
+                }
+                quickPick.hide();
+                vscode.window.showInformationMessage(`Setting "ShowButtons" to ${this.showButtons}`);
+            })
+
 
             quickPick.onDidHide(() => quickPick.dispose());
             quickPick.show();
@@ -169,7 +273,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(COMPILE_COMMAND.command, async () => {
-                const options = this.createQuickPick(this.systems)
+                const options = this.createQuickPick(this.systems.filter(system => system.isPublic || this.showPrivateSystems));
                 const quickPick = vscode.window.createQuickPick();
                 quickPick.items = options;
                 quickPick.onDidChangeSelection(selection => {
@@ -328,11 +432,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     /**
      * Handles the visualization of new snapshot descriptions send by the LS.
      */
-    handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): void {
+    async handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): Promise<void> {
         // Show next/previous command and keybinding if not already added
-        if (!vscode.commands.getCommands().then(commands => {
-            return commands.includes(SHOW_NEXT.command)
-        })) {
+        if (!(await vscode.commands.getCommands()).includes(SHOW_NEXT.command)) {
             this.registerShowNext()
             this.registerShowPrevious()
         }

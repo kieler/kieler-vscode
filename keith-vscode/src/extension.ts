@@ -23,6 +23,7 @@ import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
 import { SimulationTreeDataProvider } from "./simulation/simulation-tree-data-provider";
+import { StorageService } from "./storage";
 // import 'simulation/index.css'
 
 //** Command identifiers that are provided by klighd-vscode. */
@@ -41,6 +42,7 @@ const supportedFileEndings = ["sctx", "scl", "elkt", "kgt", "kviz", "strl", "lus
 
 let lsClient: LanguageClient;
 let socket: Socket;
+let storageService: StorageService;
 
 // this method is called when your extension is activated
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -76,7 +78,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         handlePerformAction
     );
 
-    const compilationDataProvider = new CompilationDataProvider(lsClient, context)
+    storageService = new StorageService(context.workspaceState);
+    
+    const compilationDataProvider = new CompilationDataProvider(lsClient, context, storageService);
 
     // Register and start kico view
     vscode.window.registerTreeDataProvider(

@@ -173,6 +173,11 @@
         "category": "KiCo"
       },
       {
+        "command": "keith-vscode.show-resulting-model",
+        "title": "Show model after compile?",
+        "category": "KiCo"
+      },
+      {
         "command": "keith-vscode.show-private-systems",
         "title": "Show private systems?",
         "category": "KiCo"
@@ -180,6 +185,11 @@
       {
         "command": "keith-vscode.inplace",
         "title": "Set inplace compilation to ...",
+        "category": "KiCo"
+      },
+      {
+        "command": "keith-vscode.button-mode",
+        "title": "Show buttons in compilation widget ...",
         "category": "KiCo"
       },
       {
@@ -263,11 +273,6 @@
         "command": "keith-vscode.simulation-load-trace",
         "title": "Load trace",
         "category": "Simulation"
-      },
-      {
-        "command": "keith-vscode.kieler-compiler",
-        "title": "Open KIELER view",
-        "category": "Kieler"
       }
     ],
     "menus": {
@@ -293,19 +298,22 @@
           "command": "keith-vscode.compile-snapshot"
         },
         {
-            "command": "keith-vscode.auto-compile"
+          "command": "keith-vscode.auto-compile"
         },
         {
-            "command": "keith-vscode.show-private-systems"
+          "command": "keith-vscode.show-resulting-model"
         },
         {
-            "command": "keith-vscode.inplace"
+          "command": "keith-vscode.show-private-systems"
         },
         {
-            "command": "keith-vscode.request-compilation-systems"
+          "command": "keith-vscode.inplace"
         },
         {
-            "command": "keith-vscode.compilation-time"
+          "command": "keith-vscode.request-compilation-systems"
+        },
+        {
+          "command": "keith-vscode.compilation-time"
         },
         {
           "command": "keith-vscode.simulate"
