@@ -232,22 +232,26 @@
       {
         "command": "keith-vscode.simulation-stop",
         "title": "Stop simulation",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(debug-stop)"
       },
       {
         "command": "keith-vscode.simulation-step",
         "title": "Execute simulation step",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(debug-step-over)"
       },
       {
         "command": "keith-vscode.simulation-run",
         "title": "Run simulation",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(debug-continue)"
       },
       {
         "command": "keith-vscode.simulation-pause",
         "title": "Pause simulation",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(debug-pause)"
       },
       {
         "command": "keith-vscode.simulation-start",
@@ -257,7 +261,8 @@
       {
         "command": "keith-vscode.simulation-restart",
         "title": "Restart simulation",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(debug-restart)"
       },
       {
         "command": "keith-vscode.simulation-new-value",
@@ -377,6 +382,28 @@
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
           "command": "klighd-vscode.diagram.open",
+          "group": "navigation"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "keith-vscode.simulation-step",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "group": "navigation"
+        },
+        {
+          "command": "keith-vscode.simulation-stop",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "group": "navigation"
+        },
+        {
+          "command": "keith-vscode.simulation-run",
+          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-tree",
+          "group": "navigation"
+        },
+        {
+          "command": "keith-vscode.simulation-pause",
+          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-tree",
           "group": "navigation"
         }
       ]
