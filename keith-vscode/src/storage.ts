@@ -6,6 +6,9 @@ type STORAGE_ITEMS = {
     'keith.vscode.compilation.showResultingModel': boolean;
     'keith.vscode.compilation.showButtons': boolean;
     'keith.vscode.compilation.showPrivateSystems': boolean;
+    'keith.vscode.simulation.simulationStepDelay': number;
+    'keith.vscode.simulation.simulationType': string;
+    'keith.vscode.simulation.showInternalVariables': boolean;
 };
 
 /**
@@ -22,6 +25,7 @@ export class StorageService {
      */
     public async put<K extends keyof STORAGE_ITEMS>(key: K, value: STORAGE_ITEMS[K]): Promise<void> {
         await this.memento.update(key, value);
+        
     }
 
     /**
