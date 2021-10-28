@@ -694,7 +694,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     }
 
     openExternalKVizView(): void {
-        // TODO test
+        this.lsClient.onReady().then(() => {
+            this.lsClient.sendNotification('keith/simulation/startVisualizationServer')
+        })
         vscode.env.openExternal(vscode.Uri.parse('http://localhost:5010/visualization'))
     }
 
