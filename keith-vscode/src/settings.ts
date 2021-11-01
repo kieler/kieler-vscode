@@ -1,41 +1,46 @@
 import * as vscode from 'vscode';
-
+import { Tuple } from './util';
+  
 /**
- * Type for enforcing default settings.
+ * Type for enforcing list of settings.
  */
-type DefaultSettings<S> = {
-    [key in Extract<keyof S, string>]: S[key]
-}
+type SettingList<S> = Tuple<Extract<keyof S, string>>;
 
 /**
  * Service for providing an interface for retrieving and updating VSC settings.
  */
 export class SettingsService<S> {
 
+    /**
+     * Cache for settings, so no calls to API are needed upon requests for values of settings.
+     */
     private readonly cache: Map<string, any>;
-    private readonly configuration: vscode.WorkspaceConfiguration;
 
     /**
      * Initialize a new wrapper around the settings API of VSC for a specific configuration with built-in caching.
      * 
      * @param configurationKey key ('namespace') of the configuration. Supports dot-notation
-     * @param defaultConfiguration default values for settings
+     * @param settingKeys list of settings to manage. Note: This HAS to be an array containing 
+     *                    the keys of all settings passed as the class generic.
      */
-    constructor(configurationKey: string, defaultConfiguration: DefaultSettings<S>) {
+    constructor(private readonly configurationKey: string, settingKeys: SettingList<S>) {
         this.cache = new Map();
-        for (const key in defaultConfiguration) {
-            this.cache.set(key, (defaultConfiguration as any)[key])
+        
+        // read current settings into cache
+        const configuration = vscode.workspace.getConfiguration(configurationKey);
+        for (const key of settingKeys as string[]) {
+            this.cache.set(key, configuration.get(key));
         }
-        // TODO lme: retrieve configuration during update
-        this.configuration = vscode.workspace.getConfiguration(configurationKey);
         
         // register listener for setting changes
         vscode.workspace.onDidChangeConfiguration(e => {
+            // get current workspace configuration and iterate over current cache
+            const configuration = vscode.workspace.getConfiguration(this.configurationKey);
             for (const key of this.cache.keys()) {
                 // update cache, if settings are changed
-                const setting = `${configurationKey}`;
+                const setting = `${this.configurationKey}`;
                 if (e.affectsConfiguration(setting)) {
-                    this.cache.set(key, this.configuration.get(key));
+                    this.cache.set(key, configuration.get(key));
                 }
             }
         })
@@ -58,6 +63,6 @@ export class SettingsService<S> {
      * @param value new value of the setting
      */
     public set<K extends Extract<keyof S, string>>(key: K, value: S[K]): void {
-        this.configuration.update(key, value);
+        vscode.workspace.getConfiguration(this.configurationKey).update(key, value);
     }
 }

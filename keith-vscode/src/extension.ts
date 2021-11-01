@@ -79,13 +79,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         handlePerformAction
     );
 
-    settingService = new SettingsService<Settings>(settingsKey, {
-        "autocompile.enabled": false,
-        "compileInplace.enabled": false,
-        "showResultingModel.enabled": true,
-        "showButtons.enabled": false,
-        "showPrivateSystems.enabled": false,
-    });
+    // create SettingsService with list of setting-keys to manage                
+    settingService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled']);
 
     const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingService);
 
