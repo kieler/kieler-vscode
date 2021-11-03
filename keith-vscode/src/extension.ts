@@ -92,7 +92,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
 
-    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context)
+    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, storageService)
     // Register and start simulation tree view
     vscode.window.registerTreeDataProvider(
         'kieler-simulation-tree',
