@@ -279,8 +279,10 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             }));
         
         // Kviz commands
-        this.context.subscriptions.push(
-            vscode.commands.registerCommand(OPEN_INTERNAL_KVIZ_VIEW.command, this.openInternalKVizView, this));
+
+        // Not supported by VS Code
+        // this.context.subscriptions.push(
+        //     vscode.commands.registerCommand(OPEN_INTERNAL_KVIZ_VIEW.command, this.openInternalKVizView, this));
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(OPEN_EXTERNAL_KVIZ_VIEW.command, this.openExternalKVizView, this));
@@ -704,10 +706,13 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         this.setValuesToStopSimulation()
     }
 
-    openInternalKVizView(): void {
-        // TODO not possible without extention
-    }
+    // openInternalKVizView(): void {
+    //     // not possible without extension
+    // }
 
+    /**
+     * Start the simulation visualization socket server and opens a browser window.
+     */
     openExternalKVizView(): void {
         this.lsClient.onReady().then(() => {
             this.lsClient.sendNotification('keith/simulation/startVisualizationServer')
