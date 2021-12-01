@@ -222,7 +222,8 @@
       {
         "command": "keith-vscode.open-kviz-external",
         "title": "Open KIELER visualization in browser",
-        "category": "Simulation"
+        "category": "Simulation",
+        "icon": "$(preview)"
       },
       {
         "command": "keith-vscode.add-co-simulation",
@@ -351,7 +352,7 @@
           "command": "keith-vscode.simulation-load-trace"
         },
         {
-          "command": "keith-vscode.open-kviz-internal"
+          "command": "keith-vscode.open-kviz-external"
         }
       ],
       "editor/title": [
@@ -389,22 +390,27 @@
         {
           "command": "keith-vscode.simulation-step",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "keith-vscode.simulation-stop",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "command": "keith-vscode.simulation-run",
           "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-tree",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "keith-vscode.simulation-pause",
           "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-tree",
-          "group": "navigation"
+          "group": "navigation@2"
+        },
+        {
+          "command": "keith-vscode.open-kviz-external",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "group": "simulation-visualization"
         }
       ]
     },
