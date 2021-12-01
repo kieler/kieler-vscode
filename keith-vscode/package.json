@@ -215,11 +215,6 @@
         "category": "Simulation"
       },
       {
-        "command": "keith-vscode.open-kviz-internal",
-        "title": "Open KIELER visualization preview",
-        "category": "Simulation"
-      },
-      {
         "command": "keith-vscode.open-kviz-external",
         "title": "Open KIELER visualization in browser",
         "category": "Simulation",
@@ -253,11 +248,6 @@
         "title": "Pause simulation",
         "category": "Simulation",
         "icon": "$(debug-pause)"
-      },
-      {
-        "command": "keith-vscode.simulation-start",
-        "title": "Start simulation",
-        "category": "Simulation"
       },
       {
         "command": "keith-vscode.simulation-restart",
@@ -328,31 +318,40 @@
           "command": "keith-vscode.simulate-snapshot"
         },
         {
-          "command": "keith-vscode.simulation-stop"
+          "command": "keith-vscode.simulation-new-value",
+          "when": "false"
         },
         {
-          "command": "keith-vscode.simulation-step"
+          "command": "keith-vscode.simulation-stop",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-run"
+          "command": "keith-vscode.simulation-step",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-pause"
+          "command": "keith-vscode.simulation-run",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-start"
+          "command": "keith-vscode.simulation-pause",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-restart"
+          "command": "keith-vscode.simulation-restart",
+          "when": "!keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-save-trace"
+          "command": "keith-vscode.simulation-save-trace",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.simulation-load-trace"
+          "command": "keith-vscode.simulation-load-trace",
+          "when": "keith.vscode:simulationRunning"
         },
         {
-          "command": "keith-vscode.open-kviz-external"
+          "command": "keith-vscode.open-kviz-external",
+          "when": "keith.vscode:simulationRunning"
         }
       ],
       "editor/title": [
@@ -410,7 +409,17 @@
         {
           "command": "keith-vscode.open-kviz-external",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
-          "group": "simulation-visualization"
+          "group": "1_simulation-visualization"
+        },
+        {
+          "command": "keith-vscode.simulation-save-trace",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "group": "2_simulation-trace@1"
+        },
+        {
+          "command": "keith-vscode.simulation-load-trace",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "group": "2_simulation-trace@2"
         }
       ]
     },

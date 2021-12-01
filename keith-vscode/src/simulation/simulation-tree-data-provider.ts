@@ -15,7 +15,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
-import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, OPEN_INTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
+import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
 import { delay, reverse, SimulationDataBlackList, LoadedTraceMessage, SavedTraceMessage, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { StorageService } from '../storage';
@@ -279,10 +279,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             }));
         
         // Kviz commands
-
-        // Not supported by VS Code
-        // this.context.subscriptions.push(
-        //     vscode.commands.registerCommand(OPEN_INTERNAL_KVIZ_VIEW.command, this.openInternalKVizView, this));
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(OPEN_EXTERNAL_KVIZ_VIEW.command, this.openExternalKVizView, this));
@@ -705,10 +701,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         // this.messageService.error(message)
         this.setValuesToStopSimulation()
     }
-
-    // openInternalKVizView(): void {
-    //     // not possible without extension
-    // }
 
     /**
      * Start the simulation visualization socket server and opens a browser window.
