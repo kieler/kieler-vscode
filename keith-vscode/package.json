@@ -359,17 +359,17 @@
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
           "command": "keith-vscode.compile",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
           "command": "keith-vscode.simulate",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
           "command": "klighd-vscode.diagram.open",
-          "group": "navigation"
+          "group": "navigation@300000"
         }
       ],
       "editor/context": [
