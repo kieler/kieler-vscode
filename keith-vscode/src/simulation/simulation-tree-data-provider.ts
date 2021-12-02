@@ -592,15 +592,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      * Asks the user for a file to store the simulation trace from the current simulation in a file.
      */
     async saveTrace(): Promise<void> {
-        // Request the LS to serialize the current trace into a savable string.
-        const lsClient = await this.lsClient
-        const message = await lsClient.sendRequest('keith/simulation/saveTrace') as SavedTraceMessage
-        if (!message.successful) {
-            // TODO: better logging of error state
-            console.log('could not save trace: ' + message.reason)
-            return
-        }
-        
         // Ask the user where to save this trace
         const uri = await vscode.window.showSaveDialog({
             filters: {'KTrace': ['ktrace']},
@@ -611,8 +602,14 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             return
         }
 
-        // Save the file on the file system.
-        await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(message.fileContent))
+        // Request the LS to save the current trace into the file picked by the user.
+        const lsClient = await this.lsClient
+        const message = await lsClient.sendRequest('keith/simulation/saveTrace', uri.path) as SavedTraceMessage
+        if (!message.successful) {
+            // TODO: better logging of error state
+            console.log('could not save trace: ' + message.reason)
+            return
+        }
     }
 
     /**
@@ -628,13 +625,10 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             // The user did not pick any file to load.
             return
         }
-        // If a document was selected, read its content from the workspace.
-        const document = await vscode.workspace.openTextDocument(uris[0].path)
-        const text = document.getText()
 
-        // Send the trace file content to the server to convert it into a Trace model and to synchronize it.
+        // Send the trace file uri to the server to convert it into a Trace model and to load it.
         const lClient = await this.lsClient
-        const message = await lClient.sendRequest('keith/simulation/loadTrace', text) as LoadedTraceMessage
+        const message = await lClient.sendRequest('keith/simulation/loadTrace', uris[0].path) as LoadedTraceMessage
 
         if (!message.successful) {
             // TODO: better logging of error state
