@@ -15,11 +15,12 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider';
-import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
+import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SET_DISPLAY_IN_OUT, SET_INPUT_OUTPUT_COLUMN, SET_SIMULATION_STEP_DELAY, SET_SIMULATION_TYPE_TO, SHOW_INTERNAL_VARIABLES, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
 import { delay, reverse, SimulationDataBlackList, LoadedTraceMessage, SavedTraceMessage, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
 import { SettingsService } from '../settings';
-import { Settings } from '../constants';
+import { Settings, SimulationType } from '../constants';
+import { Tuple } from '../util';
 
 export const externalStepMessageType = 'keith/simulation/didStep';
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep';
@@ -255,6 +256,104 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         
         this.context.subscriptions.push(
             vscode.commands.registerCommand(NEW_VALUE_SIMULATION.command, this.newInputValue, this));
+
+        // settings commands
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SET_DISPLAY_IN_OUT.command, () => {
+                const options: vscode.QuickPickItem[] = [{
+                    label: 'true',
+                    picked: this.settings.get("displayInOut.enabled")
+                }, {
+                    label: 'false',
+                    picked: !this.settings.get("displayInOut.enabled")
+                }];
+                const quickPick = vscode.window.createQuickPick();
+                quickPick.items = options;
+                quickPick.onDidChangeSelection(selection => {
+                    if (selection[0]) {
+                        this.settings.set("displayInOut.enabled", selection[0]?.label === 'true')
+                    }
+                    quickPick.hide();
+                })
+                quickPick.onDidHide(quickPick.dispose);
+                quickPick.show();
+            })
+        );
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SET_INPUT_OUTPUT_COLUMN.command, () => {
+                const options: vscode.QuickPickItem[] = [{
+                    label: 'true',
+                    picked: this.settings.get("inputOutputColumn.enabled")
+                }, {
+                    label: 'false',
+                    picked: !this.settings.get("inputOutputColumn.enabled")
+                }];
+                const quickPick = vscode.window.createQuickPick();
+                quickPick.items = options;
+                quickPick.onDidChangeSelection(selection => {
+                    if (selection[0]) {
+                        this.settings.set("inputOutputColumn.enabled", selection[0]?.label === 'true')
+                    }
+                    quickPick.hide();
+                })
+                quickPick.onDidHide(quickPick.dispose);
+                quickPick.show();
+            })
+        );
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SET_SIMULATION_STEP_DELAY.command, async () => {
+                const input = await vscode.window.showInputBox({validateInput: (val) => isNaN(parseInt(val, 10)) ? "Given input is not a valid number!" : null})
+                if (input != undefined) {
+                    const simulationSetDelay = parseInt(input, 10);
+                    this.settings.set("simulationStepDelay", simulationSetDelay);
+                }
+            })
+        );
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SET_SIMULATION_TYPE_TO.command, () => {
+                // TODO lme: why doesn't TS like this?
+                const simulationTypes: Tuple<SimulationType> = ['Periodic', 'Manual', 'Dynamic']
+                const options: vscode.QuickPickItem[] = simulationTypes.map(type => ({
+                    label: type,
+                    picked: this.settings.get("simulationType") === type
+                }))
+                const quickPick = vscode.window.createQuickPick();
+                quickPick.items = options;
+                quickPick.onDidChangeSelection(selection => {
+                    if (selection[0]) {
+                        this.settings.set("simulationType", selection[0].label as SimulationType)
+                    }
+                    quickPick.hide();
+                })
+                quickPick.onDidHide(quickPick.dispose);
+                quickPick.show();
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(SHOW_INTERNAL_VARIABLES.command, () => {
+                const options: vscode.QuickPickItem[] = [{
+                    label: 'true',
+                    picked: this.settings.get("showInternalVariables.enabled")
+                }, {
+                    label: 'false',
+                    picked: !this.settings.get("showInternalVariables.enabled")
+                }];
+                const quickPick = vscode.window.createQuickPick();
+                quickPick.items = options;
+                quickPick.onDidChangeSelection(selection => {
+                    if (selection[0]) {
+                        this.settings.set("showInternalVariables.enabled", selection[0]?.label === 'true')
+                    }
+                    quickPick.hide();
+                })
+                quickPick.onDidHide(quickPick.dispose);
+                quickPick.show();
+            })
+        )
     }
 
     // BUILD VIEW

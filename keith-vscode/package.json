@@ -279,6 +279,30 @@
         "command": "keith-vscode.simulation-load-trace",
         "title": "Load trace",
         "category": "Simulation"
+      }, {
+        "command": "keith-vscode.diplay-in-out",
+        "title": "Set display in/out to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.input-output-column",
+        "title": "Set display input/output column to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.simulation-step-delay",
+        "title": "Set simulation step delay to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.simulation-type",
+        "title": "Set simulation type to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.show-internal-variables",
+        "title": "Set display internal variables to ...",
+        "category": "Simulation"
       }
     ],
     "menus": {
