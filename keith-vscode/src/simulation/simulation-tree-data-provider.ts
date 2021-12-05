@@ -18,15 +18,16 @@ import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
 import { delay, reverse, SimulationDataBlackList, LoadedTraceMessage, SavedTraceMessage, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 import { PerformActionAction } from '../perform-action-handler'
-import { StorageService } from '../storage';
+import { SettingsService } from '../settings';
+import { Settings } from '../constants';
 
 export const externalStepMessageType = 'keith/simulation/didStep';
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep';
 export const externalStopMessageType = 'keith/simulation/externalStop';
 export const startedSimulationMessageType = 'keith/simulation/started';
 
+// TODO lme: Maybe match naming with CompilationDataProvider
 export class SimulationTreeDataProvider implements vscode.TreeDataProvider<SimulationTreeData> {
-
 
     public readonly newSimulationDataEmitter = new vscode.EventEmitter<this>()
 
@@ -60,54 +61,25 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      */
     public eventListenerRegistered: Map<string, boolean> = new Map
 
-    /**
-     * Whether the input/output column is added to the table.
-     * this is part of the state of the widget.
-     */
-    protected displayInOut = false
-
+    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Wether next simulation step should be requested after a time specified by simulation delay
      */
     public play = false
 
-    /**
-     * Time in milliseconds to wait till next simulation step is requested in play mode.
-     */
-    public simulationStepDelay: number;
-
-    /**
-     * All simulation types
-     */
-    public simulationTypes: string[] = ["Periodic", "Manual", "Dynamic"]
-
-    /**
-     * The currently selected simulation type.
-     * The value of this attribute is simulation type selected by default.
-     */
-    public simulationType: string;
-
+    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Set by SimulationContribution after a simulation is started or stopped.
      * If false disables step, stop and play.
      */
     public controlsEnabled = false
 
-    /**
-     * Indicates whether the input/output column should be displayed.
-     */
-    public inputOutputColumnEnabled = true
-
+    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Indicates whether a simulation is currently running.
      * TODO this might not be needed since simulationRunning already expresses this
      */
     public simulationRunning = false
-
-    /**
-     * Show internal variables of simulation (e.g. guards, ...)
-     */
-    public showInternalVariables: boolean;
 
     /**
      * Categories of variables with their respective members.
@@ -144,7 +116,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     readonly onDidChangeTreeData: vscode.Event<SimulationTreeData | undefined | null | void> = this._onDidChangeTreeData.event;
 
 
-	constructor(lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext, private readonly storage: StorageService) {
+	constructor(lsClient: LanguageClient, kico: CompilationDataProvider, readonly context: vscode.ExtensionContext, private readonly settings: SettingsService<Settings>) {
         console.log('Simulation view tree is created')
         // TODO
         this.lsClient = lsClient
@@ -156,11 +128,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         // Push context variables for conditional menu items
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
         vscode.commands.executeCommand('setContext', 'keith.vscode:play', this.play)
-
-        // Load settings from storage
-        this.simulationStepDelay = this.storage.get('keith.vscode.simulation.simulationStepDelay', 200)
-        this.simulationType = this.storage.get('keith.vscode.simulation.simulationType', 'Periodic')
-        this.showInternalVariables = this.storage.get('keith.vscode.simulation.showInternalVariables', false)
 
         // Bind to events
         kico.newSimulationCommands(systems => {
@@ -455,7 +422,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             // The uri of the current editor is needed to identify the already compiled snapshot that is used to start the simulation.
             const uri = this.kico.lastCompiledUri
             this.lsClient.onReady().then(() => {
-                this.lsClient.sendNotification('keith/simulation/start', [uri, this.simulationType])
+                this.lsClient.sendNotification('keith/simulation/start', [uri, this.settings.get("simulationType")])
             })
             this.simulationStatus.text = '$(spinner) Starting simulation...',
             this.simulationStatus.tooltip ='Starting simulation...'
@@ -649,7 +616,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     async waitForNextStep(): Promise<void> {
         while (this.play) {
             this.executeSimulationStep()
-            await delay(this.simulationStepDelay)
+            await delay(this.settings.get("simulationStepDelay"))
         }
     }
 

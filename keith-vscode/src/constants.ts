@@ -20,6 +20,9 @@ export const views = {
  */
 export const settingsKey = 'keith-vscode';
 
+
+export type SimulationType = 'Periodic' | 'Manual' | 'Dynamic';
+
 /**
  * Keys for all settings under the 'keith-vscode' namespace with their corresponding type.
  */
@@ -29,4 +32,25 @@ export type Settings = {
     'showResultingModel.enabled': boolean;
     'showButtons.enabled': boolean;
     'showPrivateSystems.enabled': boolean;
+    /**
+     * Whether the input/output column is added to the table.
+     * this is part of the state of the widget.
+     */
+    'displayInOut.enabled': boolean;
+    /**
+     * Indicates whether the input/output column should be displayed.
+     */
+    'inputOutputColumn.enabled': boolean;
+    /**
+     * Time in milliseconds to wait till next simulation step is requested in play mode.
+     */
+    'simulationStepDelay': number;
+    /**
+     * The currently selected simulation type.
+     */
+    'simulationType': SimulationType;
+    /**
+     * Show internal variables of simulation (e.g. guards, ...).
+     */
+    'showInternalVariables.enabled': boolean;
 }

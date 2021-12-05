@@ -489,6 +489,32 @@
           "type": "boolean",
           "default": false,
           "description": "Specifies whether private compilation systems shall be shown."
+        },
+        "keith-vscode.displayInOut.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether the input/output column is added to the table in the simulation widget."
+        },
+        "keith-vscode.inputOutputColumn.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Indicates whether the input/output column should be displayed."
+        },
+        "keith-vscode.simulationStepDelay": {
+          "type": "number",
+          "default": 200,
+          "description": "Time in milliseconds to wait till next simulation step is requested in play mode."
+        },
+        "keith-vscode.simulationType": {
+          "type": "string",
+          "default": "Periodic",
+          "description": "The currently selected simulation type.",
+          "enum": ["Periodic", "Manual", "Dynamic"]
+        },
+        "keith-vscode.showInternalVariables.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether internal variables shall be shown in the simulation widget (e.g. guards, ...)."
         }
       }
     }

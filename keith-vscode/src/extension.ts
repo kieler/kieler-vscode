@@ -80,7 +80,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     );
 
     // create SettingsService with list of setting-keys to manage                
-    settingService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled']);
+    settingService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'displayInOut.enabled', 'inputOutputColumn.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
 
     const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingService);
 
@@ -94,7 +94,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
 
-    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, storageService)
+    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, settingService)
     // Register and start simulation tree view
     vscode.window.registerTreeDataProvider(
         'kieler-simulation-tree',
