@@ -13,6 +13,7 @@ type STORAGE_ITEMS = {
 
 /**
  * Wrapper around the Memento API provided by VSCode. 
+ * @deprecated
  */
 export class StorageService {
     constructor(private memento: Memento) {}

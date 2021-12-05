@@ -193,6 +193,16 @@
         "category": "KiCo"
       },
       {
+        "command": "keith-vscode.show-next",
+        "title": "Show next",
+        "category": "KiCo"
+      },
+      {
+        "command": "keith-vscode.show-previous",
+        "title": "Show previous",
+        "category": "KiCo"
+      },
+      {
         "command": "keith-vscode.request-compilation-systems",
         "title": "Request compilation systems",
         "category": "KiCo"
@@ -304,6 +314,12 @@
         },
         {
           "command": "keith-vscode.inplace"
+        },
+        {
+          "command": "keith-vscode.show-next"
+        },
+        {
+          "command": "keith-vscode.show-previous"
         },
         {
           "command": "keith-vscode.request-compilation-systems"

@@ -40,16 +40,6 @@ export const COMPILER: vscode.Command = {
     command: 'kico-compiler:toggle',
     title: 'Kico: Compiler'
 }
-// TODO lme: isnt this redundant with COMPILE_COMMAND?
-export const SELECT_COMPILATION_CHAIN: vscode.Command = {
-    command: 'kico-select-compiler',
-    title: 'Kico: Select compilation chain'
-}
-// TODO lme: isnt this redundant with COMPILE_SNAPSHOT_COMMAND?
-export const SELECT_SNAPSHOT_COMPILATION_CHAIN: vscode.Command = {
-    command: 'kico-select-snapshot-compiler',
-    title: 'Kico: Select snapshot compilation chain'
-}
 export const REQUEST_CS: vscode.Command = {
     command: 'keith-vscode.request-compilation-systems',
     title: 'Request compilation systems'

@@ -13,10 +13,10 @@
 
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_PRIVATE_SYSTEMS, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
 import { Utils } from 'vscode-uri';
-import { SettingsService } from '../settings';
 import { Settings } from '../constants';
+import { SettingsService } from '../settings';
+import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_PRIVATE_SYSTEMS, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
 export const compilerWidgetId = "compiler-widget"
 export const COMPILE = 'keith/kicool/compile'
 export const CANCEL_COMPILATION = "keith/kicool/cancel-compilation"
@@ -152,6 +152,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             quickPick.onDidHide(() => quickPick.dispose());
             quickPick.show();
         }));
+        
+        this.registerShowNext()
+
+        this.registerShowPrevious();
 
         this.context.subscriptions.push(vscode.commands.registerCommand(REQUEST_CS.command, async () => {
             await this.requestSystemDescriptions();
@@ -577,8 +581,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 return false
             }
             return this.show(uri, Math.min(lastIndex + 1, length - 1))
-        }
-        )
+        })
         // TODO
         // this.keybindingRegistry.registerKeybinding({
         //     command: SHOW_NEXT.id,
@@ -608,8 +611,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             }
             // Show for original model is on the lower bound of -1.
             return this.show(uri, Math.max(lastIndex - 1, -1))
-        }
-        )
+        })
         // this.keybindingRegistry.registerKeybinding({
         //     command: SHOW_PREVIOUS.id,
         //     context: this.kicoolKeybindingContext.id,

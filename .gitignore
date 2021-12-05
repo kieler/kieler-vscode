@@ -11,3 +11,4 @@ yarn-error.log
 **/*.log
 **/package-backup.json
 **/gen-webpack.config.js
+.DS_Store
