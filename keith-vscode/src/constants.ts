@@ -21,7 +21,7 @@ export const views = {
 export const settingsKey = 'keith-vscode';
 
 
-export type SimulationType = 'Periodic' | 'Manual' | 'Dynamic';
+export type SimulationType = 'Manual' | 'Periodic' |  'Dynamic';
 
 /**
  * Keys for all settings under the 'keith-vscode' namespace with their corresponding type.

@@ -314,8 +314,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SET_SIMULATION_TYPE_TO.command, () => {
-                // TODO lme: why doesn't TS like this?
-                const simulationTypes: Tuple<SimulationType> = ['Periodic', 'Manual', 'Dynamic']
+                const simulationTypes: Tuple<SimulationType> = ['Manual', 'Periodic', 'Dynamic']
                 const options: vscode.QuickPickItem[] = simulationTypes.map(type => ({
                     label: type,
                     picked: this.settings.get("simulationType") === type
