@@ -62,20 +62,17 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      */
     public eventListenerRegistered: Map<string, boolean> = new Map
 
-    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Wether next simulation step should be requested after a time specified by simulation delay
      */
     public play = false
 
-    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Set by SimulationContribution after a simulation is started or stopped.
      * If false disables step, stop and play.
      */
     public controlsEnabled = false
 
-    // TODO lme: persisting this does not seem to be right, since it is changed during every run of the simulation
     /**
      * Indicates whether a simulation is currently running.
      * TODO this might not be needed since simulationRunning already expresses this
