@@ -35,6 +35,8 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     protected readonly onRequestSimulationSystemsEmitter = new vscode.EventEmitter<this | undefined>()
 
     readonly onDidChangeOpenStateEmitter = new vscode.EventEmitter<boolean>()
+    
+    output: vscode.OutputChannel
 
     /**
      * Trace for each symbol.
@@ -152,6 +154,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         this.simulationStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
         // TODO this.simulationStatus.command = TODO reveal view on command
         this.context.subscriptions.push(this.simulationStatus)
+
+        // Output channel
+		this.output = vscode.window.createOutputChannel('KIELER Simulation');
 
         // Push context variables for conditional menu items
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
@@ -606,8 +611,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         const lsClient = await this.lsClient
         const message = await lsClient.sendRequest('keith/simulation/saveTrace', uri.path) as SavedTraceMessage
         if (!message.successful) {
-            // TODO: better logging of error state
-            console.log('could not save trace: ' + message.reason)
+            const errorMessage = 'could not save trace: ' + message.reason
+            this.output.appendLine('[ERROR]\t' + errorMessage)
+            vscode.window.showErrorMessage(errorMessage)
             return
         }
     }
@@ -631,8 +637,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         const message = await lClient.sendRequest('keith/simulation/loadTrace', uris[0].path) as LoadedTraceMessage
 
         if (!message.successful) {
-            // TODO: better logging of error state
-            console.log('could not load trace: ' + message.reason)
+            const errorMessage = 'could not load trace: ' + message.reason
+            this.output.appendLine('[ERROR]\t' + errorMessage)
+            vscode.window.showErrorMessage(errorMessage)
             return
         }
         // Store the trace model here as well.
