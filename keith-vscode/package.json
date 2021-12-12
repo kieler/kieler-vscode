@@ -4,7 +4,7 @@
   "description": "KIEL Environment Integrated in Visual Studio Code",
   "version": "0.1.0",
   "publisher": "kieler",
-  "author": "Kiel University \u003crt-kieler-devel@informatik.uni-kiel.de\u003e",
+  "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
   "icon": "icon.png",
   "license": "EPL-2.0",
   "repository": {
@@ -279,7 +279,8 @@
         "command": "keith-vscode.simulation-load-trace",
         "title": "Load trace",
         "category": "Simulation"
-      }, {
+      },
+      {
         "command": "keith-vscode.diplay-in-out",
         "title": "Set display in/out to ...",
         "category": "Simulation"
@@ -396,31 +397,31 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.compile",
           "group": "navigation@1"
         },
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.simulate",
           "group": "navigation@2"
         },
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation@300000"
         }
       ],
       "editor/context": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
@@ -464,23 +465,23 @@
       ]
     },
     "viewsContainers": {
-        "activitybar": [
-            {
-                "id": "kieler",
-                "title": "KIELER",
-                "icon": "./icon.png"
-            }
-        ]
+      "activitybar": [
+        {
+          "id": "kieler",
+          "title": "KIELER",
+          "icon": "./icon.png"
+        }
+      ]
     },
     "views": {
       "kieler": [
         {
-            "type": "tree",
-            "id": "kieler-kico",
-            "name": "KIELER Compiler"
+          "type": "tree",
+          "id": "kieler-kico",
+          "name": "KIELER Compiler"
         },
         {
-					"type": "tree",
+          "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
         }
@@ -533,7 +534,11 @@
           "type": "string",
           "default": "Periodic",
           "description": "The currently selected simulation type.",
-          "enum": ["Periodic", "Manual", "Dynamic"]
+          "enum": [
+            "Periodic",
+            "Manual",
+            "Dynamic"
+          ]
         },
         "keith-vscode.showInternalVariables.enabled": {
           "type": "boolean",
@@ -555,12 +560,21 @@
     "vscode:prepublish": "yarn run build"
   },
   "devDependencies": {
-    "@types/vscode": "^1.56.0",
     "@types/node": "^12.11.7",
     "@types/react": "^17.0.27",
+    "@types/vscode": "^1.56.0",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "css-loader": "^5.2.4",
+    "eslint": "^8.4.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
     "mini-css-extract-plugin": "^1.6.0",
+    "prettier": "2.5.1",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
@@ -571,7 +585,7 @@
     "react": "^17.0.2",
     "snabbdom-jsx": "^0.4.2",
     "snabbdom-to-html": "^7.0.0",
-    "vscode-uri": "^3.0.2",
-    "vscode-languageclient": "^5.2.1"
+    "vscode-languageclient": "^5.2.1",
+    "vscode-uri": "^3.0.2"
   }
 }
