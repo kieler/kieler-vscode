@@ -658,9 +658,11 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      */
     async saveTrace(): Promise<void> {
         // Ask the user where to save this trace
+        const currentFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined
         const uri = await vscode.window.showSaveDialog({
             filters: {'KTrace': ['ktrace']},
             title: 'Save current KTrace to...',
+            defaultUri: currentFolder ? vscode.Uri.file(currentFolder + '/trace.ktrace') : undefined,
         })
         if (uri === undefined) {
             // The user did not pick any file to save to.
