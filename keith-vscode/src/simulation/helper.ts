@@ -120,12 +120,10 @@ export class LoadedTraceMessage {
 }
 
 /**
- * Message sent by the LS as a response to send the content of the trace file to be saved by the client.
+ * Message sent by the LS as a response to save the current trace to a file.
  */
  export class SavedTraceMessage {
     constructor(
-        /* The trace object loaded into the system. */
-        public fileContent: string,
         /* If saving the trace was successful. */
         public successful: boolean,
         /* Human-readable reason why saving failed (if it failed). */
