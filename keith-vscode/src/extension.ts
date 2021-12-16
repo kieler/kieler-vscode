@@ -23,7 +23,8 @@ import { KeithErrorHandler } from "./error-handler";
 import { performActionKind, handlePerformAction } from "./perform-action-handler";
 import { CompilationDataProvider } from "./kico/compilation-data-provider";
 import { SimulationTreeDataProvider } from "./simulation/simulation-tree-data-provider";
-import { StorageService } from "./storage";
+import { SettingsService } from "./settings";
+import { Settings, settingsKey } from "./constants";
 // import 'simulation/index.css'
 
 //** Command identifiers that are provided by klighd-vscode. */
@@ -42,7 +43,7 @@ const supportedFileEndings = ["sctx", "scl", "elkt", "kgt", "kviz", "strl", "lus
 
 let lsClient: LanguageClient;
 let socket: Socket;
-let storageService: StorageService;
+let settingService: SettingsService<Settings>;
 
 // this method is called when your extension is activated
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -78,9 +79,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         handlePerformAction
     );
 
-    storageService = new StorageService(context.workspaceState);
-    
-    const compilationDataProvider = new CompilationDataProvider(lsClient, context, storageService);
+    // create SettingsService with list of setting-keys to manage                
+    settingService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'displayInOut.enabled', 'inputOutputColumn.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
+
+    const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingService);
 
     // Register and start kico view
     vscode.window.registerTreeDataProvider(
@@ -92,7 +94,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
 
-    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, storageService)
+    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, settingService)
     // Register and start simulation tree view
     vscode.window.registerTreeDataProvider(
         'kieler-simulation-tree',

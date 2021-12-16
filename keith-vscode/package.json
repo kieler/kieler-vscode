@@ -193,6 +193,16 @@
         "category": "KiCo"
       },
       {
+        "command": "keith-vscode.show-next",
+        "title": "Show next",
+        "category": "KiCo"
+      },
+      {
+        "command": "keith-vscode.show-previous",
+        "title": "Show previous",
+        "category": "KiCo"
+      },
+      {
         "command": "keith-vscode.request-compilation-systems",
         "title": "Request compilation systems",
         "category": "KiCo"
@@ -269,6 +279,30 @@
         "command": "keith-vscode.simulation-load-trace",
         "title": "Load trace",
         "category": "Simulation"
+      }, {
+        "command": "keith-vscode.diplay-in-out",
+        "title": "Set display in/out to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.input-output-column",
+        "title": "Set display input/output column to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.simulation-step-delay",
+        "title": "Set simulation step delay to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.simulation-type",
+        "title": "Set simulation type to ...",
+        "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.show-internal-variables",
+        "title": "Set display internal variables to ...",
+        "category": "Simulation"
       }
     ],
     "menus": {
@@ -304,6 +338,12 @@
         },
         {
           "command": "keith-vscode.inplace"
+        },
+        {
+          "command": "keith-vscode.show-next"
+        },
+        {
+          "command": "keith-vscode.show-previous"
         },
         {
           "command": "keith-vscode.request-compilation-systems"
@@ -445,6 +485,62 @@
           "name": "KIELER Simulation Tree"
         }
       ]
+    },
+    "configuration": {
+      "title": "KIELER",
+      "properties": {
+        "keith-vscode.autocompile.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether compilations shall happen on save."
+        },
+        "keith-vscode.compileInplace.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether compilations shall happen in place."
+        },
+        "keith-vscode.showResultingModel.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Specifies whether the model of the compilation shall be shown after compilation."
+        },
+        "keith-vscode.showButtons.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether buttons in the compilation widget shall be shown."
+        },
+        "keith-vscode.showPrivateSystems.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether private compilation systems shall be shown."
+        },
+        "keith-vscode.displayInOut.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether the input/output column is added to the table in the simulation widget."
+        },
+        "keith-vscode.inputOutputColumn.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Indicates whether the input/output column should be displayed."
+        },
+        "keith-vscode.simulationStepDelay": {
+          "type": "number",
+          "default": 200,
+          "description": "Time in milliseconds to wait till next simulation step is requested in play mode."
+        },
+        "keith-vscode.simulationType": {
+          "type": "string",
+          "default": "Periodic",
+          "description": "The currently selected simulation type.",
+          "enum": ["Periodic", "Manual", "Dynamic"]
+        },
+        "keith-vscode.showInternalVariables.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether internal variables shall be shown in the simulation widget (e.g. guards, ...)."
+        }
+      }
     }
   },
   "extensionDependencies": [

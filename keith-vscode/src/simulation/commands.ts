@@ -98,3 +98,28 @@ export const REVEAL_SIMULATION_WIDGET: vscode.Command = {
     command: 'reveal-simulation-widget',
     title: 'Reveal simulation widget'
 }
+
+export const SET_DISPLAY_IN_OUT: vscode.Command = {
+    command: 'keith-vscode.diplay-in-out',
+    title: 'Set display in/out to ...'
+}
+
+export const SET_INPUT_OUTPUT_COLUMN: vscode.Command = {
+    command: 'keith-vscode.input-output-column',
+    title: 'Set display input/output column to ...'
+}
+
+export const SET_SIMULATION_STEP_DELAY: vscode.Command = {
+    command: "keith-vscode.simulation-step-delay",
+    title: "Set simulation step delay to ..."
+}
+
+export const SET_SIMULATION_TYPE_TO: vscode.Command = {
+    command: "keith-vscode.simulation-type",
+    title: "Set simulation type to ..."
+}
+
+export const SHOW_INTERNAL_VARIABLES: vscode.Command = {
+    command: "keith-vscode.show-internal-variables",
+    title: "Set display internal variables to ..."
+}

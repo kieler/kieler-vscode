@@ -11,7 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 import * as vscode from 'vscode';
-import { config } from '../constants';
+import { extensionName, views } from '../constants';
 
 export const SHOW_COMMAND: vscode.Command = {
     command: 'keith-vscode.show',
@@ -39,14 +39,6 @@ export const SHOW_PREVIOUS: vscode.Command = {
 export const COMPILER: vscode.Command = {
     command: 'kico-compiler:toggle',
     title: 'Kico: Compiler'
-}
-export const SELECT_COMPILATION_CHAIN: vscode.Command = {
-    command: 'kico-select-compiler',
-    title: 'Kico: Select compilation chain'
-}
-export const SELECT_SNAPSHOT_COMPILATION_CHAIN: vscode.Command = {
-    command: 'kico-select-snapshot-compiler',
-    title: 'Kico: Select snapshot compilation chain'
 }
 export const REQUEST_CS: vscode.Command = {
     command: 'keith-vscode.request-compilation-systems',
@@ -85,16 +77,16 @@ export const TOGGLE_BUTTON_MODE: vscode.Command = {
  */
 
 export const REVEAL_COMPILATION_WIDGET: vscode.Command = {
-    command: `${config.views.kieler.compiler.id}.focus`,
-    title: `Focus on ${config.views.kieler.compiler.name} View`
+    command: `${views.compiler.id}.focus`,
+    title: `Focus on ${views.compiler.name} View`
 }
 
 export const REVEAL_SIMULATION_WIDGET: vscode.Command = {
-    command: `${config.views.kieler.simulation.id}.focus`,
-    title: `Focus on ${config.views.kieler.simulation.name} View`
+    command: `${views.simulation.id}.focus`,
+    title: `Focus on ${views.simulation.name} View`
 }
 
 export const OPEN_KIELER_VIEW: vscode.Command = {
-    command: `workbench.view.extension.${config.name}`,
+    command: `workbench.view.extension.${extensionName}`,
     title: 'Show KIELER'
 }
