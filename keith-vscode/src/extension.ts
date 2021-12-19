@@ -43,7 +43,7 @@ const supportedFileEndings = ["sctx", "scl", "elkt", "kgt", "kviz", "strl", "lus
 
 let lsClient: LanguageClient;
 let socket: Socket;
-let settingService: SettingsService<Settings>;
+let settingsService: SettingsService<Settings>;
 
 // this method is called when your extension is activated
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -80,9 +80,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     );
 
     // create SettingsService with list of setting-keys to manage                
-    settingService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'displayInOut.enabled', 'inputOutputColumn.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
+    settingsService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'displayInOut.enabled', 'inputOutputColumn.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
 
-    const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingService);
+    const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingsService);
 
     // Register and start kico view
     vscode.window.registerTreeDataProvider(
@@ -94,7 +94,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     });
 
 
-    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, settingService)
+    const simulationTreeDataProvider = new SimulationTreeDataProvider(lsClient, compilationDataProvider, context, settingsService)
     // Register and start simulation tree view
     vscode.window.registerTreeDataProvider(
         'kieler-simulation-tree',
