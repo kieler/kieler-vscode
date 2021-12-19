@@ -63,6 +63,6 @@ export class SettingsService<S> {
      * @param value new value of the setting
      */
     public set<K extends Extract<keyof S, string>>(key: K, value: S[K]): void {
-        vscode.workspace.getConfiguration(this.configurationKey).update(key, value);
+        vscode.workspace.getConfiguration(this.configurationKey).update(key, value, vscode.ConfigurationTarget.Global);
     }
 }
