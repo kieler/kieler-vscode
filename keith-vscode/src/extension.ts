@@ -80,7 +80,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     );
 
     // create SettingsService with list of setting-keys to manage                
-    settingsService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'displayInOut.enabled', 'inputOutputColumn.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
+    settingsService = new SettingsService<Settings>(settingsKey, ['autocompile.enabled', 'compileInplace.enabled', 'showResultingModel.enabled', 'showButtons.enabled', 'showPrivateSystems.enabled', 'simulationStepDelay', 'simulationType', 'showInternalVariables.enabled']);
 
     const compilationDataProvider = new CompilationDataProvider(lsClient, context, settingsService);
 
