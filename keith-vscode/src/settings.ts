@@ -63,6 +63,28 @@ export class SettingsService<S> {
      * @param value new value of the setting
      */
     public set<K extends Extract<keyof S, string>>(key: K, value: S[K]): void {
-        vscode.workspace.getConfiguration(this.configurationKey).update(key, value, vscode.ConfigurationTarget.Global);
+        const configurationTarget = this.determineConfigurationTarget(key);
+        vscode.workspace.getConfiguration(this.configurationKey).update(key, value, configurationTarget);
+    }
+
+    /**
+     * Determine the {@link vscode.ConfigurationTarget} for a specified configuration key.
+     * The determined target is...
+     *  - {@link vscode.ConfigurationTarget.WorkspaceFolder}, if there is configuration in one of the current workspace folders
+     *  - {@link vscode.ConfigurationTarget.Workspace}, if there is a configuration in the current workspace
+     *  - {@link vscode.ConfigurationTarget.Global} otherwise
+     *    
+     * @param key key of the configuration
+     * @returns the determined {@link vscode.ConfigurationTarget}
+     */
+    private determineConfigurationTarget<K extends Extract<keyof S, string>>(key: K): vscode.ConfigurationTarget {
+        const inspection = vscode.workspace.getConfiguration(this.configurationKey).inspect(key);
+        let configurationTarget: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+        if (inspection?.workspaceFolderValue !== undefined) {
+            configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+        } else if (inspection?.workspaceValue !== undefined) {
+            configurationTarget = vscode.ConfigurationTarget.Workspace;
+        }
+        return configurationTarget;
     }
 }
