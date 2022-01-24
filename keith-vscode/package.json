@@ -299,11 +299,11 @@
     "menus": {
       "view/item/context": [
         {
-          "when": "viewItem == snapshot",
+          "when": "viewItem \u003d\u003d snapshot",
           "command": "keith-vscode.show"
         },
         {
-          "when": "viewItem == simulation:data:input || viewItem == simulation:history:input",
+          "when": "viewItem \u003d\u003d simulation:data:input || viewItem \u003d\u003d simulation:history:input",
           "command": "keith-vscode.simulation-new-value"
         }
       ],
@@ -419,59 +419,59 @@
       "view/title": [
         {
           "command": "keith-vscode.simulation-step",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "navigation@1"
         },
         {
           "command": "keith-vscode.simulation-stop",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "navigation@3"
         },
         {
           "command": "keith-vscode.simulation-run",
-          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 !keith.vscode:play \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.simulation-pause",
-          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 keith.vscode:play \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.open-kviz-external",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "1_simulation-visualization"
         },
         {
           "command": "keith-vscode.simulation-save-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "2_simulation-trace@1"
         },
         {
           "command": "keith-vscode.simulation-load-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning \u0026\u0026 view \u003d\u003d kieler-simulation-tree",
           "group": "2_simulation-trace@2"
         }
       ]
     },
     "viewsContainers": {
-        "activitybar": [
-            {
-                "id": "kieler",
-                "title": "KIELER",
-                "icon": "./icon.png"
-            }
-        ]
+      "activitybar": [
+        {
+          "id": "kieler",
+          "title": "KIELER",
+          "icon": "./icon.png"
+        }
+      ]
     },
     "views": {
       "kieler": [
         {
-            "type": "tree",
-            "id": "kieler-kico",
-            "name": "KIELER Compiler"
+          "type": "tree",
+          "id": "kieler-kico",
+          "name": "KIELER Compiler"
         },
         {
-					"type": "tree",
+          "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
         }
@@ -524,7 +524,11 @@
           "type": "string",
           "default": "Periodic",
           "description": "The currently selected simulation type.",
-          "enum": ["Periodic", "Manual", "Dynamic"]
+          "enum": [
+            "Periodic",
+            "Manual",
+            "Dynamic"
+          ]
         },
         "keith-vscode.showInternalVariables.enabled": {
           "type": "boolean",
