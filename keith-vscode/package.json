@@ -4,7 +4,7 @@
   "description": "KIEL Environment Integrated in Visual Studio Code",
   "version": "0.1.0",
   "publisher": "kieler",
-  "author": "Kiel University \u003crt-kieler-devel@informatik.uni-kiel.de\u003e",
+  "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
   "icon": "icon.png",
   "license": "EPL-2.0",
   "repository": {
@@ -387,31 +387,31 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.compile",
           "group": "navigation@1"
         },
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.simulate",
           "group": "navigation@2"
         },
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation@300000"
         }
       ],
       "editor/context": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "when": "resourceLangId \u003d\u003d sctx || resourceLangId \u003d\u003d elkt || resourceLangId \u003d\u003d kgt || resourceLangId \u003d\u003d kviz || resourceLangId \u003d\u003d strl || resourceLangId \u003d\u003d lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
@@ -455,23 +455,23 @@
       ]
     },
     "viewsContainers": {
-        "activitybar": [
-            {
-                "id": "kieler",
-                "title": "KIELER",
-                "icon": "./icon.png"
-            }
-        ]
+      "activitybar": [
+        {
+          "id": "kieler",
+          "title": "KIELER",
+          "icon": "./icon.png"
+        }
+      ]
     },
     "views": {
       "kieler": [
         {
-            "type": "tree",
-            "id": "kieler-kico",
-            "name": "KIELER Compiler"
+          "type": "tree",
+          "id": "kieler-kico",
+          "name": "KIELER Compiler"
         },
         {
-					"type": "tree",
+          "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
         }
@@ -524,7 +524,11 @@
           "type": "string",
           "default": "Periodic",
           "description": "The currently selected simulation type.",
-          "enum": ["Periodic", "Manual", "Dynamic"]
+          "enum": [
+            "Periodic",
+            "Manual",
+            "Dynamic"
+          ]
         },
         "keith-vscode.showInternalVariables.enabled": {
           "type": "boolean",
