@@ -14,6 +14,15 @@ module.exports = {
         'prettier/prettier': 2, // Means error
         'import/extensions': [0, 'never'],
         'no-plusplus': 0,
+        'import/prefer-default-export': 0,
+        'no-useless-constructor': 0,
+        'no-restricted-syntax': 1,
+        'max-classes-per-file': 0,
+        'no-use-before-define': 0,
+        'no-underscore-dangle': 0,
+        'no-nested-ternary': 0,
+        'no-param-reassign': 0,
+        'class-methods-use-this': 0,
     },
     settings: {
         'import/resolver': {

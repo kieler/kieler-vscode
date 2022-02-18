@@ -11,7 +11,7 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { SimulationData } from "./helper";
+import { SimulationData } from './helper'
 
 // Holds all messages between the simulation view and the simulation provider
 
@@ -20,8 +20,8 @@ export interface WebviewReadyMessage {
 }
 
 export function isWebviewReadyMessage(object: any): object is WebviewReadyMessage {
-    /*eslint no-prototype-builtins: "off"*/
-    return object !== undefined && object.hasOwnProperty('readyMessage');
+    /* eslint no-prototype-builtins: "off" */
+    return object !== undefined && object.hasOwnProperty('readyMessage')
 }
 
 export interface SimulationTableData {
@@ -32,9 +32,11 @@ export interface SimulationTableData {
 }
 
 export function isSimulationData(object: any): object is SimulationTableData {
-    return object !== undefined
-        && object.hasOwnProperty('key')
-        && object.hasOwnProperty('data')
-        && object.hasOwnProperty('inputOutputColumnEnabled')
-        && object.hasOwnProperty('valuesForNextStep'); // TODO really check the type if needed
+    return (
+        object !== undefined &&
+        object.hasOwnProperty('key') &&
+        object.hasOwnProperty('data') &&
+        object.hasOwnProperty('inputOutputColumnEnabled') &&
+        object.hasOwnProperty('valuesForNextStep')
+    ) // TODO really check the type if needed
 }

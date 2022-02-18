@@ -52,8 +52,10 @@
     outline: none;
     cursor: pointer;
     border-radius: 1px;
-    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border), 0px 1px 1px -2px var(--vscode-checkbox-border);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border),
+        0px 1px 1px -2px var(--vscode-checkbox-border);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+        box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     width: 100%;
 }
 
@@ -68,8 +70,10 @@
     border-radius: 0;
     outline: none;
     cursor: pointer;
-    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border), 0px 1px 1px -2px var(--vscode-checkbox-border);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border),
+        0px 1px 1px -2px var(--vscode-checkbox-border);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+        box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
@@ -86,7 +90,7 @@
 .simulation-panel {
     margin-top: 12px;
     display: flex;
-    margin-left: calc(var(--vscode-ui-padding)*2);
+    margin-left: calc(var(--vscode-ui-padding) * 2);
 }
 
 .icon {
@@ -114,8 +118,10 @@
     border-radius: 0;
     outline: none;
     cursor: pointer;
-    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border), 0px 1px 1px -2px var(--vscode-checkbox-border);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: 0px 1px 5px 0px var(--vscode-checkbox-border), 0px 1px 2px 0px var(--vscode-checkbox-border),
+        0px 1px 1px -2px var(--vscode-checkbox-border);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+        box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
@@ -138,7 +144,7 @@ simulation-td {
 .simulation-div {
     margin: 0px;
     padding: 0px;
-    display:block;
+    display: block;
     resize: horizontal;
 }
 

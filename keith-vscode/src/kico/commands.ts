@@ -10,43 +10,43 @@
  *
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
-import * as vscode from 'vscode';
-import { extensionName, views } from '../constants';
+import * as vscode from 'vscode'
+import { extensionName, views } from '../constants'
 
 export const SHOW_COMMAND: vscode.Command = {
     command: 'keith-vscode.show',
-    title: 'Show Snapshot'
+    title: 'Show Snapshot',
 }
 
 export const COMPILE_COMMAND: vscode.Command = {
     command: 'keith-vscode.compile',
-    title: 'Compile'
+    title: 'Compile',
 }
 
 export const COMPILE_SNAPSHOT_COMMAND: vscode.Command = {
     command: 'keith-vscode.compile-snapshot',
-    title: 'Compile model in diagram'
+    title: 'Compile model in diagram',
 }
 
 export const SHOW_NEXT: vscode.Command = {
     command: 'keith-vscode.show-next',
-    title: 'Show next'
+    title: 'Show next',
 }
 export const SHOW_PREVIOUS: vscode.Command = {
     command: 'keith-vscode.show-previous',
-    title: 'Show previous'
+    title: 'Show previous',
 }
 export const COMPILER: vscode.Command = {
     command: 'kico-compiler:toggle',
-    title: 'Kico: Compiler'
+    title: 'Kico: Compiler',
 }
 export const REQUEST_CS: vscode.Command = {
     command: 'keith-vscode.request-compilation-systems',
-    title: 'Request compilation systems'
+    title: 'Request compilation systems',
 }
 export const TOGGLE_INPLACE: vscode.Command = {
     command: 'keith-vscode.inplace',
-    title: 'Toggle inplace compilation'
+    title: 'Toggle inplace compilation',
 }
 /**
  * Show the resulting model after compile.
@@ -54,22 +54,21 @@ export const TOGGLE_INPLACE: vscode.Command = {
  */
 export const TOGGLE_SHOW_RESULTING_MODEL: vscode.Command = {
     command: 'keith-vscode.show-resulting-model',
-    title: 'Toggle show model after compile'
+    title: 'Toggle show model after compile',
 }
 export const TOGGLE_PRIVATE_SYSTEMS: vscode.Command = {
     command: 'keith-vscode.show-private-systems',
-    title: 'Toggle show private systems'
+    title: 'Toggle show private systems',
 }
 export const TOGGLE_AUTO_COMPILE: vscode.Command = {
     command: 'keith-vscode.auto-compile',
-    title: 'Toggle auto compile'
-};
+    title: 'Toggle auto compile',
+}
 
 export const TOGGLE_BUTTON_MODE: vscode.Command = {
     command: 'keith-vscode.button-mode',
-    title: 'Toggle button mode'
+    title: 'Toggle button mode',
 }
-
 
 /**
  * Utility commands for focussing different views of the extension.
@@ -78,15 +77,15 @@ export const TOGGLE_BUTTON_MODE: vscode.Command = {
 
 export const REVEAL_COMPILATION_WIDGET: vscode.Command = {
     command: `${views.compiler.id}.focus`,
-    title: `Focus on ${views.compiler.name} View`
+    title: `Focus on ${views.compiler.name} View`,
 }
 
 export const REVEAL_SIMULATION_WIDGET: vscode.Command = {
     command: `${views.simulation.id}.focus`,
-    title: `Focus on ${views.simulation.name} View`
+    title: `Focus on ${views.simulation.name} View`,
 }
 
 export const OPEN_KIELER_VIEW: vscode.Command = {
     command: `workbench.view.extension.${extensionName}`,
-    title: 'Show KIELER'
+    title: 'Show KIELER',
 }

@@ -22,7 +22,8 @@
         "prebuild": "yarn clean",
         "build": "lerna run build",
         "watch": "lerna run watch --parallel",
-        "package": "lerna run build && lerna run package --parallel"
+        "package": "lerna run build && lerna run package --parallel",
+        "prettier": "prettier --write keith-vscode/src/"
     },
     "dependencies": {},
     "devDependencies": {

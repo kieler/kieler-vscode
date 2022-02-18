@@ -11,92 +11,131 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import * as vscode from 'vscode';
-import { LanguageClient } from 'vscode-languageclient';
-import { Utils } from 'vscode-uri';
-import { Settings } from '../constants';
-import { SettingsService } from '../settings';
-import { COMPILE_COMMAND, COMPILE_SNAPSHOT_COMMAND, OPEN_KIELER_VIEW, REQUEST_CS, SHOW_COMMAND, SHOW_NEXT, SHOW_PREVIOUS, TOGGLE_AUTO_COMPILE, TOGGLE_BUTTON_MODE, TOGGLE_INPLACE, TOGGLE_PRIVATE_SYSTEMS, TOGGLE_SHOW_RESULTING_MODEL } from './commands';
-export const compilerWidgetId = "compiler-widget"
+import * as vscode from 'vscode'
+import { LanguageClient } from 'vscode-languageclient'
+import { Utils } from 'vscode-uri'
+import { Settings } from '../constants'
+import { SettingsService } from '../settings'
+import {
+    COMPILE_COMMAND,
+    COMPILE_SNAPSHOT_COMMAND,
+    OPEN_KIELER_VIEW,
+    REQUEST_CS,
+    SHOW_COMMAND,
+    SHOW_NEXT,
+    SHOW_PREVIOUS,
+    TOGGLE_AUTO_COMPILE,
+    TOGGLE_BUTTON_MODE,
+    TOGGLE_INPLACE,
+    TOGGLE_PRIVATE_SYSTEMS,
+    TOGGLE_SHOW_RESULTING_MODEL,
+} from './commands'
+
+export const compilerWidgetId = 'compiler-widget'
 export const COMPILE = 'keith/kicool/compile'
-export const CANCEL_COMPILATION = "keith/kicool/cancel-compilation"
+export const CANCEL_COMPILATION = 'keith/kicool/cancel-compilation'
 export const SHOW = 'keith/kicool/show'
 export const GET_SYSTEMS = 'keith/kicool/get-systems'
 
-export const OPEN_COMPILER_WIDGET_KEYBINDING = "ctrlcmd+alt+c"
-export const SHOW_PREVIOUS_KEYBINDING = "alt+g"
-export const SHOW_NEXT_KEYBINDING = "alt+j"
+export const OPEN_COMPILER_WIDGET_KEYBINDING = 'ctrlcmd+alt+c'
+export const SHOW_PREVIOUS_KEYBINDING = 'alt+g'
+export const SHOW_NEXT_KEYBINDING = 'alt+j'
 
-export const EDITOR_UNDEFINED_MESSAGE = "Editor is undefined"
-export const snapshotDescriptionMessageType = 'keith/kicool/compile';
-export const cancelCompilationMessageType = 'keith/kicool/cancel-compilation';
-export const compilationSystemsMessageType = 'keith/kicool/compilation-systems';
+export const EDITOR_UNDEFINED_MESSAGE = 'Editor is undefined'
+export const snapshotDescriptionMessageType = 'keith/kicool/compile'
+export const cancelCompilationMessageType = 'keith/kicool/cancel-compilation'
+export const compilationSystemsMessageType = 'keith/kicool/compilation-systems'
 
-export const diagramType = "keith-diagram"
+export const diagramType = 'keith-diagram'
 
 export class CompilationDataProvider implements vscode.TreeDataProvider<CompilationData> {
-    editor: vscode.TextEditor | undefined = undefined;
-    requestedSystems = false;
-    systems: CompilationSystem[] = [];
-    snapshotSystems: CompilationSystem[] = [];
-    quickpickSystems: vscode.QuickPickItem[] = [];
-    kicoCommands: vscode.Disposable[] = [];
+    editor: vscode.TextEditor | undefined = undefined
+
+    requestedSystems = false
+
+    systems: CompilationSystem[] = []
+
+    snapshotSystems: CompilationSystem[] = []
+
+    quickpickSystems: vscode.QuickPickItem[] = []
+
+    kicoCommands: vscode.Disposable[] = []
     // TODO collect all listeners and commands here and dispose this on dispose of this provider
 
-    startTime = 0;
-    endTime = 0;
-    compiling = false;
-    lastInvokedCompilation = '';
-    lastCompiledUri = '';
-    sourceModelPath = ''; // Set when editor is changed to current uri
+    startTime = 0
+
+    endTime = 0
+
+    compiling = false
+
+    lastInvokedCompilation = ''
+
+    lastCompiledUri = ''
+
+    sourceModelPath = '' // Set when editor is changed to current uri
 
     requestSystems: vscode.StatusBarItem
+
     compilation: vscode.StatusBarItem
+
     output: vscode.OutputChannel
 
     /**
      * The file extension of the last file for which compilation systems where requested.
      */
-    public lastRequestedUriExtension = '';
+    public lastRequestedUriExtension = ''
 
     /**
      * Indicates that a compilation is currently being cancelled
      */
-    public cancellingCompilation = false;
+    public cancellingCompilation = false
 
     /**
      * Snapshots that are currently shown in the view, created during compilation.
      */
-    snapshots: CodeContainer | undefined = undefined;
+    snapshots: CodeContainer | undefined = undefined
 
-    isCompiled: Map<string, boolean> = new Map;
-    sourceURI: Map<string, string> = new Map;
-    resultMap: Map<string, CodeContainer> = new Map;
-    indexMap: Map<string, number> = new Map;
-    lengthMap: Map<string, number> = new Map;
+    isCompiled: Map<string, boolean> = new Map()
+
+    sourceURI: Map<string, string> = new Map()
+
+    resultMap: Map<string, CodeContainer> = new Map()
+
+    indexMap: Map<string, number> = new Map()
+
+    lengthMap: Map<string, number> = new Map()
 
     public readonly compilationStartedEmitter = new vscode.EventEmitter<this | undefined>()
+
     /**
      * Finish of compilation is recognized by cancel of compilation or by receiving a snapshot that is the last of the compilation system.
      * Returns whether compilation has successfully finished (the last snapshot was send).
      */
     public readonly compilationFinishedEmitter = new vscode.EventEmitter<boolean | undefined>()
+
     public readonly showedNewSnapshotEmitter = new vscode.EventEmitter<string | undefined>()
+
     public readonly newSimulationCommandsEmitter = new vscode.EventEmitter<CompilationSystem[]>()
 
     public readonly compilationStarted: vscode.Event<this | undefined> = this.compilationStartedEmitter.event
+
     /**
      * Finish of compilation is recognized by cancel of compilation or by receiving a snapshot that is the last of the compilation system.
      * Returns whether compilation has successfully finished (the last snapshot was send).
      */
     public readonly compilationFinished: vscode.Event<boolean | undefined> = this.compilationFinishedEmitter.event
+
     public readonly showedNewSnapshot: vscode.Event<string | undefined> = this.showedNewSnapshotEmitter.event
+
     public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
 
-    constructor(private lsClient: LanguageClient, readonly context: vscode.ExtensionContext, private readonly settings: SettingsService<Settings>) {
-
+    constructor(
+        private lsClient: LanguageClient,
+        readonly context: vscode.ExtensionContext,
+        private readonly settings: SettingsService<Settings>
+    ) {
         // Output channel
-		this.output = vscode.window.createOutputChannel('KIELER Compilation');
+        this.output = vscode.window.createOutputChannel('KIELER Compilation')
 
         // TODO call treeview.reveal(item, {focus: true}); to reveal tree view after compilation finished
         // The item that is revealed should maybe be the last one. Also this provider may need access to the tree view.
@@ -111,19 +150,35 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
         // Bind notifications to receive
         lsClient.onReady().then(() => {
-            lsClient.onNotification(compilationSystemsMessageType, (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
-                this.handleReceiveSystemDescriptions(systems, snapshotSystems)
-            });
-            lsClient.onNotification(snapshotDescriptionMessageType, (snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number) => {
-                this.handleNewSnapshotDescriptions(snapshotsDescriptions, uri, finished, currentIndex, maxIndex)
-            });
-        });
+            lsClient.onNotification(
+                compilationSystemsMessageType,
+                (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
+                    this.handleReceiveSystemDescriptions(systems, snapshotSystems)
+                }
+            )
+            lsClient.onNotification(
+                snapshotDescriptionMessageType,
+                (
+                    snapshotsDescriptions: CodeContainer,
+                    uri: string,
+                    finished: boolean,
+                    currentIndex: number,
+                    maxIndex: number
+                ) => {
+                    this.handleNewSnapshotDescriptions(snapshotsDescriptions, uri, finished, currentIndex, maxIndex)
+                }
+            )
+        })
         // Bind to change active editor event
-        this.context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(async editor => {
-            this.onDidChangeActiveTextEditor(editor)
-        }));
+        this.context.subscriptions.push(
+            vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+                this.onDidChangeActiveTextEditor(editor)
+            })
+        )
 
-        this.context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this)));
+        this.context.subscriptions.push(
+            vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this))
+        )
         // Request compilation systems at the start, since onDidChangeActiveTextEditor does not fire at the beginning
         const editor = vscode.window.activeTextEditor
         if (editor) {
@@ -132,176 +187,218 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
         // TODO lme: maybe re-order commands to fit order in commands.ts
         // Create commands
-        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
-            const options: vscode.QuickPickItem[] = [{
-                label: 'true',
-                picked: this.settings.get("autocompile.enabled")
-            }, {
-                label: 'false',
-                picked: !this.settings.get("autocompile.enabled")
-            }];
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = options;
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
-                    this.settings.set("autocompile.enabled", selection[0]?.label === 'true');
-                }
-                quickPick.hide();
-            })
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(TOGGLE_AUTO_COMPILE.command, () => {
+                const options: vscode.QuickPickItem[] = [
+                    {
+                        label: 'true',
+                        picked: this.settings.get('autocompile.enabled'),
+                    },
+                    {
+                        label: 'false',
+                        picked: !this.settings.get('autocompile.enabled'),
+                    },
+                ]
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
+                    if (selection[0]) {
+                        this.settings.set('autocompile.enabled', selection[0]?.label === 'true')
+                    }
+                    quickPick.hide()
+                })
 
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.show();
-        }));
-        
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
         this.registerShowNext()
 
-        this.registerShowPrevious();
-
-        this.context.subscriptions.push(vscode.commands.registerCommand(REQUEST_CS.command, async () => {
-            await this.requestSystemDescriptions();
-            vscode.window.showInformationMessage("Registered compilation system");
-        }))
-
-        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_INPLACE.command, () => {
-            const options: vscode.QuickPickItem[] = [{
-                label: 'true',
-                picked: this.settings.get("compileInplace.enabled")
-            }, {
-                label: 'false',
-                picked: !this.settings.get("compileInplace.enabled")
-            }];
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = options;
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
-                    this.settings.set("compileInplace.enabled", selection[0]?.label === 'true');
-                }
-                quickPick.hide();
-            })
-
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.show();
-        }));
-
-        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_SHOW_RESULTING_MODEL.command, () => {
-            const options: vscode.QuickPickItem[] = [{
-                label: 'true',
-                picked: this.settings.get("showResultingModel.enabled")
-            }, {
-                label: 'false',
-                picked: !this.settings.get("showResultingModel.enabled")
-            }];
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = options;
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
-                    this.settings.set("showResultingModel.enabled", selection[0]?.label === 'true');
-                }
-                quickPick.hide();
-            })
-
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.show();
-        }));
-
-        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_PRIVATE_SYSTEMS.command, () => {
-            const options: vscode.QuickPickItem[] = [{
-                label: 'true',
-                picked: this.settings.get("showPrivateSystems.enabled")
-            }, {
-                label: 'false',
-                picked: !this.settings.get("showPrivateSystems.enabled")
-            }];
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = options;
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
-                    this.settings.set("showPrivateSystems.enabled", selection[0]?.label === 'true');
-                }
-                quickPick.hide();
-            })
-
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.show();
-        }))
-
-
-        this.context.subscriptions.push(vscode.commands.registerCommand(TOGGLE_BUTTON_MODE.command, () => {
-            const options: vscode.QuickPickItem[] = [{
-                label: 'true',
-                picked: this.settings.get("showButtons.enabled")
-            }, {
-                label: 'false',
-                picked: !this.settings.get("showButtons.enabled")
-            }];
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = options;
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
-                    this.settings.set("showButtons.enabled", selection[0]?.label === 'true');
-                }
-                quickPick.hide();
-            })
-
-
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.show();
-        }));
+        this.registerShowPrevious()
 
         this.context.subscriptions.push(
-            vscode.commands.registerCommand(SHOW_COMMAND.command, async (snapshot) => {
-                this.show(this.lastCompiledUri, snapshot.index)
-            }, this));
+            vscode.commands.registerCommand(REQUEST_CS.command, async () => {
+                await this.requestSystemDescriptions()
+                vscode.window.showInformationMessage('Registered compilation system')
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(TOGGLE_INPLACE.command, () => {
+                const options: vscode.QuickPickItem[] = [
+                    {
+                        label: 'true',
+                        picked: this.settings.get('compileInplace.enabled'),
+                    },
+                    {
+                        label: 'false',
+                        picked: !this.settings.get('compileInplace.enabled'),
+                    },
+                ]
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
+                    if (selection[0]) {
+                        this.settings.set('compileInplace.enabled', selection[0]?.label === 'true')
+                    }
+                    quickPick.hide()
+                })
+
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(TOGGLE_SHOW_RESULTING_MODEL.command, () => {
+                const options: vscode.QuickPickItem[] = [
+                    {
+                        label: 'true',
+                        picked: this.settings.get('showResultingModel.enabled'),
+                    },
+                    {
+                        label: 'false',
+                        picked: !this.settings.get('showResultingModel.enabled'),
+                    },
+                ]
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
+                    if (selection[0]) {
+                        this.settings.set('showResultingModel.enabled', selection[0]?.label === 'true')
+                    }
+                    quickPick.hide()
+                })
+
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(TOGGLE_PRIVATE_SYSTEMS.command, () => {
+                const options: vscode.QuickPickItem[] = [
+                    {
+                        label: 'true',
+                        picked: this.settings.get('showPrivateSystems.enabled'),
+                    },
+                    {
+                        label: 'false',
+                        picked: !this.settings.get('showPrivateSystems.enabled'),
+                    },
+                ]
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
+                    if (selection[0]) {
+                        this.settings.set('showPrivateSystems.enabled', selection[0]?.label === 'true')
+                    }
+                    quickPick.hide()
+                })
+
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(TOGGLE_BUTTON_MODE.command, () => {
+                const options: vscode.QuickPickItem[] = [
+                    {
+                        label: 'true',
+                        picked: this.settings.get('showButtons.enabled'),
+                    },
+                    {
+                        label: 'false',
+                        picked: !this.settings.get('showButtons.enabled'),
+                    },
+                ]
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
+                    if (selection[0]) {
+                        this.settings.set('showButtons.enabled', selection[0]?.label === 'true')
+                    }
+                    quickPick.hide()
+                })
+
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(
+                SHOW_COMMAND.command,
+                async (snapshot) => {
+                    this.show(this.lastCompiledUri, snapshot.index)
+                },
+                this
+            )
+        )
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(COMPILE_COMMAND.command, async () => {
-                const options = this.createQuickPick(this.systems.filter(system => system.isPublic || this.settings.get("showPrivateSystems.enabled")));
-                const quickPick = vscode.window.createQuickPick();
-                quickPick.items = options;
-                quickPick.onDidChangeSelection(selection => {
+                const options = this.createQuickPick(
+                    this.systems.filter((system) => system.isPublic || this.settings.get('showPrivateSystems.enabled'))
+                )
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
                     if (selection[0]) {
-                        this.systems.forEach(system => {
+                        this.systems.forEach((system) => {
                             if (system.label === selection[0].label) {
-                                this.compile(system.id, this.settings.get("compileInplace.enabled"), this.settings.get("showResultingModel.enabled"), system.snapshotSystem)
+                                this.compile(
+                                    system.id,
+                                    this.settings.get('compileInplace.enabled'),
+                                    this.settings.get('showResultingModel.enabled'),
+                                    system.snapshotSystem
+                                )
                             }
                         })
                     }
                     quickPick.hide()
-                });
-                quickPick.onDidHide(() => quickPick.dispose());
-                quickPick.show();
-                
-            }));
-    
+                })
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
+
         this.context.subscriptions.push(
             vscode.commands.registerCommand(COMPILE_SNAPSHOT_COMMAND.command, async () => {
                 const options = this.createQuickPick(this.snapshotSystems)
-                const quickPick = vscode.window.createQuickPick();
-                quickPick.items = options;
-                quickPick.onDidChangeSelection(selection => {
+                const quickPick = vscode.window.createQuickPick()
+                quickPick.items = options
+                quickPick.onDidChangeSelection((selection) => {
                     if (selection[0]) {
-                        this.snapshotSystems.forEach(system => {
+                        this.snapshotSystems.forEach((system) => {
                             if (system.label === selection[0].label) {
-                                this.compile(system.id, this.settings.get("compileInplace.enabled"), this.settings.get("showResultingModel.enabled"), system.snapshotSystem)
+                                this.compile(
+                                    system.id,
+                                    this.settings.get('compileInplace.enabled'),
+                                    this.settings.get('showResultingModel.enabled'),
+                                    system.snapshotSystem
+                                )
                             }
                         })
                     }
                     quickPick.hide()
-                });
-                quickPick.onDidHide(() => quickPick.dispose());
-                quickPick.show();
-                
-            }));
+                })
+                quickPick.onDidHide(() => quickPick.dispose())
+                quickPick.show()
+            })
+        )
     }
 
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
         const quickPicks: vscode.QuickPickItem[] = []
-        systems.forEach(system => {
+        systems.forEach((system) => {
             quickPicks.push({
-                label: system.label
+                label: system.label,
             })
-        });
-        return quickPicks;
+        })
+        return quickPicks
     }
 
     /**
@@ -314,7 +411,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         // Remove status bar element after successfully requesting systems
         this.requestSystems.hide()
         // Sort all compilation systems by id
-        systems.sort((a, b) => (a.id > b.id) ? 1 : -1)
+        systems.sort((a, b) => (a.id > b.id ? 1 : -1))
         this.systems = systems
         this.snapshotSystems = snapshotSystems
         if (this.editor) {
@@ -323,13 +420,13 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         }
         this.requestedSystems = false
 
-        const simulationSystems = systems.filter(system => system.simulation)
+        const simulationSystems = systems.filter((system) => system.simulation)
         // Register additional simulation commands
         this.newSimulationCommandsEmitter.fire(simulationSystems)
     }
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
-        if (editor && editor.document.uri.scheme === "file") {
+        if (editor && editor.document.uri.scheme === 'file') {
             this.lsClient.onReady().then(() => {
                 console.log()
                 this.editor = editor
@@ -340,15 +437,25 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
         // don't autocompile, if autocompile is off, document is not saved or it is not the last compiled file
-        if (!this.settings.get("autocompile.enabled") || event.document.isDirty || event.document.uri.toString() !== this.lastCompiledUri) return;
-        this.compile(this.lastInvokedCompilation, this.settings.get("compileInplace.enabled"), this.settings.get("showResultingModel.enabled"), false);
+        if (
+            !this.settings.get('autocompile.enabled') ||
+            event.document.isDirty ||
+            event.document.uri.toString() !== this.lastCompiledUri
+        )
+            return
+        this.compile(
+            this.lastInvokedCompilation,
+            this.settings.get('compileInplace.enabled'),
+            this.settings.get('showResultingModel.enabled'),
+            false
+        )
     }
 
     async requestSystemDescriptions(): Promise<void> {
         if (this.editor) {
             // when systems are requested request systems status bar entry is updated
-            this.requestSystems.text = '$(spinner) Request compilation systems',
-            this.requestSystems.tooltip ='Requesting compilation systems...'
+            this.requestSystems.text = '$(spinner) Request compilation systems'
+            this.requestSystems.tooltip = 'Requesting compilation systems...'
             this.requestSystems.show()
             this.requestedSystems = true
             const uri = this.editor.document.uri.toString()
@@ -369,10 +476,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public show(uri: string, index: number): void {
         this.lsClient.onReady().then(async () => {
             this.indexMap.set(uri, index)
-            this.lsClient.sendRequest(SHOW, [uri, diagramType + '_sprotty', index])
+            this.lsClient.sendRequest(SHOW, [uri, `${diagramType}_sprotty`, index])
             // original model must not fire this emitter.
             if (index !== -1) {
-                this.showedNewSnapshotEmitter.fire("Success")
+                this.showedNewSnapshotEmitter.fire('Success')
             }
             return true
         })
@@ -384,7 +491,12 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      * @param inplace whether inplace compilation is on or off
      * @param showResultingModel whether the resulting model should be shown in the diagram. Simulation does not do this.
      */
-    public async compile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): Promise<void> {
+    public async compile(
+        command: string,
+        inplace: boolean,
+        showResultingModel: boolean,
+        snapshot: boolean
+    ): Promise<void> {
         this.startTime = Date.now()
         this.compiling = true
         await this.executeCompile(command, inplace, showResultingModel, snapshot)
@@ -395,26 +507,38 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     executeCompile(command: string, inplace: boolean, showResultingModel: boolean, snapshot: boolean): void {
         if (!this.editor) {
             vscode.window.showErrorMessage(EDITOR_UNDEFINED_MESSAGE)
-            return;
+            return
         }
 
         const uri = this.sourceModelPath
 
-        if (!this.settings.get("autocompile.enabled")) {
+        if (!this.settings.get('autocompile.enabled')) {
             // TODO too much information? Test this for visual clutter
-            vscode.window.showInformationMessage("Compiling " + uri + " with " + command)
+            vscode.window.showInformationMessage(`Compiling ${uri} with ${command}`)
         }
         this.lsClient.onReady().then(() => {
-            this.lsClient.sendNotification(COMPILE, [uri, diagramType + '_sprotty', command, inplace, showResultingModel, snapshot])
+            this.lsClient.sendNotification(COMPILE, [
+                uri,
+                `${diagramType}_sprotty`,
+                command,
+                inplace,
+                showResultingModel,
+                snapshot,
+            ])
             this.compilationStartedEmitter.fire(this)
         })
-
     }
 
     /**
      * Handles the visualization of new snapshot descriptions send by the LS.
      */
-    async handleNewSnapshotDescriptions(snapshotsDescriptions: CodeContainer, uri: string, finished: boolean, currentIndex: number, maxIndex: number): Promise<void> {
+    async handleNewSnapshotDescriptions(
+        snapshotsDescriptions: CodeContainer,
+        uri: string,
+        finished: boolean,
+        currentIndex: number,
+        maxIndex: number
+    ): Promise<void> {
         // Show next/previous command and keybinding if not already added
         if (!(await vscode.commands.getCommands()).includes(SHOW_NEXT.command)) {
             this.registerShowNext()
@@ -423,62 +547,64 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.isCompiled.set(uri as string, true)
         this.resultMap.set(uri as string, snapshotsDescriptions)
         this.snapshots = snapshotsDescriptions
-        const length = snapshotsDescriptions.files.reduce((previousSum, snapshots) => {
-            return previousSum + snapshots.length
-        }, 0)
+        const length = snapshotsDescriptions.files.reduce((previousSum, snapshots) => previousSum + snapshots.length, 0)
         this.lengthMap.set(uri as string, length)
         this.indexMap.set(uri as string, length - 1)
         if (finished) {
-            let index = 0;
+            let index = 0
             let errorOccurred = false
             this.compiling = false
-            let errorString = '';
-            snapshotsDescriptions.files.forEach(array => {
-                array.forEach(element => {
+            let errorString = ''
+            snapshotsDescriptions.files.forEach((array) => {
+                array.forEach((e) => {
+                    const element = e
                     if (element.infos && element.infos.length > 0) {
-                        element.iconPath = new vscode.ThemeIcon('info');
+                        element.iconPath = new vscode.ThemeIcon('info')
                         element.tooltip = 'Check the KIELER Compiler output channel for details'
-                        this.output.appendLine("[INFO]\t" + element.infos.reduce((x, y) => x + '\n\t\t' + y))
+                        this.output.appendLine(`[INFO]\t${element.infos.reduce((x, y) => `${x}\n\t\t${y}`)}`)
                     }
                     if (element.warnings && element.warnings.length > 0) {
-                        element.iconPath = new vscode.ThemeIcon('warning');
+                        element.iconPath = new vscode.ThemeIcon('warning')
                         element.tooltip = 'Check the KIELER Compiler output channel for details'
-                        this.output.appendLine("[WARN]\t" + element.warnings.reduce((x, y) => x + '\n\t\t' + y))
+                        this.output.appendLine(`[WARN]\t${element.warnings.reduce((x, y) => `${x}\n\t\t${y}`)}`)
                     }
                     if (element.errors && element.errors.length > 0) {
-                        element.iconPath = new vscode.ThemeIcon('error');
+                        element.iconPath = new vscode.ThemeIcon('error')
                         element.tooltip = 'Check the KIELER Compiler output channel for details'
-                        errorString = element.errors.reduce((x, y) => x + '\n\t\t' + y)
+                        errorString = element.errors.reduce((x, y) => `${x}\n\t\t${y}`)
                         errorOccurred = true
-                        this.output.appendLine("[ERROR]\t" + errorString)
+                        this.output.appendLine(`[ERROR]\t${errorString}`)
                     }
                     element.index = index
                     index++
                     element.command = {
-                        title: 'Show snapshot ' + element.label + " " + element.snapshotIndex,
+                        title: `Show snapshot ${element.label} ${element.snapshotIndex}`,
                         command: SHOW_COMMAND.command,
-                        arguments: [element]
+                        arguments: [element],
                     }
                     this._onDidChangeTreeData.fire(element)
                 })
-            });
+            })
             this.compilationFinishedEmitter.fire(!errorOccurred)
 
             this.endTime = Date.now()
             // Set finished bar if the currentIndex of the processor is the maxIndex the compilation was not canceled TODO
-            this.compilation.text = currentIndex === maxIndex && !errorOccurred ?
-                    `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms)` :
-                    `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
+            this.compilation.text =
+                currentIndex === maxIndex && !errorOccurred
+                    ? `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
+                    : `$(times) (${(this.endTime - this.startTime).toPrecision(3)}ms)`
             this.compilation.tooltip = currentIndex === maxIndex ? 'Compilation finished' : 'Compilation stopped'
             if (errorOccurred) {
-                vscode.window.showErrorMessage('An error occurred during compilation. Check the output channel for details.' + errorString)
+                vscode.window.showErrorMessage(
+                    `An error occurred during compilation. Check the output channel for details.${errorString}`
+                )
             }
         } else {
             // Set progress bar for compilation TODO
             const progress = '█'.repeat(currentIndex) + '░'.repeat(maxIndex - currentIndex)
 
             this.compilation.show()
-            this.compilation.text =  `$(spinner) ${progress}`
+            this.compilation.text = `$(spinner) ${progress}`
             this.compilation.tooltip = 'Compiling...'
         }
         // this.compilerWidget.update() TODO it updates since the compilation data of this provider changes somehow
@@ -552,7 +678,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     //                 }
     //             }
     //         })
-    //     })        
+    //     })
     // }
 
     // TODO
@@ -577,7 +703,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 // this.messageService.error("Length is undefined")
                 return false
             }
-            if (lastIndex === length - 1) { // No show necessary, since the last snapshot is already drawn.
+            if (lastIndex === length - 1) {
+                // No show necessary, since the last snapshot is already drawn.
                 return false
             }
             return this.show(uri, Math.min(lastIndex + 1, length - 1))
@@ -606,7 +733,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 // this.messageService.error('Index is undefined')
                 return false
             }
-            if (lastIndex === -1) { // No show necessary, since the original model is already drawn.
+            if (lastIndex === -1) {
+                // No show necessary, since the original model is already drawn.
                 return true
             }
             // Show for original model is on the lower bound of -1.
@@ -621,62 +749,87 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     // private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>()
     // readonly onDidChangeTreeData = this._onDidChangeTreeData.event
-    private _onDidChangeTreeData: vscode.EventEmitter<CompilationData | undefined | null | void> = new vscode.EventEmitter<CompilationData | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<CompilationData | undefined | null | void> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: vscode.EventEmitter<CompilationData | undefined | null | void> =
+        new vscode.EventEmitter<CompilationData | undefined | null | void>()
+
+    readonly onDidChangeTreeData: vscode.Event<CompilationData | undefined | null | void> =
+        this._onDidChangeTreeData.event
 
     getTreeItem(element: CompilationData): vscode.TreeItem | Thenable<vscode.TreeItem> {
         if (element) {
             // Put context into element to show it in diagram
-            element.id = element.name + element.index + (!element.contextValue || element.contextValue != "parent"? ":" + element.snapshotIndex : "")
+            element.id =
+                element.name +
+                element.index +
+                (!element.contextValue || element.contextValue !== 'parent' ? `:${element.snapshotIndex}` : '')
             element.label = element.name
             return element
         }
         // resultMap holds a CodeContainer with everything
-        throw new Error('Method not implemented.');
+        throw new Error('Method not implemented.')
     }
+
     getChildren(element?: CompilationData): vscode.ProviderResult<CompilationData[]> {
         // TODO somehow show the original model in there too
         if (this.snapshots) {
-            if (element?.contextValue == 'parent') {
-                let index = -1;
-                this.snapshots?.files.find(e => {
-                    index++;
+            if (element?.contextValue === 'parent') {
+                let index = -1
+                this.snapshots?.files.find((e) => {
+                    index++
                     return e[0].index === element.index
                 })
                 return this.snapshots.files[index]
-            } else {
-                const originalElement = new CompilationData(
-                    'Original',
-                    '',
-                    vscode.TreeItemCollapsibleState.None,
-                    'Original', 0,
-                    -1, [], [], [])
-                originalElement.command =  {
-                    title: 'Show original ',
-                    command: SHOW_COMMAND.command,
-                    arguments: [originalElement]
-                }
-                return [originalElement].concat(this.snapshots.files.map(snapshots => {
+            }
+            const originalElement = new CompilationData(
+                'Original',
+                '',
+                vscode.TreeItemCollapsibleState.None,
+                'Original',
+                0,
+                -1,
+                [],
+                [],
+                []
+            )
+            originalElement.command = {
+                title: 'Show original ',
+                command: SHOW_COMMAND.command,
+                arguments: [originalElement],
+            }
+            return [originalElement].concat(
+                this.snapshots.files.map((snapshots) => {
                     if (snapshots.length > 1) {
                         // TODO calculate or safe what was expanded and what collapsed for each compilation systems, maybe by their name?
-                        const parentElement = new CompilationData(snapshots[0].name, '', vscode.TreeItemCollapsibleState.Collapsed, snapshots[0].name, snapshots[0].snapshotIndex,
-                        snapshots[0].index)
+                        const parentElement = new CompilationData(
+                            snapshots[0].name,
+                            '',
+                            vscode.TreeItemCollapsibleState.Collapsed,
+                            snapshots[0].name,
+                            snapshots[0].snapshotIndex,
+                            snapshots[0].index
+                        )
                         parentElement.contextValue = 'parent'
                         let error = false
                         let warn = false
                         let info = false
-                        snapshots.forEach(element => {
-                            if (element.infos && element.infos.length > 0) {
+                        snapshots.forEach((snapshot) => {
+                            if (snapshot.infos && snapshot.infos.length > 0) {
                                 info = true
                             }
-                            if (element.warnings && element.warnings.length > 0) {
+                            if (snapshot.warnings && snapshot.warnings.length > 0) {
                                 warn = true
                             }
-                            if (element.errors && element.errors.length > 0) {
+                            if (snapshot.errors && snapshot.errors.length > 0) {
                                 error = true
                             }
                         })
-                        parentElement.iconPath = error ? new vscode.ThemeIcon('error') : warn ? new vscode.ThemeIcon('warning') : info ? new vscode.ThemeIcon('info') : ''
+                        parentElement.iconPath = error
+                            ? new vscode.ThemeIcon('error')
+                            : warn
+                            ? new vscode.ThemeIcon('warning')
+                            : info
+                            ? new vscode.ThemeIcon('info')
+                            : ''
                         if (info || warn || error) {
                             parentElement.tooltip = 'Check the KIELER Compiler output channel for details'
                         }
@@ -684,8 +837,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                     }
                     snapshots[0].contextValue = 'snapshot'
                     return snapshots[0]
-                }))
-            }
+                })
+            )
         }
         return []
     }
@@ -703,48 +856,53 @@ export class CompilationData extends vscode.TreeItem {
         warnings?: string[],
         infos?: string[]
     ) {
-        super(label, collapsibleState);
-        this.tooltip = `${this.label}`;
-        this.description = this.version;
+        super(label, collapsibleState)
+        this.tooltip = `${this.label}`
+        this.description = this.version
         this.name = name
         this.snapshotIndex = snapshotIndex
         this.index = index
         if (errors) {
-            this.errors = errors;
+            this.errors = errors
         }
         if (warnings) {
-            this.warnings = warnings;
+            this.warnings = warnings
         }
         if (infos) {
-            this.infos = infos;
+            this.infos = infos
         }
     }
-    name: string;
-    snapshotIndex: number;
-    index: number;
-    errors?: string[];
-    warnings?: string[];
-    infos?: string[];
+
+    name: string
+
+    snapshotIndex: number
+
+    index: number
+
+    errors?: string[]
+
+    warnings?: string[]
+
+    infos?: string[]
 }
 
 export class CompilationSystem {
-    constructor(
-        label: string,
-        id: string,
-        isPublic: boolean,
-        simulation: boolean,
-        snapshotSystem: boolean
-    ) {
+    constructor(label: string, id: string, isPublic: boolean, simulation: boolean, snapshotSystem: boolean) {
         this.label = label
         this.id = id
         this.isPublic = isPublic
         this.simulation = simulation
         this.snapshotSystem = snapshotSystem
     }
+
     label: string
+
     id: string
+
     isPublic: boolean
+
     simulation: boolean
+
     snapshotSystem: boolean
 }
 
