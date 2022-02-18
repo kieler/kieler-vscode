@@ -14,6 +14,9 @@
     },
     {
       "include": "#constants-and-special-vars"
+    },
+    {
+      "include": "#comment"
     }
   ],
   "repository": {
@@ -57,6 +60,42 @@
         {
           "name": "constant.numeric.float.kviz",
           "match": "(?x)\n\t\t\t\t\t\t(?\u003c!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t\t(?\u003e\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(0|[1-9]([0-9_]*[0-9])?)\t\t\t\t# Leading digits\n\t\t\t\t\t\t\t\t(?\u003d[eEfFdD.])\t\t\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t(?\u003c\u003d[0-9])(?\u003d[eEfFdD])\t\t\t\t\t# Allow for numbers without .\n\t\t\t\t\t\t\t  | \\.\n\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[0-9]([0-9_]*[0-9])?\t\t\t\t\t# Numbers after .\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\t[eE][+-]?(0|[1-9]([0-9_]*[0-9])?)\t\t# Exponent\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t[fFdD]?\t\t\t\t\t\t\t\t\t\t# Float Type Suffix\n\t\t\t\t\t\t)\n\t\t\t\t\t\t(?!\\w)\t\t\t\t\t\t\t\t\t\t\t# Ensure word boundry\n\t\t\t\t\t"
+        }
+      ]
+    },
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.block.kviz",
+          "begin": "(/\\*)(?:\\s*((@)internal)(?\u003d\\s|(\\*/)))?",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.kviz"
+            },
+            "2": {
+              "name": "punctuation.decorator.internaldeclaration.kviz"
+            },
+            "3": {}
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.whitespace.comment.leading.kviz"
+            }
+          }
+        },
+        {
+          "begin": "(^[ \\t]+)?((//)(?:\\s*((@)internal)(?\u003d\\s|$))?)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.kviz"
+            },
+            "2": {
+              "name": "comment.line.double-slash.kviz"
+            }
+          },
+          "end": "(?\u003d^)",
+          "contentName": "comment.line.double-slash.kviz"
         }
       ]
     }

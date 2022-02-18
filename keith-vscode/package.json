@@ -281,16 +281,6 @@
         "category": "Simulation"
       },
       {
-        "command": "keith-vscode.diplay-in-out",
-        "title": "Set display in/out to ...",
-        "category": "Simulation"
-      },
-      {
-        "command": "keith-vscode.input-output-column",
-        "title": "Set display input/output column to ...",
-        "category": "Simulation"
-      },
-      {
         "command": "keith-vscode.simulation-step-delay",
         "title": "Set simulation step delay to ...",
         "category": "Simulation"
