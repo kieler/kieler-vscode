@@ -4,6 +4,7 @@
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "eamodio.tsl-problem-matcher",
-        "kieler.klighd-vscode"
+        "kieler.klighd-vscode",
+        "esbenp.prettier-vscode"
     ]
 }
