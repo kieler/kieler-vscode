@@ -550,12 +550,21 @@
     "vscode:prepublish": "yarn run build"
   },
   "devDependencies": {
-    "@types/vscode": "^1.56.0",
     "@types/node": "^12.11.7",
     "@types/react": "^17.0.27",
+    "@types/vscode": "^1.56.0",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "css-loader": "^5.2.4",
+    "eslint": "^8.4.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
     "mini-css-extract-plugin": "^1.6.0",
+    "prettier": "2.5.1",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
@@ -566,7 +575,7 @@
     "react": "^17.0.2",
     "snabbdom-jsx": "^0.4.2",
     "snabbdom-to-html": "^7.0.0",
-    "vscode-uri": "^3.0.2",
-    "vscode-languageclient": "^5.2.1"
+    "vscode-languageclient": "^5.2.1",
+    "vscode-uri": "^3.0.2"
   }
 }

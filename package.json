@@ -22,13 +22,11 @@
         "prebuild": "yarn clean",
         "build": "lerna run build",
         "watch": "lerna run watch --parallel",
-        "package": "lerna run build && lerna run package --parallel"
+        "package": "lerna run build && lerna run package --parallel",
+        "prettier": "prettier --write keith-vscode/src/"
     },
     "dependencies": {},
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.27.0",
-        "@typescript-eslint/parser": "^4.27.0",
-        "eslint": "^7.28.0",
         "lerna": "^4.0.0",
         "typescript": "^4.3.2"
     }
