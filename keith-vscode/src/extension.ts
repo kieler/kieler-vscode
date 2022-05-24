@@ -34,7 +34,7 @@ const klighdCommands = {
  * The file ending should also be the language id, since it is also used to
  * register document selectors in the language client.
  */
-const supportedFileEndings = ['sctx', 'scl', 'elkt', 'kgt', 'kviz', 'strl', 'lus']
+const supportedFileEndings = ['sctx', 'scl', 'elkt', 'kgt', 'kgx', 'kviz', 'strl', 'lus']
 
 let lsClient: LanguageClient
 let socket: Socket

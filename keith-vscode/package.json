@@ -26,6 +26,7 @@
     "onLanguage:scl",
     "onLanguage:elkt",
     "onLanguage:kgt",
+    "onLanguage:kgx",
     "onLanguage:kviz",
     "onLanguage:strl",
     "onLanguage:lus"
@@ -41,6 +42,17 @@
         ],
         "extensions": [
           "kgt"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "kgx",
+        "aliases": [
+          "KGraph",
+          "kgx"
+        ],
+        "extensions": [
+          "kgx"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -387,31 +399,31 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.compile",
           "group": "navigation@1"
         },
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "keith-vscode.simulate",
           "group": "navigation@2"
         },
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation@300000"
         }
       ],
       "editor/context": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
