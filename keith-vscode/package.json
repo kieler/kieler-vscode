@@ -399,12 +399,12 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
           "command": "keith-vscode.compile",
           "group": "navigation@1"
         },
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
           "command": "keith-vscode.simulate",
           "group": "navigation@2"
         },

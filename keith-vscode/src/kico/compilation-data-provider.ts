@@ -219,6 +219,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(REQUEST_CS.command, async () => {
+                vscode.commands.executeCommand('setContext', 'keith.vscode:compilationReady', false)
                 await this.requestSystemDescriptions()
                 vscode.window.showInformationMessage('Registered compilation system')
             })
@@ -410,6 +411,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     handleReceiveSystemDescriptions(systems: CompilationSystem[], snapshotSystems: CompilationSystem[]): void {
         // Remove status bar element after successfully requesting systems
         this.requestSystems.hide()
+
+        // Compilation and simulation menu items
+        vscode.commands.executeCommand('setContext', 'keith.vscode:compilationReady', true)
+
         // Sort all compilation systems by id
         systems.sort((a, b) => (a.id > b.id ? 1 : -1))
         this.systems = systems
