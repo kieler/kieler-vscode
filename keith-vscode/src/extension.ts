@@ -94,8 +94,8 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
     const lsPath = context.asAbsolutePath(`server/kieler-language-server.${getPlattformType()}.jar`)
 
     return {
-        run: { command: 'java', args: ['-jar', lsPath] },
-        debug: { command: 'java', args: ['-jar', lsPath] },
+        run: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },
+        debug: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },
     }
 }
 
