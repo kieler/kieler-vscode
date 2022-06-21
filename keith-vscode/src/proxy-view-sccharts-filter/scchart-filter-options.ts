@@ -13,8 +13,8 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { RenderOption, TransformationOptionType } from "@kieler/klighd-core/src/options/option-models";
-import { ProxyViewFilterCategory } from "@kieler/klighd-core/src/proxy-view/filters/proxy-view-filter-options";
+import { RenderOption, TransformationOptionType } from "@kieler/klighd-core/lib/options/option-models";
+import { ProxyViewFilterCategory } from "@kieler/klighd-core/lib/proxy-view/filters/proxy-view-filter-options";
 
 /** The category containing SCChart-specific proxy-view filters. */
 export class ProxyViewSCChartFilterCategory implements RenderOption {

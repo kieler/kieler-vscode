@@ -18,11 +18,11 @@
 
 //////// Registering filters ////////
 
-import { DISymbol } from "@kieler/klighd-core/src/di.symbols";
-import { RenderOptionsRegistry } from "@kieler/klighd-core/src/options/render-options-registry";
-import { ProxyFilterArgs } from "@kieler/klighd-core/src/proxy-view/filters/proxy-view-filters";
-import { SendProxyViewAction } from "@kieler/klighd-core/src/proxy-view/proxy-view-actions";
-import { SynthesesRegistry } from "@kieler/klighd-core/src/syntheses/syntheses-registry";
+import { DISymbol } from "@kieler/klighd-core/lib/di.symbols";
+import { RenderOptionsRegistry } from "@kieler/klighd-core/lib/options/render-options-registry";
+import { ProxyFilterArgs } from "@kieler/klighd-core/lib/proxy-view/filters/proxy-view-filters";
+import { SendProxyViewAction } from "@kieler/klighd-core/lib/proxy-view/proxy-view-actions";
+import { SynthesesRegistry } from "@kieler/klighd-core/lib/syntheses/syntheses-registry";
 import { inject, injectable, postConstruct } from "inversify";
 import { ActionHandlerRegistry, IActionHandler, IActionHandlerInitializer, ICommand } from "sprotty";
 import { Action } from "sprotty-protocol";

@@ -40,6 +40,16 @@ const config = {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"],
             },
+            {
+                test: /\.(ttf)$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: '',
+                    publicPath: '..',
+                    postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+                }
+            }
         ],
     },
 };
