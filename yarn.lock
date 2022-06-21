@@ -1539,7 +1539,7 @@ braces@^3.0.1:
 browser-split@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/browser-split/-/browser-split-0.0.1.tgz#7b097574f8e3ead606fb4664e64adfdda2981a93"
-  integrity sha1-ewl1dPjj6tYG+0Zk5krf3aKYGpM=
+  integrity sha512-JhvgRb2ihQhsljNda3BI8/UcRHVzrVwo3Q+P8vDtSiyobXuFpuZ9mq+MbRGMnC22CjW3RrfXdg6j6ITX8M+7Ow==
 
 browserslist@^4.14.5:
   version "4.17.3"
@@ -3792,12 +3792,12 @@ lodash._reinterpolate@^3.0.0:
 lodash.escape@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/lodash.escape/-/lodash.escape-4.0.1.tgz#c9044690c21e04294beaa517712fded1fa88de98"
-  integrity sha1-yQRGkMIeBClL6qUXcS/e0fqI3pg=
+  integrity sha512-nXEOnb/jK9g0DYMr1/Xvq6l5xMD7GDG55+GSYIYmS0G4tBk/hURD4JR9WCavs04t33WmJx9kCyp9vJ+mr4BOUw==
 
 lodash.forown@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.forown/-/lodash.forown-4.4.0.tgz#85115cf04f73ef966eced52511d3893cc46683af"
-  integrity sha1-hRFc8E9z75ZuztUlEdOJPMRmg68=
+  integrity sha512-xcpca6BCshoe5SFSrQOoV8FBEbNzcBa6QQYmtv48eEFNzdwQLkHkcWSaBlecHhyHb1BUk1xqFdXoiSLJkt/w5w==
 
 lodash.ismatch@^4.4.0:
   version "4.4.0"
@@ -3807,7 +3807,7 @@ lodash.ismatch@^4.4.0:
 lodash.kebabcase@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lodash.kebabcase/-/lodash.kebabcase-4.1.1.tgz#8489b1cb0d29ff88195cceca448ff6d6cc295c36"
-  integrity sha1-hImxyw0p/4gZXM7KRI/21swpXDY=
+  integrity sha512-N8XRTIMMqqDgSy4VLKPnJ/+hpGZN+PHQiJnSenYqPaVV/NCqEogTnAdZLQiGKhxX+JCs8waWq2t1XHWKOmlY8g==
 
 lodash.merge@^4.6.2:
   version "4.6.2"
@@ -3817,7 +3817,7 @@ lodash.merge@^4.6.2:
 lodash.remove@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.remove/-/lodash.remove-4.7.0.tgz#f31d31e7c39a0690d5074ec0d3627162334ee626"
-  integrity sha1-8x0x58OaBpDVB07A02JxYjNO5iY=
+  integrity sha512-GnwkSsEXGXirSxh3YI+jc/qvptE2DV8ZjA4liK0NT1MJ3mNDMFhX3bY+4Wr8onlNItYuPp7/4u19Fi55mvzkTw==
 
 lodash.template@^4.5.0:
   version "4.5.0"
@@ -3837,7 +3837,7 @@ lodash.templatesettings@^4.0.0:
 lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
-  integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
+  integrity sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==
 
 lodash@^4.17.15, lodash@^4.17.19, lodash@^4.7.0:
   version "4.17.21"
@@ -4704,7 +4704,7 @@ parse-path@^4.0.0:
 parse-sel@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/parse-sel/-/parse-sel-1.0.0.tgz#b9300d2bb946a06c22c98e208e47b2088690cbdd"
-  integrity sha1-uTANK7lGoGwiyY4gjkeyCIaQy90=
+  integrity sha512-GLAtaUf/vkdsPQwFKKBR1LHsw4Sm5YVDSbzcPQqmq3N/qlI8gsxUMhSV8NRHj677eeJUV1YpI8OeALaUL5yxUQ==
   dependencies:
     browser-split "0.0.1"
 
@@ -5423,17 +5423,10 @@ smart-buffer@^4.1.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.1.0.tgz#91605c25d91652f4661ea69ccf45f1b331ca21ba"
   integrity sha512-iVICrxOzCynf/SNaBQCw34eM9jROU/s5rzIhpOvzhzuYHfJR/DhZfDkXiZSgKXfgv26HT3Yni3AV/DGw0cGnnw==
 
-snabbdom-jsx@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/snabbdom-jsx/-/snabbdom-jsx-0.4.2.tgz#e580682d60b4cc1da9898c6a0bacfcd062a0cffc"
-  integrity sha512-6akqPyuossD3niO3RCgaqAIrQ6ylBI+shzUKukIwqkNOybCmgst81khJ48BHYtEamQ7ltlFaEKjvKi3N0NPNVw==
-  dependencies:
-    snabbdom "^0.7.0"
-
 snabbdom-to-html@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/snabbdom-to-html/-/snabbdom-to-html-7.0.0.tgz#9c4913c6b583cfedffc440b900454274b2c76cdf"
-  integrity sha512-TNydGmPhYscvAuVZN/og9tg0iKLFobn+c7O2D0V8BjKqRrSaLZFaRWkbzq+V7PYOPURwVKorOuZ2QXwoal/HqA==
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/snabbdom-to-html/-/snabbdom-to-html-7.1.0.tgz#b81f0c6de1957819c41da247bb038d6eaa5b13e3"
+  integrity sha512-R/Rc/5duxWvV4w/B3JI/lt1jXb96pIVV9Xxwqvne259cNuDRXYppuBMtoUGdda0JGhMjNmvc1z+G9ch/PQx+kg==
   dependencies:
     lodash.escape "^4.0.1"
     lodash.forown "^4.4.0"
@@ -5442,11 +5435,6 @@ snabbdom-to-html@^7.0.0:
     lodash.uniq "^4.5.0"
     object-assign "^4.1.0"
     parse-sel "^1.0.0"
-
-snabbdom@^0.7.0:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-0.7.4.tgz#817f07e8d3fb870960c3763b8da56f1ba982d31a"
-  integrity sha512-nnN+7uZ2NTIiu7EPMNwSDhmrYXqwlfCP/j72RdzvDPujXyvQxOW7Jl9yuLayzxMHDNWQR7FM6Pcn4wnDpKRe6Q==
 
 socks-proxy-agent@^5.0.0:
   version "5.0.0"
@@ -6177,11 +6165,6 @@ vscode-languageserver-types@3.14.0:
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.14.0.tgz#d3b5952246d30e5241592b6dde8280e03942e743"
   integrity sha512-lTmS6AlAlMHOvPQemVwo3CezxBp0sNB95KNPkqp3Nxd5VFEnuG1ByM0zlRWos0zjO3ZWtkvhal0COgiV1xIA4A==
-
-vscode-uri@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.0.2.tgz#ecfd1d066cb8ef4c3a208decdbab9a8c23d055d0"
-  integrity sha512-jkjy6pjU1fxUvI51P+gCsxg1u2n8LSt0W6KrCNQceaziKzff74GoWmjVG46KieVzybO1sttPQmYfrwSHey7GUA==
 
 watchpack@^2.2.0:
   version "2.2.0"

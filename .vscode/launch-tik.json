@@ -8,7 +8,6 @@
             "name": "Launch VS Code Extension",
             "type": "extensionHost",
             "request": "launch",
-            "_comment": "Fix args and preLaunchTask",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
 				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"

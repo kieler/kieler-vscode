@@ -582,12 +582,16 @@
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
   },
+  "_comment": "Don't use local path for @kieler/klighd-core dependency",
   "dependencies": {
+    "@kieler/klighd-core": "file:../../klighd-vscode/packages/klighd-core",
+    "@kieler/klighd-interactive": "file:../../klighd-vscode/packages/klighd-interactive",
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
-    "snabbdom-jsx": "^0.4.2",
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
-    "vscode-uri": "^3.0.2"
+    "vscode-uri": "^3.0.2",
+    "inversify": "^5.0.1",
+    "sprotty": "0.11.1"
   }
 }
