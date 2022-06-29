@@ -11,7 +11,6 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import { registerModules } from '@kieler/klighd-core/lib/di.config'
 import * as vscode from 'vscode'
 import { LanguageClient, ServerOptions, LanguageClientOptions, StreamInfo } from 'vscode-languageclient'
 import { connect, NetConnectOpts, Socket } from 'net'
@@ -21,7 +20,6 @@ import { CompilationDataProvider } from './kico/compilation-data-provider'
 import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
 import { SettingsService } from './settings'
 import { Settings, settingsKey } from './constants'
-import { sCChartFilterModule } from './proxy-view-sccharts-filter/scchart-filter-module'
 // import 'simulation/index.css'
 
 /** Command identifiers that are provided by klighd-vscode. */
@@ -129,8 +127,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     )
     // Intercept PerformActionActions from klighd diagrams.
     vscode.commands.executeCommand(klighdCommands.addActionHandler, refId, performActionKind, handlePerformAction)
-
-    registerModules(sCChartFilterModule) // FIXME:
 
     // create SettingsService with list of setting-keys to manage
     settingsService = new SettingsService<Settings>(settingsKey, [
