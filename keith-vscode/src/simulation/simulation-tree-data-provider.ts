@@ -694,7 +694,10 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
         // Request the LS to save the current trace into the file picked by the user.
         const lsClient = await this.lsClient
-        const message = (await lsClient.sendRequest('keith/simulation/saveTrace', uri.path)) as SavedTraceMessage
+        const message = (await lsClient.sendRequest(
+            'keith/simulation/saveTrace',
+            encodeURI(uri.path)
+        )) as SavedTraceMessage
         if (!message.successful) {
             const errorMessage = `could not save trace: ${message.reason}`
             this.output.appendLine(`[ERROR]\t${errorMessage}`)
@@ -718,7 +721,10 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
         // Send the trace file uri to the server to convert it into a Trace model and to load it.
         const lClient = await this.lsClient
-        const message = (await lClient.sendRequest('keith/simulation/loadTrace', uris[0].path)) as LoadedTraceMessage
+        const message = (await lClient.sendRequest(
+            'keith/simulation/loadTrace',
+            encodeURI(uris[0].path)
+        )) as LoadedTraceMessage
 
         if (!message.successful) {
             const errorMessage = `could not load trace: ${message.reason}`
