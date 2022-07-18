@@ -115,7 +115,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     public readonly showedNewSnapshotEmitter = new vscode.EventEmitter<string | undefined>()
 
-    public readonly newSimulationCommandsEmitter = new vscode.EventEmitter<CompilationSystem[]>()
+    public readonly newSimulationCommandsEmitter = new vscode.EventEmitter<CompilationSystemsMessage>()
 
     public readonly compilationStarted: vscode.Event<this | undefined> = this.compilationStartedEmitter.event
 
@@ -127,7 +127,8 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     public readonly showedNewSnapshot: vscode.Event<string | undefined> = this.showedNewSnapshotEmitter.event
 
-    public readonly newSimulationCommands: vscode.Event<CompilationSystem[]> = this.newSimulationCommandsEmitter.event
+    public readonly newSimulationCommands: vscode.Event<CompilationSystemsMessage> =
+        this.newSimulationCommandsEmitter.event
 
     constructor(
         private lsClient: LanguageClient,
@@ -173,6 +174,13 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(
             vscode.window.onDidChangeActiveTextEditor(async (editor) => {
                 this.onDidChangeActiveTextEditor(editor)
+            })
+        )
+
+        // Bind event executed after a new snapshot is shown.
+        this.context.subscriptions.push(
+            this.showedNewSnapshot(() => {
+                this.requestSystemDescriptions()
             })
         )
 
@@ -426,14 +434,16 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.requestedSystems = false
 
         const simulationSystems = systems.filter((system) => system.simulation)
+        const simulationSnapshotSystems = snapshotSystems.filter((system) => system.simulation)
         // Register additional simulation commands
-        this.newSimulationCommandsEmitter.fire(simulationSystems)
+        this.newSimulationCommandsEmitter.fire(
+            new CompilationSystemsMessage(simulationSystems, simulationSnapshotSystems)
+        )
     }
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
         if (editor && editor.document.uri.scheme === 'file') {
             this.lsClient.onReady().then(() => {
-                console.log()
                 this.editor = editor
                 this.requestSystemDescriptions()
             })
@@ -909,6 +919,17 @@ export class CompilationSystem {
     simulation: boolean
 
     snapshotSystem: boolean
+}
+
+export class CompilationSystemsMessage {
+    constructor(systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) {
+        this.systems = systems
+        this.snapshotSystems = snapshotSystems
+    }
+
+    systems: CompilationSystem[]
+
+    snapshotSystems: CompilationSystem[]
 }
 
 /**
