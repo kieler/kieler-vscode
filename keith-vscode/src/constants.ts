@@ -13,6 +13,10 @@ export const views = {
         id: 'kieler-simulation-tree',
         name: 'KIELER Simulation Tree',
     },
+    checker: {
+        id: 'kieler-model-checker',
+        name: 'KIELER Model Checker',
+    }
 }
 
 /**

@@ -294,6 +294,12 @@
         "command": "keith-vscode.show-internal-variables",
         "title": "Set display internal variables to ...",
         "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.verification-load-properties",
+        "title": "Reload Properties",
+        "category": "Verification",
+        "icon": "$(debug-step-over)"
       }
     ],
     "menus": {
@@ -383,6 +389,9 @@
         {
           "command": "keith-vscode.open-kviz-external",
           "when": "keith.vscode:simulationRunning"
+        },
+        {
+          "command": "keith-vscode.verification-load-properties"
         }
       ],
       "editor/title": [
@@ -451,6 +460,11 @@
           "command": "keith-vscode.simulation-load-trace",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
           "group": "2_simulation-trace@2"
+        },
+        {
+          "command": "keith-vscode.verification-load-properties",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@1"
         }
       ]
     },
@@ -474,6 +488,11 @@
           "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
+        },
+        {
+          "type": "webview",
+          "id": "kieler-model-checker",
+          "name": "KIELER Model Checker"
         }
       ]
     },

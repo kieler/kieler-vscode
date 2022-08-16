@@ -20,6 +20,7 @@ import { CompilationDataProvider } from './kico/compilation-data-provider'
 import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
 import { SettingsService } from './settings'
 import { Settings, settingsKey } from './constants'
+import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
 // import 'simulation/index.css'
 
 /** Command identifiers that are provided by klighd-vscode. */
@@ -159,6 +160,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.createTreeView('kieler-simulation-tree', {
         treeDataProvider: simulationTreeDataProvider,
     })
+
+    // Register and start model checker view
+    const modelCheckerDataProvider: vscode.WebviewViewProvider = new ModelCheckerDataProvider(
+        lsClient,
+        compilationDataProvider,
+        context
+    )
+    vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
 
     console.debug('Starting Language Server...')
     lsClient.start()

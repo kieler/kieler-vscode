@@ -8,11 +8,13 @@
             "name": "Launch VS Code Extension",
             "type": "extensionHost",
             "request": "launch",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}/keith-vscode"],
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
+				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
+            ],
             "sourceMaps": true,
             "smartStep": true,
             "outFiles": ["${workspaceFolder}/keith-vscode/dist/**/*.js"],
-            "preLaunchTask": "${defaultBuildTask}"
         },
         {
             "name": "Launch VS Code Extension (Socket)",
