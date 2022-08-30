@@ -16,7 +16,31 @@ import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { TableWebview } from '../table/table-webview';
-import { REALOD_PROPERTIES_VERIFICATION } from './commands';
+import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION } from './commands';
+
+// eslint-disable-next-line no-shadow
+enum VerificationPropertyStatus {
+    PENDING,
+    RUNNING,
+    PASSED,
+    FAILED,
+    EXCEPTION
+}
+
+function statusToString(status: VerificationPropertyStatus) {
+    switch(status) {
+        case VerificationPropertyStatus.PENDING:
+            return "Pending"
+        case VerificationPropertyStatus.RUNNING:
+            return "Running"
+        case VerificationPropertyStatus.PASSED:
+            return "Passed"
+        case VerificationPropertyStatus.FAILED:
+            return "Failed"
+        default:
+            return "Exception"
+    }
+}
 
 
 export class SmallVerificationProperty {
@@ -36,8 +60,10 @@ export class SmallVerificationProperty {
     }
 }
 
-export const webviewRdyMessageType = 'keith/verification/ready';
+export const webviewLoadPropsMessageType = 'keith/verification/loadProperties';
+export const runCheckerMessageType = 'keith/verification/runChecker';
 export const propertiesMessageType = 'keith/verification/properties';
+export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus'
 
 export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
@@ -57,16 +83,32 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
                 this.handlePropertiesMessage(props);
             });
         });
+        lsClient.onReady().then(() => {
+            lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus) => {
+                this.handleUpdatePropertyStatus(id, status)
+            });
+        });
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(REALOD_PROPERTIES_VERIFICATION.command, async () => {
-                this.lsClient.sendNotification(webviewRdyMessageType, this.kico.lastCompiledUri);
+                this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri);
+            })
+        )
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(RUN_CHECKER_VERIFICATION.command, async () => {
+                this.lsClient.sendNotification(runCheckerMessageType, this.kico.lastCompiledUri);
             })
         )
     }
 
-    handlePropertiesMessage(props: SmallVerificationProperty[]) {
+    private handlePropertiesMessage(props: SmallVerificationProperty[]) {
+        this.webview.reset();
         props.forEach(prop => this.webview.addRow([prop.name, prop.formula], prop.id));
+    }
+
+    private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
+        this.webview.updateCell(id, "Result", statusToString(status))
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {

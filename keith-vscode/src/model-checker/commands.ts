@@ -16,3 +16,8 @@ export const REALOD_PROPERTIES_VERIFICATION: vscode.Command = {
     command: 'keith-vscode.verification-load-properties',
     title: 'Reload Properties',
 }
+
+export const RUN_CHECKER_VERIFICATION: vscode.Command = {
+    command: 'keith-vscode.verification-run-checker',
+    title: 'Start Verification',
+}

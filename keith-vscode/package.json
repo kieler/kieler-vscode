@@ -299,7 +299,13 @@
         "command": "keith-vscode.verification-load-properties",
         "title": "Reload Properties",
         "category": "Verification",
-        "icon": "$(debug-step-over)"
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "keith-vscode.verification-run-checker",
+        "title": "Start Verification",
+        "category": "Verification",
+        "icon": "$(debug-start)"
       }
     ],
     "menus": {
@@ -392,6 +398,9 @@
         },
         {
           "command": "keith-vscode.verification-load-properties"
+        },
+        {
+          "command": "keith-vscode.verification-run-checker"
         }
       ],
       "editor/title": [
@@ -465,6 +474,11 @@
           "command": "keith-vscode.verification-load-properties",
           "when": "view == kieler-model-checker",
           "group": "navigation@1"
+        },
+        {
+          "command": "keith-vscode.verification-run-checker",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@2"
         }
       ]
     },

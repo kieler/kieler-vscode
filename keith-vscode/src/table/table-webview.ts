@@ -1,3 +1,10 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-promise-executor-return */
+/* eslint-disable no-console */
+/* eslint-disable no-return-assign */
+/* eslint-disable prefer-template */
+/* eslint-disable prettier/prettier */
 /*
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
@@ -27,6 +34,10 @@ export class TableWebview {
 
     protected disposables: vscode.Disposable[] = [];
 
+    protected title: string;
+
+    protected headers: string[];
+
     constructor(identifier: string) {
         this.identifier = identifier;
     }
@@ -36,6 +47,8 @@ export class TableWebview {
     }
 
     async initializeWebview(webview: vscode.Webview, title: string, headers: string[]) {
+        this.title = title;
+        this.headers = headers;
         webview.html = `
             <!DOCTYPE html>
             <html lang="en">
@@ -44,7 +57,7 @@ export class TableWebview {
                     <meta name="viewport" content="width=device-width, height=device-height">
                     <title>${title}</title>
                     <style>
-                        table, th, td {border: 1px solid white; border-collapse: collapse; padding: 5px;}
+                        table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
                     </style>
                 </head>
                 <body>
@@ -61,13 +74,29 @@ export class TableWebview {
 
     addRow(values: string[], id: string) {
         const endTableIndex = this.webview.html.indexOf("</table>");
-        let row = "<tr>";
+        let row = "<tr id=" + id + ">";
         values.forEach(value => {
-            const cell = "<td id =" + id + ">" + value + "</td>";
+            const cell = "<td>" + value + "</td>";
             row += cell;
         });
-        row += "</tr>"
+        for (let i = values.length; i < this.headers.length; i++) {
+            row += "<td></td>";
+        }
+        row += "</tr>";
         this.webview.html = this.webview.html.substring(0, endTableIndex) + row + this.webview.html.substring(endTableIndex, this.webview.html.length);
+    }
+
+    updateCell(rowId: string, columnId: string, value: string) {
+        const col = this.headers.findIndex(c => c === columnId);
+        const row = this.webview.html.indexOf("id=" + rowId);
+        const splits = this.webview.html.substring(row).split(/(?<=<td>)/);
+        const sp = splits[col+1]
+        splits[col + 1] = value + sp.substring(sp.indexOf("</td>"));
+        this.webview.html = this.webview.html.substring(0, row).concat(...splits);
+    }
+
+    reset() {
+        this.initializeWebview(this.webview, this.title, this.headers);
     }
 
 }
