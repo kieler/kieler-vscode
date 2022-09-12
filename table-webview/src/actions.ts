@@ -92,3 +92,24 @@ export namespace ResetTableAction {
         return action.kind === ResetTableAction.KIND;
     }
 }
+
+export interface SelectedRowAction extends Action {
+    kind: typeof SelectedRowAction.KIND;
+    rowId: string;
+}
+
+
+export namespace SelectedRowAction {
+    export const KIND = "selectRow";
+
+    export function create(rowId: string): SelectedRowAction {
+        return {
+            kind: KIND,
+            rowId: rowId
+        };
+    }
+
+    export function isThisAction(action: Action): action is SelectedRowAction {
+        return action.kind === SelectedRowAction.KIND;
+    }
+}

@@ -9,3 +9,11 @@
     border-collapse: collapse; 
     padding: 5px;
 }
+
+.vscode-light .focused {
+    background-color: #e4e6f1;
+}
+
+.vscode-dark .focused {
+    background-color: #37373d;
+}

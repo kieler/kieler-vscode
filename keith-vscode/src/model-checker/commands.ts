@@ -21,3 +21,8 @@ export const RUN_CHECKER_VERIFICATION: vscode.Command = {
     command: 'keith-vscode.verification-run-checker',
     title: 'Start Verification',
 }
+
+export const RUN_COUNTEREXAMPLE_VERIFICATION: vscode.Command = {
+    command: 'keith-vscode.verification-run-counterexample',
+    title: 'Start Counterexample',
+}

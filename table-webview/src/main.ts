@@ -18,6 +18,7 @@
 import '../css/index.css';
 import { AddRowAction, ResetTableAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
+import { click } from './mouseListener';
 
 interface vscode {
     postMessage(message: any): void;
@@ -74,12 +75,12 @@ export class Starter {
             const table = createTable(identifier, headers);
             patch(tablePlaceholder, table);
         }
-        /* document.addEventListener('click', event => {
+        document.addEventListener('click', event => {
             const action = click(event);
             if (action) {
                 vscode.postMessage({ action: action });
             }
-        }); */
+        });
     }
 
     protected handleAddRow(action: AddRowAction) {

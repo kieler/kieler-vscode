@@ -18,7 +18,7 @@ import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { TableWebview } from '../table/table-webview';
 
-import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION } from './commands';
+import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION, RUN_COUNTEREXAMPLE_VERIFICATION } from './commands';
 
 // eslint-disable-next-line no-shadow
 enum VerificationPropertyStatus {
@@ -64,6 +64,7 @@ export class SmallVerificationProperty {
 
 export const webviewLoadPropsMessageType = 'keith/verification/loadProperties';
 export const runCheckerMessageType = 'keith/verification/runChecker';
+export const runCounterexampleMessageType = 'keith/verification/runCounterExample';
 export const propertiesMessageType = 'keith/verification/properties';
 export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus';
 
@@ -99,9 +100,17 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_CHECKER_VERIFICATION.command, async () => {
+                
                 this.lsClient.sendNotification(runCheckerMessageType, this.kico.lastCompiledUri);
             })
         );
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand(RUN_COUNTEREXAMPLE_VERIFICATION.command, async () => {
+                this.lsClient.sendNotification(runCounterexampleMessageType, [this.kico.lastCompiledUri, this.webview.getSelectedRow()]);
+            })
+        );
+        
     }
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {

@@ -306,6 +306,12 @@
         "title": "Start Verification",
         "category": "Verification",
         "icon": "$(debug-start)"
+      },
+      {
+        "command": "keith-vscode.verification-run-counterexample",
+        "title": "Start Counterexample",
+        "category": "Verification",
+        "icon": "$(debug-alt)"
       }
     ],
     "menus": {
@@ -401,6 +407,9 @@
         },
         {
           "command": "keith-vscode.verification-run-checker"
+        },
+        {
+          "command": "keith-vscode.verification-run-counterexample"
         }
       ],
       "editor/title": [
@@ -479,6 +488,11 @@
           "command": "keith-vscode.verification-run-checker",
           "when": "view == kieler-model-checker",
           "group": "navigation@2"
+        },
+        {
+          "command": "keith-vscode.verification-run-counterexample",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@3"
         }
       ]
     },

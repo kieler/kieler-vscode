@@ -23,7 +23,7 @@
  */
 
 import * as vscode from 'vscode';
-import { AddRowAction, ResetTableAction, UpdateCellAction } from './actions';
+import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
 
 export class TableWebview {
 
@@ -47,6 +47,8 @@ export class TableWebview {
 
     private readonly webviewReady = new Promise<void>((resolve) => this.resolveWebviewReady = resolve);
 
+    protected selectedRow: string;
+
 
     constructor(identifier: string, localResourceRoots: vscode.Uri[], scriptUri: vscode.Uri) {
         this.identifier = identifier;
@@ -60,6 +62,10 @@ export class TableWebview {
 
     createTitle(): string {
         return this.identifier;
+    }
+
+    getSelectedRow() {
+        return this.selectedRow
     }
 
     async initializeWebview(webview: vscode.Webview, title: string, headers: string[]) {
@@ -130,6 +136,10 @@ export class TableWebview {
         if (message.readyMessage) {
             this.resolveWebviewReady();
             this.sendTableIdentifier();
+        }else if (message.action) {
+            if (SelectedRowAction.isThisAction(message.action)) {
+                this.selectedRow = message.action.rowId
+            }
         }
     }
 
