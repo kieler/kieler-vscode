@@ -23,6 +23,7 @@
  */
 
 import * as vscode from 'vscode';
+import { AddRowAction, ResetTableAction, UpdateCellAction } from './actions';
 
 export class TableWebview {
 
@@ -85,32 +86,23 @@ export class TableWebview {
         this.webview = webview;
     }
 
-/*     addRow(values: string[], id: string) {
-        const endTableIndex = this.webview.html.indexOf("</table>");
-        let row = "<tr id=" + id + ">";
-        values.forEach(value => {
-            const cell = "<td>" + value + "</td>";
-            row += cell;
-        });
-        for (let i = values.length; i < this.headers.length; i++) {
-            row += "<td></td>";
-        }
-        row += "</tr>";
-        this.webview.html = this.webview.html.substring(0, endTableIndex) + row + this.webview.html.substring(endTableIndex, this.webview.html.length);
+    async addRow(values: string[], rowId: string) {
+        await this.ready();
+        const action = { kind: AddRowAction.KIND, rowId,  values} as AddRowAction;
+        this.sendToWebview({ action });
     }
 
-    updateCell(rowId: string, columnId: string, value: string) {
-        const col = this.headers.findIndex(c => c === columnId);
-        const row = this.webview.html.indexOf("id=" + rowId);
-        const splits = this.webview.html.substring(row).split(/(?<=<td>)/);
-        const sp = splits[col+1]
-        splits[col + 1] = value + sp.substring(sp.indexOf("</td>"));
-        this.webview.html = this.webview.html.substring(0, row).concat(...splits);
+    async updateCell(rowId: string, columnId: string, value: string) {
+        await this.ready();
+        const action = { kind: UpdateCellAction.KIND, rowId,  columnId, value} as UpdateCellAction;
+        this.sendToWebview({ action });
     }
 
-    reset() {
-        this.initializeWebview(this.webview, this.title, this.headers);
-    } */
+    async reset() {
+        await this.ready();
+        const action = { kind: ResetTableAction.KIND } as ResetTableAction;
+        this.sendToWebview({ action });
+    }
 
 
     /**

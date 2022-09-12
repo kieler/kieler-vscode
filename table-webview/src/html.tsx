@@ -29,10 +29,23 @@ export const patch = init([
 ]);
 
 export function createTable(id: string, headers: string[]): VNode {
-    const children: VNode[] = []
+    const children: VNode[] = [];
     for (const head of headers) {
-        children.push(<th>{head}</th>)
+        children.push(<th>{head}</th>);
     }
-    const table = <table id="${this.identifier}_table"><tr id="headers">{children}</tr></table>
-    return table
+    const table = <table attrs={{ id: id + "_table" }} ><tr attrs={{ id: "headers" }}>{children}</tr></table>;
+    return table;
+}
+
+export function createRow(id: string, values: string[]): VNode {
+    const children: VNode[] = [];
+    for (const val of values) {
+        children.push(<td>{val}</td>);
+    }
+    const row = <tr attrs={{ id: id }}>{children}</tr>;
+    return row;
+}
+
+export function createCell(value: string) {
+    return <td>{value}</td>
 }
