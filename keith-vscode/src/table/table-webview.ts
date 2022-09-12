@@ -26,29 +26,44 @@ import * as vscode from 'vscode';
 
 export class TableWebview {
 
-    static viewCount = 0;
-
-    readonly identifier: string;
-
-    webview: vscode.Webview;
-
     protected disposables: vscode.Disposable[] = [];
 
     protected title: string;
 
     protected headers: string[];
+    
+    static viewCount = 0;
 
-    constructor(identifier: string) {
+    readonly identifier: string;
+
+    readonly localResourceRoots: vscode.Uri[];
+
+    readonly scriptUri: vscode.Uri;
+
+    webview: vscode.Webview;
+
+    private resolveWebviewReady: () => void;
+
+    private readonly webviewReady = new Promise<void>((resolve) => this.resolveWebviewReady = resolve);
+
+
+    constructor(identifier: string, localResourceRoots: vscode.Uri[], scriptUri: vscode.Uri) {
         this.identifier = identifier;
+        this.localResourceRoots = localResourceRoots;
+        this.scriptUri = scriptUri;
     }
 
-    createTitle() {
+    ready(): Promise<void> {
+        return this.webviewReady;
+    }
+
+    createTitle(): string {
         return this.identifier;
     }
 
     async initializeWebview(webview: vscode.Webview, title: string, headers: string[]) {
-        this.title = title;
-        this.headers = headers;
+        this.headers = headers
+        // TODO: headers should be able by sending the webview a msg
         webview.html = `
             <!DOCTYPE html>
             <html lang="en">
@@ -56,23 +71,21 @@ export class TableWebview {
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, height=device-height">
                     <title>${title}</title>
-                    <style>
-                        table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
-                    </style>
+                    <link
+                        rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+                        integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+                        crossorigin="anonymous">
                 </head>
                 <body>
                     <div id="${this.identifier}_container" style="height: 100%;"></div>
-                    <table id="${this.identifier}_table">
-                        <tr>`;
-        headers.forEach(head => webview.html += '<th>' + head + '</th>');
-        webview.html += `</tr>
-                    </table>
+                    <script> const vscode = acquireVsCodeApi();</script>
+                    <script src="${webview.asWebviewUri(this.scriptUri).toString()}"></script>
                 </body>
             </html>`;
         this.webview = webview;
     }
 
-    addRow(values: string[], id: string) {
+/*     addRow(values: string[], id: string) {
         const endTableIndex = this.webview.html.indexOf("</table>");
         let row = "<tr id=" + id + ">";
         values.forEach(value => {
@@ -97,6 +110,39 @@ export class TableWebview {
 
     reset() {
         this.initializeWebview(this.webview, this.title, this.headers);
+    } */
+
+
+    /**
+     * Registers listeners.
+     */
+    async connect() {
+        this.disposables.push(this.webview.onDidReceiveMessage(message => this.receiveFromWebview(message)));
+        await this.ready();
+    }
+
+    /**
+     * Sends identifier to the webview.
+     */
+    protected async sendTableIdentifier() {
+        await this.ready();
+        this.sendToWebview({ identifier: this.identifier, headers: this.headers });
+    }
+
+    /**
+     * Handles messages from the webview.
+     * @param message The message received from the webview.
+     */
+    protected async receiveFromWebview(message: any) {
+        console.log("Received from template webview");
+        if (message.readyMessage) {
+            this.resolveWebviewReady();
+            this.sendTableIdentifier();
+        }
+    }
+
+    sendToWebview(message: any) {
+        this.webview.postMessage(message);
     }
 
 }

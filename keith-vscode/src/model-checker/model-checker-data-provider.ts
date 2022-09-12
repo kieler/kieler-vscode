@@ -12,10 +12,12 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { TableWebview } from '../table/table-webview';
+
 import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION } from './commands';
 
 // eslint-disable-next-line no-shadow
@@ -28,17 +30,17 @@ enum VerificationPropertyStatus {
 }
 
 function statusToString(status: VerificationPropertyStatus) {
-    switch(status) {
+    switch (status) {
         case VerificationPropertyStatus.PENDING:
-            return "Pending"
+            return "Pending";
         case VerificationPropertyStatus.RUNNING:
-            return "Running"
+            return "Running";
         case VerificationPropertyStatus.PASSED:
-            return "Passed"
+            return "Passed";
         case VerificationPropertyStatus.FAILED:
-            return "Failed"
+            return "Failed";
         default:
-            return "Exception"
+            return "Exception";
     }
 }
 
@@ -63,7 +65,7 @@ export class SmallVerificationProperty {
 export const webviewLoadPropsMessageType = 'keith/verification/loadProperties';
 export const runCheckerMessageType = 'keith/verification/runChecker';
 export const propertiesMessageType = 'keith/verification/properties';
-export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus'
+export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus';
 
 export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
@@ -76,7 +78,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         kico: CompilationDataProvider,
         readonly context: vscode.ExtensionContext
     ) {
-        this.kico = kico
+        this.kico = kico;
         // Bind to LSP messages
         lsClient.onReady().then(() => {
             lsClient.onNotification(propertiesMessageType, (props: SmallVerificationProperty[]) => {
@@ -85,7 +87,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         });
         lsClient.onReady().then(() => {
             lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus) => {
-                this.handleUpdatePropertyStatus(id, status)
+                this.handleUpdatePropertyStatus(id, status);
             });
         });
 
@@ -93,27 +95,31 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
             vscode.commands.registerCommand(REALOD_PROPERTIES_VERIFICATION.command, async () => {
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri);
             })
-        )
+        );
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_CHECKER_VERIFICATION.command, async () => {
                 this.lsClient.sendNotification(runCheckerMessageType, this.kico.lastCompiledUri);
             })
-        )
+        );
     }
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {
-        this.webview.reset();
-        props.forEach(prop => this.webview.addRow([prop.name, prop.formula], prop.id));
+        //this.webview.reset();
+        //props.forEach(prop => this.webview.addRow([prop.name, prop.formula], prop.id));
     }
 
     private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
-        this.webview.updateCell(id, "Result", statusToString(status))
+        //this.webview.updateCell(id, "Result", statusToString(status));
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
         const tWebview = new TableWebview(
             "Model Checker Table",
+            [
+                this.getExtensionFileUri('dist')
+            ],
+            this.getExtensionFileUri('dist', 'table-webview.js'),
         );
         tWebview.webview = webviewView.webview;
         tWebview.webview.options = {
@@ -122,7 +128,13 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         const title = tWebview.createTitle();
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Formula', 'Result']);
+        tWebview.connect();
         this.webview = tWebview;
+    }
+
+    getExtensionFileUri(...segments: string[]): vscode.Uri {
+        return vscode.Uri
+            .file(path.join(this.context.extensionPath, ...segments));
     }
 
 }
