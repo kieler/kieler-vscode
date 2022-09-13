@@ -1,4 +1,4 @@
-# KEITH for Visual Studio Code
+# KIELER for Visual Studio Code
 
 > This extension brings the KIELER project to VS Code!
 

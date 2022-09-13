@@ -1,7 +1,6 @@
 # KEITH
 
-This monorepo is the home of the KEITH project. It mainly consists of a Visual Studio Code extension and a
-custom built [Theia IDE](https://theia-ide.org).
+This monorepo is the home of the KIELER VS Code project. It mainly consists of a Visual Studio Code extension.
 
 ## Packages
 

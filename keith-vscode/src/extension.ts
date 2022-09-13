@@ -35,7 +35,7 @@ const klighdCommands = {
  * The file ending should also be the language id, since it is also used to
  * register document selectors in the language client.
  */
-const supportedFileEndings = ['sctx', 'scl', 'elkt', 'kgt', 'kviz', 'strl', 'lus']
+const supportedFileEndings = ['sctx', 'scl', 'elkt', 'kgt', 'kgx', 'kviz', 'strl', 'lus']
 
 let lsClient: LanguageClient
 let socket: Socket
@@ -95,8 +95,8 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
     const lsPath = context.asAbsolutePath(`server/kieler-language-server.${getPlattformType()}.jar`)
 
     return {
-        run: { command: 'java', args: ['-jar', lsPath] },
-        debug: { command: 'java', args: ['-jar', lsPath] },
+        run: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },
+        debug: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },
     }
 }
 
