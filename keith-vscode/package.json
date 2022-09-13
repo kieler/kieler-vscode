@@ -294,24 +294,6 @@
         "command": "keith-vscode.show-internal-variables",
         "title": "Set display internal variables to ...",
         "category": "Simulation"
-      },
-      {
-        "command": "keith-vscode.verification-load-properties",
-        "title": "Reload Properties",
-        "category": "Verification",
-        "icon": "$(repo-sync)"
-      },
-      {
-        "command": "keith-vscode.verification-run-checker",
-        "title": "Start Verification",
-        "category": "Verification",
-        "icon": "$(debug-start)"
-      },
-      {
-        "command": "keith-vscode.verification-run-counterexample",
-        "title": "Start Counterexample",
-        "category": "Verification",
-        "icon": "$(debug-alt)"
       }
     ],
     "menus": {
@@ -401,15 +383,6 @@
         {
           "command": "keith-vscode.open-kviz-external",
           "when": "keith.vscode:simulationRunning"
-        },
-        {
-          "command": "keith-vscode.verification-load-properties"
-        },
-        {
-          "command": "keith-vscode.verification-run-checker"
-        },
-        {
-          "command": "keith-vscode.verification-run-counterexample"
         }
       ],
       "editor/title": [
@@ -478,21 +451,6 @@
           "command": "keith-vscode.simulation-load-trace",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
           "group": "2_simulation-trace@2"
-        },
-        {
-          "command": "keith-vscode.verification-load-properties",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@1"
-        },
-        {
-          "command": "keith-vscode.verification-run-checker",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@2"
-        },
-        {
-          "command": "keith-vscode.verification-run-counterexample",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@3"
         }
       ]
     },

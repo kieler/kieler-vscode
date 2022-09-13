@@ -161,14 +161,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         treeDataProvider: simulationTreeDataProvider,
     })
 
-    // Register and start model checker view
-    const modelCheckerDataProvider: vscode.WebviewViewProvider = new ModelCheckerDataProvider(
-        lsClient,
-        compilationDataProvider,
-        context
-    )
-    vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
-
     console.debug('Starting Language Server...')
     lsClient.start()
 
