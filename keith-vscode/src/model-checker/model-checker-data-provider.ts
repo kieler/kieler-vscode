@@ -138,6 +138,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Formula', 'Result']);
         tWebview.connect();
+        tWebview.addRowListener();
         this.webview = tWebview;
     }
 

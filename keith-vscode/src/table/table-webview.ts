@@ -23,7 +23,7 @@
  */
 
 import * as vscode from 'vscode';
-import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
+import { AddRowAction, AddRowListenerAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
 
 export class TableWebview {
 
@@ -110,6 +110,11 @@ export class TableWebview {
         this.sendToWebview({ action });
     }
 
+    async addRowListener() {
+        await this.ready();
+        const action = { kind: AddRowListenerAction.KIND } as AddRowListenerAction;
+        this.sendToWebview({ action });
+    }
 
     /**
      * Registers listeners.

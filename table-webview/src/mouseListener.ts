@@ -19,7 +19,7 @@ import { SelectedRowAction } from "./actions";
 
 let lastSelected: HTMLElement;
 
-export function click(event: MouseEvent) {
+export function rowSelection(event: MouseEvent) {
     const node = event.target;
     const owner = (node as HTMLElement).parentElement;
     if (owner) {

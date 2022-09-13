@@ -16,9 +16,9 @@
  */
 
 import '../css/index.css';
-import { AddRowAction, ResetTableAction, UpdateCellAction } from './actions';
+import { AddRowAction, AddRowListenerAction, ResetTableAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
-import { click } from './mouseListener';
+import { rowSelection } from './mouseListener';
 
 interface vscode {
     postMessage(message: any): void;
@@ -55,10 +55,21 @@ export class Starter {
                 this.handleUpdateCell(action as UpdateCellAction);
             } else if (ResetTableAction.isThisAction(action)) {
                 this.handleResetTable();
+            } else if (AddRowListenerAction.isThisAction(action)) {
+                this.addRowListener()
             }
         } else {
             console.log("Message not supported: " + message);
         }
+    }
+
+    protected addRowListener() {
+        document.addEventListener('click', event => {
+            const action = rowSelection(event);
+            if (action) {
+                vscode.postMessage({ action: action });
+            }
+        });
     }
 
     /**
@@ -75,12 +86,6 @@ export class Starter {
             const table = createTable(identifier, headers);
             patch(tablePlaceholder, table);
         }
-        document.addEventListener('click', event => {
-            const action = click(event);
-            if (action) {
-                vscode.postMessage({ action: action });
-            }
-        });
     }
 
     protected handleAddRow(action: AddRowAction) {
