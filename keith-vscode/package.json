@@ -489,11 +489,6 @@
           "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
-        },
-        {
-          "type": "webview",
-          "id": "kieler-model-checker",
-          "name": "KIELER Model Checker"
         }
       ]
     },

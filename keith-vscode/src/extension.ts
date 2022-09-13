@@ -20,7 +20,6 @@ import { CompilationDataProvider } from './kico/compilation-data-provider'
 import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
 import { SettingsService } from './settings'
 import { Settings, settingsKey } from './constants'
-import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
 // import 'simulation/index.css'
 
 /** Command identifiers that are provided by klighd-vscode. */
