@@ -34,7 +34,7 @@ the extension locally if VS Code is not able to install the dependency automatic
 ## Developing the VS Code extension
 
 We recommend VS Code to develop the VS Code extension to make use of the provided launch tasks. The
-following steps have are required to start developing.
+following steps are required to start developing.
 
 1. Fulfill the requirements above.
 1. Install all
