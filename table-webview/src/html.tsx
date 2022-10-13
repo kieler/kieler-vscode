@@ -15,9 +15,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { attributesModule, classModule, eventListenersModule, init, propsModule, styleModule, VNode, h, jsx } from 'snabbdom';
+import { attributesModule, classModule, eventListenersModule, init, jsx, propsModule, styleModule, VNode } from 'snabbdom';
 
-
+/** Needed to update the html document */
 export const patch = init([
     // Init patch function with chosen modules
     propsModule, // for setting properties on DOM elements
@@ -28,6 +28,12 @@ export const patch = init([
     classModule // makes it easy to toggle classes
 ]);
 
+/**
+ * Creates a header with the given parameters.
+ * @param id Id of the table.
+ * @param headers Header Values of the table.
+ * @returns the created table as VNode.
+ */
 export function createTable(id: string, headers: string[]): VNode {
     const children: VNode[] = [];
     for (const head of headers) {
@@ -37,6 +43,12 @@ export function createTable(id: string, headers: string[]): VNode {
     return table;
 }
 
+/**
+ * Creates a row of a table as VNode.
+ * @param id Id of the row.
+ * @param values The values of the row in the correct ordering.
+ * @returns a row of a table as VNode.
+ */
 export function createRow(id: string, values: string[]): VNode {
     const children: VNode[] = [];
     for (const val of values) {
@@ -46,6 +58,11 @@ export function createRow(id: string, values: string[]): VNode {
     return row;
 }
 
-export function createCell(value: string) {
+/**
+ * Creates a cell of a table as VNode.
+ * @param value The value of the cell.
+ * @returns a cell of a table as VNode.
+ */
+export function createCell(value: string): VNode {
     return <td>{value}</td>
 }

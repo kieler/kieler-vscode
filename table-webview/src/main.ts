@@ -25,7 +25,7 @@ interface vscode {
 }
 declare const vscode: vscode;
 
-export class Starter {
+class Table {
 
     protected identifier: string;
     protected headers: string[];
@@ -44,7 +44,7 @@ export class Starter {
      * Handles incoming messages from the extension.
      * @param message The received Message.
      */
-    protected handleMessages(message: any) {
+    protected handleMessages(message: any): void {
         if (message.data.identifier) {
             this.initHtml(message.data.identifier, message.data.headers);
         } else if (message.data.action) {
@@ -63,7 +63,10 @@ export class Starter {
         }
     }
 
-    protected addRowListener() {
+    /** 
+     * Adds a mouse listener that sends the client the selected row.
+     */
+    protected addRowListener(): void {
         document.addEventListener('click', event => {
             const action = rowSelection(event);
             if (action) {
@@ -73,7 +76,7 @@ export class Starter {
     }
 
     /**
-     * Initializes the webview with a header and a placeholder for the templates.
+     * Initializes the webview with a header and a placeholder for the table.
      * @param identifier The identifier of the element that should contain the webview.
      */
     protected initHtml(identifier: string, headers: string[]): void {
@@ -88,7 +91,11 @@ export class Starter {
         }
     }
 
-    protected handleAddRow(action: AddRowAction) {
+    /**
+     * Adds a row to the table at the bottom.
+     * @param action AddRowAction that determines the values and Id of the new row.
+     */
+    protected handleAddRow(action: AddRowAction): void {
         const table = document.getElementById(this.identifier + '_table');
         if (table) {
             const rowPlaceholder = document.createElement("tr");
@@ -98,24 +105,34 @@ export class Starter {
         }
     }
 
-    protected handleUpdateCell(action: UpdateCellAction) {
+    /**
+     * Updates a cell in the table.
+     * @param action Action that contains the Id and new value of the cell.
+     */
+    protected handleUpdateCell(action: UpdateCellAction): void {
         const row = document.getElementById(action.rowId);
-        const index = this.headers.indexOf(action.columnId);
+        const column = this.headers.indexOf(action.columnId);
         const newCell = createCell(action.value);
-        if (index < row.children.length) {
-            patch(row.children[index], newCell);
+        if (column < row.children.length) {
+            // cell exists already
+            patch(row.children[column], newCell);
         } else {
-            for (let i = row.children.length; i < index; i++) {
+            // row might be so short that we need to add empty cells in order to add the new value to the desired cell
+            for (let i = row.children.length; i < column; i++) {
                 const cell = document.createElement("td");
                 row.appendChild(cell);
             }
+            // add new cell
             const cellPlaceholder = document.createElement("td");
             row.appendChild(cellPlaceholder);
             patch(cellPlaceholder, newCell);
         }
     }
 
-    protected handleResetTable() {
+    /**
+     * Resets the table to the headers.
+     */
+    protected handleResetTable(): void {
         const table = document.getElementById(this.identifier + '_table');
         if (table) {
             const newTable = createTable(this.identifier, this.headers);
@@ -125,4 +142,4 @@ export class Starter {
 
 }
 
-new Starter();
+new Table();

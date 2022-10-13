@@ -13,4 +13,4 @@ yarn-error.log
 **/gen-webpack.config.js
 .DS_Store
 
-table-webview/out/
+out

@@ -9,8 +9,7 @@
             "type": "extensionHost",
             "request": "launch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
-				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
+                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode"
             ],
             "sourceMaps": true,
             "smartStep": true,

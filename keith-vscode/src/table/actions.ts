@@ -19,6 +19,7 @@ interface Action {
     kind: string;
 }
 
+/** Adds a row to the table. */
 export interface AddRowAction extends Action {
     kind: typeof AddRowAction.KIND;
     rowId: string;
@@ -45,6 +46,7 @@ export namespace AddRowAction {
     }
 }
 
+/** Updates a cell of the table. A new cell is added if necessary */
 export interface UpdateCellAction extends Action {
     kind: typeof UpdateCellAction.KIND;
     rowId: string;
@@ -74,6 +76,7 @@ export namespace UpdateCellAction {
     }
 }
 
+/** Resets the table to the headers. */
 export interface ResetTableAction extends Action {
     kind: typeof ResetTableAction.KIND;
 }
@@ -93,6 +96,7 @@ export namespace ResetTableAction {
     }
 }
 
+/** Sends the Id of the selected row to the client */
 export interface SelectedRowAction extends Action {
     kind: typeof SelectedRowAction.KIND;
     rowId: string;
@@ -114,6 +118,7 @@ export namespace SelectedRowAction {
     }
 }
 
+/** Adds the mouselistener for selecting a row in the table */
 export interface AddRowListenerAction extends Action {
     kind: typeof AddRowListenerAction.KIND;
 }
