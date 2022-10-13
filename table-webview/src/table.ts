@@ -25,7 +25,7 @@ interface vscode {
 }
 declare const vscode: vscode;
 
-class Table {
+export class Table {
 
     protected identifier: string;
     protected headers: string[];
@@ -141,5 +141,3 @@ class Table {
     }
 
 }
-
-new Table();
