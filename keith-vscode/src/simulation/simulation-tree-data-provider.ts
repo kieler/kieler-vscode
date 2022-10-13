@@ -715,10 +715,13 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             // The user did not pick any file to load.
             return
         }
+        this.loadTraceFromUri(uris[0])
+    }
 
+    async loadTraceFromUri(uri: vscode.Uri): Promise<void> {
         // Send the trace file uri to the server to convert it into a Trace model and to load it.
         const lClient = await this.lsClient
-        const message = (await lClient.sendRequest('keith/simulation/loadTrace', uris[0].path)) as LoadedTraceMessage
+        const message = (await lClient.sendRequest('keith/simulation/loadTrace', uri.path)) as LoadedTraceMessage
 
         if (!message.successful) {
             const errorMessage = `could not load trace: ${message.reason}`

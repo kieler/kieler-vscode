@@ -16,6 +16,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
+import { COMPILE_AND_SIMULATE } from '../simulation/commands';
+import { SimulationTreeDataProvider } from '../simulation/simulation-tree-data-provider';
 import { TableWebview } from '../table/table-webview';
 
 import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION, RUN_COUNTEREXAMPLE_VERIFICATION } from './commands';
@@ -54,17 +56,19 @@ export class SmallVerificationProperty {
 
     status: number;
 
-    constructor(id: string, name: string, formula: string, status: number) {
+    counterExampleUri: string
+
+    constructor(id: string, name: string, formula: string, status: number, coutnerExample: string) {
         this.id = id;
         this.name = name;
         this.formula = formula;
         this.status = status;
+        this.counterExampleUri = coutnerExample;
     }
 }
 
 export const webviewLoadPropsMessageType = 'keith/verification/loadProperties';
 export const runCheckerMessageType = 'keith/verification/runChecker';
-export const runCounterexampleMessageType = 'keith/verification/runCounterExample';
 export const propertiesMessageType = 'keith/verification/properties';
 export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus';
 
@@ -74,40 +78,57 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
     protected kico: CompilationDataProvider;
 
+    protected props: SmallVerificationProperty[];
+
     constructor(
         private lsClient: LanguageClient,
         kico: CompilationDataProvider,
-        readonly context: vscode.ExtensionContext
+        readonly context: vscode.ExtensionContext,
+        simulation: SimulationTreeDataProvider
     ) {
         this.kico = kico;
         // Bind to LSP messages
         lsClient.onReady().then(() => {
             lsClient.onNotification(propertiesMessageType, (props: SmallVerificationProperty[]) => {
+                this.props = props;
                 this.handlePropertiesMessage(props);
             });
         });
         lsClient.onReady().then(() => {
-            lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus) => {
+            lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus, counterExampleUri: string) => {
                 this.handleUpdatePropertyStatus(id, status);
+                const p = this.props.find(prop => prop.id === id)
+                if (p && counterExampleUri !== '') {
+                    p.counterExampleUri = counterExampleUri
+                }
             });
         });
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(REALOD_PROPERTIES_VERIFICATION.command, async () => {
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri);
+                this.webview.addRowListener();
             })
         );
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_CHECKER_VERIFICATION.command, async () => {
-                
                 this.lsClient.sendNotification(runCheckerMessageType, this.kico.lastCompiledUri);
             })
         );
 
+        // TODO: check if a row is selected, otherwise show a notification to the user
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_COUNTEREXAMPLE_VERIFICATION.command, async () => {
-                this.lsClient.sendNotification(runCounterexampleMessageType, [this.kico.lastCompiledUri, this.webview.getSelectedRow()]);
+                vscode.commands.executeCommand(COMPILE_AND_SIMULATE.command);
+                const p = this.props.find(prop => prop.id === this.webview.getSelectedRow())
+                kico.compilationFinished((success) => {
+                    if (typeof success !== 'undefined' && success && p) {
+                        const uri = vscode.Uri.parse(p.counterExampleUri)
+                        simulation.loadTraceFromUri(uri)
+                    }
+                })
+                // this.lsClient.sendNotification(runCounterexampleMessageType, [this.kico.lastCompiledUri, this.webview.getSelectedRow()]);
             })
         );
         
@@ -138,7 +159,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Formula', 'Result']);
         tWebview.connect();
-        tWebview.addRowListener();
+        // tWebview.addRowListener();
         this.webview = tWebview;
     }
 
