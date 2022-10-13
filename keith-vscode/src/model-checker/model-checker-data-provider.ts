@@ -56,14 +56,14 @@ export class SmallVerificationProperty {
 
     status: number;
 
-    counterExampleUri: string
+    counterexampleUri: string
 
     constructor(id: string, name: string, formula: string, status: number, coutnerExample: string) {
         this.id = id;
         this.name = name;
         this.formula = formula;
         this.status = status;
-        this.counterExampleUri = coutnerExample;
+        this.counterexampleUri = coutnerExample;
     }
 }
 
@@ -95,11 +95,11 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
             });
         });
         lsClient.onReady().then(() => {
-            lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus, counterExampleUri: string) => {
+            lsClient.onNotification(updatePropertyStatusMessageTupe, (id: string, status: VerificationPropertyStatus, counterexampleUri: string) => {
                 this.handleUpdatePropertyStatus(id, status);
                 const p = this.props.find(prop => prop.id === id)
-                if (p && counterExampleUri !== '') {
-                    p.counterExampleUri = counterExampleUri
+                if (p && counterexampleUri !== '') {
+                    p.counterexampleUri = counterexampleUri
                 }
             });
         });
@@ -124,7 +124,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
                 const p = this.props.find(prop => prop.id === this.webview.getSelectedRow())
                 kico.compilationFinished((success) => {
                     if (typeof success !== 'undefined' && success && p) {
-                        const uri = vscode.Uri.parse(p.counterExampleUri)
+                        const uri = vscode.Uri.parse(p.counterexampleUri)
                         simulation.loadTraceFromUri(uri)
                     }
                 })
