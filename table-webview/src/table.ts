@@ -15,7 +15,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import '../css/index.css';
 import { AddRowAction, AddRowListenerAction, ResetTableAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
 import { rowSelection } from './mouseListener';
@@ -56,7 +55,7 @@ export class Table {
             } else if (ResetTableAction.isThisAction(action)) {
                 this.handleResetTable();
             } else if (AddRowListenerAction.isThisAction(action)) {
-                this.addRowListener()
+                this.addRowListener();
             }
         } else {
             console.log("Message not supported: " + message);
@@ -113,19 +112,21 @@ export class Table {
         const row = document.getElementById(action.rowId);
         const column = this.headers.indexOf(action.columnId);
         const newCell = createCell(action.value);
-        if (column < row.children.length) {
-            // cell exists already
-            patch(row.children[column], newCell);
-        } else {
-            // row might be so short that we need to add empty cells in order to add the new value to the desired cell
-            for (let i = row.children.length; i < column; i++) {
-                const cell = document.createElement("td");
-                row.appendChild(cell);
+        if (row) {
+            if (column < row.children.length) {
+                // cell exists already
+                patch(row.children[column], newCell);
+            } else {
+                // row might be so short that we need to add empty cells in order to add the new value to the desired cell
+                for (let i = row.children.length; i < column; i++) {
+                    const cell = document.createElement("td");
+                    row.appendChild(cell);
+                }
+                // add new cell
+                const cellPlaceholder = document.createElement("td");
+                row.appendChild(cellPlaceholder);
+                patch(cellPlaceholder, newCell);
             }
-            // add new cell
-            const cellPlaceholder = document.createElement("td");
-            row.appendChild(cellPlaceholder);
-            patch(cellPlaceholder, newCell);
         }
     }
 

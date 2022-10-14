@@ -1,0 +1,41 @@
+{
+  "name": "table-webview",
+  "version": "0.0.1",
+  "description": "Table as Webview",
+  "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
+  "license": "EPL-2.0",
+  "keywords": [
+    "vscode"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kieler",
+    "directory": "tableWebview"
+},
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "css-loader": "^6.5.1",
+    "file-loader": "^6.2.0",
+    "rimraf": "latest",
+    "source-map-loader": "^3.0.0",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "3.8.3",
+    "webpack": "^5.64.2",
+    "webpack-cli": "^4.9.1",
+    "snabbdom": "^3.5.1"
+  },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "lint": "eslint .",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "publish:next": "yarn publish --new-version \"$(semver $npm_package_version -i minor)-next.$(git rev-parse --short HEAD)\" --tag next --no-git-tag-version"
+  }
+}
