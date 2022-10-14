@@ -89,9 +89,9 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         this.kico = kico;
         // Bind to LSP messages
         lsClient.onReady().then(() => {
-            lsClient.onNotification(propertiesMessageType, (props: SmallVerificationProperty[]) => {
-                this.props = props;
-                this.handlePropertiesMessage(props);
+            lsClient.onNotification(propertiesMessageType, (propertyMsg) => {
+                this.props = propertyMsg.properties;
+                this.handlePropertiesMessage(this.props);
             });
         });
         lsClient.onReady().then(() => {
