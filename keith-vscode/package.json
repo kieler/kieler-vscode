@@ -416,15 +416,6 @@
         {
           "command": "keith-vscode.open-kviz-external",
           "when": "keith.vscode:simulationRunning"
-        },
-        {
-          "command": "keith-vscode.verification-load-properties"
-        },
-        {
-          "command": "keith-vscode.verification-run-checker"
-        },
-        {
-          "command": "keith-vscode.verification-run-counterexample"
         }
       ],
       "editor/title": [
@@ -493,21 +484,6 @@
           "command": "keith-vscode.simulation-load-trace",
           "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
           "group": "2_simulation-trace@2"
-        },
-        {
-          "command": "keith-vscode.verification-load-properties",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@1"
-        },
-        {
-          "command": "keith-vscode.verification-run-checker",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@2"
-        },
-        {
-          "command": "keith-vscode.verification-run-counterexample",
-          "when": "view == kieler-model-checker",
-          "group": "navigation@3"
         }
       ]
     },
@@ -531,11 +507,6 @@
           "type": "tree",
           "id": "kieler-simulation-tree",
           "name": "KIELER Simulation Tree"
-        },
-        {
-          "type": "webview",
-          "id": "kieler-model-checker",
-          "name": "KIELER Model Checker"
         }
       ]
     },
