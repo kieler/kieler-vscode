@@ -67,10 +67,10 @@ export class SmallVerificationProperty {
     }
 }
 
-export const webviewLoadPropsMessageType = 'keith/verification/loadProperties';
-export const runCheckerMessageType = 'keith/verification/runChecker';
+export const webviewLoadPropsMessageType = 'keith/verification/load-properties';
+export const runCheckerMessageType = 'keith/verification/run-checker';
 export const propertiesMessageType = 'keith/verification/properties';
-export const updatePropertyStatusMessageTupe = 'keith/verification/updatePropertyStatus';
+export const updatePropertyStatusMessageTupe = 'keith/verification/update-property-status';
 
 export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
