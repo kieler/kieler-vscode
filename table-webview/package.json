@@ -1,5 +1,5 @@
 {
-  "name": "table-webview",
+  "name": "@kieler/table-webview",
   "version": "0.0.1",
   "description": "Table as Webview",
   "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/kieler",
+    "url": "https://github.com/kieler/vscode",
     "directory": "tableWebview"
 },
   "files": [

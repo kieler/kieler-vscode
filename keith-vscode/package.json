@@ -561,9 +561,8 @@
     "lint": "eslint .",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
-    "package": "vsce package --yarn -o keith-vscode.vsix && yarn run copy-webview",
-    "vscode:prepublish": "yarn run build",
-    "copy-webview": "xcopy /y ..\\table-webview\\out\\* dist"
+    "package": "vsce package --yarn -o keith-vscode.vsix",
+    "vscode:prepublish": "yarn run build"
   },
   "devDependencies": {
     "@types/node": "^12.11.7",
