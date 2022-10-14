@@ -15,10 +15,10 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
+import { TableWebview } from 'table-webview/lib/table-webview';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { COMPILE_AND_SIMULATE } from '../simulation/commands';
 import { SimulationTreeDataProvider } from '../simulation/simulation-tree-data-provider';
-import { TableWebview } from '../table/table-webview';
 
 import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION, RUN_COUNTEREXAMPLE_VERIFICATION } from './commands';
 

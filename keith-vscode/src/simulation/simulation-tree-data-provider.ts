@@ -14,7 +14,11 @@
 import * as vscode from 'vscode'
 import * as path from 'path'
 import { LanguageClient } from 'vscode-languageclient'
-import { CompilationDataProvider, CompilationSystem } from '../kico/compilation-data-provider'
+import {
+    CompilationDataProvider,
+    CompilationSystem,
+    CompilationSystemsMessage,
+} from '../kico/compilation-data-provider'
 import {
     ADD_CO_SIMULATION,
     COMPILE_AND_SIMULATE,
@@ -448,15 +452,14 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      * Registers send systems as simulation systems in the command palette
      * @param systems systems that are assumed to be simulation systems
      */
-    registerSimulationCommands(systems: CompilationSystem[]): void {
+    registerSimulationCommands(systemsMessage: CompilationSystemsMessage): void {
         this.systems = []
         this.snapshotSystems = []
-        systems.forEach((system) => {
-            if (system.snapshotSystem) {
-                this.snapshotSystems.push(system)
-            } else {
-                this.systems.push(system)
-            }
+        systemsMessage.systems.forEach((system) => {
+            this.systems.push(system)
+        })
+        systemsMessage.snapshotSystems.forEach((system) => {
+            this.snapshotSystems.push(system)
         })
         this.simulationStatus.hide()
     }

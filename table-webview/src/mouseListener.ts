@@ -19,6 +19,11 @@ import { SelectedRowAction } from "./actions";
 
 let lastSelected: HTMLElement;
 
+/**
+ * Determines the Id of the row that is clicked on.
+ * @param event The mousevent.
+ * @returns Id of the selected row or undefined if none is selected.
+ */
 export function rowSelection(event: MouseEvent) {
     const node = event.target;
     const owner = (node as HTMLElement).parentElement;

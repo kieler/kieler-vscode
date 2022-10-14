@@ -15,7 +15,8 @@
     },
     "workspaces": [
         "keith-vscode",
-        "table-webview"
+        "table-webview",
+        "table"
     ],
     "scripts": {
         "clean": "lerna run clean --parallel",
