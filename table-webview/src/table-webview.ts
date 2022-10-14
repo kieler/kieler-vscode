@@ -48,7 +48,6 @@ export class TableWebview {
         this.identifier = identifier;
         this.localResourceRoots = localResourceRoots;
         this.scriptUri = scriptUri;
-        this.connect();
     }
 
     ready(): Promise<void> {
@@ -106,6 +105,7 @@ export class TableWebview {
                 </body>
             </html>`;
         this.webview = webview;
+        this.connect();
     }
 
     /**
@@ -152,7 +152,7 @@ export class TableWebview {
     /**
      * Registers listener for webview notifications.
      */
-    async connect() {
+    protected async connect() {
         this.disposables.push(this.webview.onDidReceiveMessage((message) => this.receiveFromWebview(message)))
         await this.ready();
     }
