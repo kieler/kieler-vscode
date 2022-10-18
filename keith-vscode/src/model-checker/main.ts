@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import '../css/index.css';
-import { Table } from '@kieler/table-webview/lib/table';
+import './css/index.css'
+import { Table } from '@kieler/table-webview/lib/table'
 
 new Table();
