@@ -12,7 +12,7 @@
  */
 import * as vscode from 'vscode'
 
-export const REALOD_PROPERTIES_VERIFICATION: vscode.Command = {
+export const RELOAD_PROPERTIES_VERIFICATION: vscode.Command = {
     command: 'keith-vscode.verification-load-properties',
     title: 'Reload Properties',
 }

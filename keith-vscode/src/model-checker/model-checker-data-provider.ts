@@ -12,15 +12,15 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
+import { TableWebview } from '@kieler/table-webview/lib/table-webview';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { TableWebview } from '@kieler/table-webview/lib/table-webview';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { COMPILE_AND_SIMULATE } from '../simulation/commands';
-import { SimulationTreeDataProvider } from '../simulation/simulation-tree-data-provider';
 
-import { REALOD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION, RUN_COUNTEREXAMPLE_VERIFICATION } from './commands';
+import { SimulationTableDataProvider } from '../simulation/simulation-table-data-provider';
+import { RELOAD_PROPERTIES_VERIFICATION, RUN_CHECKER_VERIFICATION, RUN_COUNTEREXAMPLE_VERIFICATION } from './commands';
 
 // eslint-disable-next-line no-shadow
 enum VerificationPropertyStatus {
@@ -84,7 +84,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         private lsClient: LanguageClient,
         kico: CompilationDataProvider,
         readonly context: vscode.ExtensionContext,
-        simulation: SimulationTreeDataProvider
+        simulation: SimulationTableDataProvider
     ) {
         this.kico = kico;
         // Bind to LSP messages
@@ -105,7 +105,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         });
 
         this.context.subscriptions.push(
-            vscode.commands.registerCommand(REALOD_PROPERTIES_VERIFICATION.command, async () => {
+            vscode.commands.registerCommand(RELOAD_PROPERTIES_VERIFICATION.command, async () => {
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri);
                 this.webview.addRowListener();
             })
@@ -136,7 +136,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {
         this.webview.reset();
-        props.forEach(prop => this.webview.addRow([prop.name, prop.formula], prop.id));
+        props.forEach(prop => this.webview.addRow(prop.id, prop.name, prop.formula));
     }
 
     private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
@@ -149,7 +149,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
             [
                 this.getExtensionFileUri('dist')
             ],
-            this.getExtensionFileUri('dist', 'table-webview.js'),
+            this.getExtensionFileUri('dist', 'verification-webview.js'),
         );
         tWebview.webview = webviewView.webview;
         tWebview.webview.options = {

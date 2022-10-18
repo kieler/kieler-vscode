@@ -461,37 +461,37 @@
       "view/title": [
         {
           "command": "keith-vscode.simulation-step",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "navigation@1"
         },
         {
           "command": "keith-vscode.simulation-stop",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "navigation@3"
         },
         {
           "command": "keith-vscode.simulation-run",
-          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-table",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.simulation-pause",
-          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-table",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.open-kviz-external",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "1_simulation-visualization"
         },
         {
           "command": "keith-vscode.simulation-save-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "2_simulation-trace@1"
         },
         {
           "command": "keith-vscode.simulation-load-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "2_simulation-trace@2"
         },
         {
@@ -528,14 +528,14 @@
           "name": "KIELER Compiler"
         },
         {
-          "type": "tree",
-          "id": "kieler-simulation-tree",
-          "name": "KIELER Simulation Tree"
-        },
-        {
           "type": "webview",
           "id": "kieler-model-checker",
           "name": "KIELER Model Checker"
+        },
+        {
+          "type": "webview",
+          "id": "kieler-simulation-table",
+          "name": "KIELER Simulation"
         }
       ]
     },

@@ -17,7 +17,7 @@
 
 import { AddRowAction, AddRowListenerAction, ResetTableAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
-import { rowSelection } from './mouseListener';
+import { rowSelection } from './mouse-listener';
 
 interface vscode {
     postMessage(message: any): void;
@@ -31,7 +31,6 @@ export class Table {
 
     constructor() {
         vscode.postMessage({ readyMessage: 'Template Webview ready' });
-        console.log('Waiting for diagram identifier...');
         // add listener for messages
         const eventListener = (message: any) => {
             this.handleMessages(message);
@@ -49,16 +48,19 @@ export class Table {
         } else if (message.data.action) {
             const action = message.data.action;
             if (AddRowAction.isThisAction(action)) {
+                console.log("Handle add row")
                 this.handleAddRow(action as AddRowAction);
             } else if (UpdateCellAction.isThisAction(action)) {
+                console.log("Handle updatecell")
                 this.handleUpdateCell(action as UpdateCellAction);
             } else if (ResetTableAction.isThisAction(action)) {
                 this.handleResetTable();
+                console.log("Handle reset")
             } else if (AddRowListenerAction.isThisAction(action)) {
                 this.addRowListener();
             }
         } else {
-            console.log("Message not supported: " + message);
+            console.log("Message not supported: ", message);
         }
     }
 
@@ -95,6 +97,7 @@ export class Table {
      * @param action AddRowAction that determines the values and Id of the new row.
      */
     protected handleAddRow(action: AddRowAction): void {
+        console.log("Addrow", action)
         const table = document.getElementById(this.identifier + '_table');
         if (table) {
             const rowPlaceholder = document.createElement("tr");

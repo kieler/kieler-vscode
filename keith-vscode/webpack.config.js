@@ -1,5 +1,7 @@
 //@ts-check
 
+"use strict";
+
 const webpack = require("webpack");
 
 const path = require("path");
@@ -45,15 +47,17 @@ const config = {
 };
 
 /**@type {import('webpack').Configuration}*/
-const webviewConfig = {
+const verificationWebview = {
     target: 'web',
+    mode: "none", // Leave source code as close as possible. Only set to production during distribution.
+
 
     entry: path.resolve(__dirname, 'src/model-checker/main.ts'),
     output: {
-		filename: 'table-webview.js',
+		filename: 'verification-webview.js',
         path: path.resolve(__dirname, "dist"),
     },
-    devtool: 'eval-source-map',
+    devtool: "nosources-source-map",
 
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
@@ -88,4 +92,50 @@ const webviewConfig = {
     }
 };
 
-module.exports = [config, webviewConfig];
+/**@type {import('webpack').Configuration}*/
+const simulationWebview = {
+    target: 'web',
+    mode: "none", // Leave source code as close as possible. Only set to production during distribution.
+
+
+    entry: path.resolve(__dirname, 'src/simulation/main.ts'),
+    output: {
+		filename: 'simulation-webview.js',
+        path: path.resolve(__dirname, "dist"),
+    },
+    devtool: 'nosources-source-map',
+
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js']
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: ['ts-loader']
+            },
+            {
+                test: /\.js$/,
+                use: ['source-map-loader'],
+                enforce: 'pre'
+            },
+            {
+                test: /\.css$/,
+                exclude: /\.useable\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(ttf)$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: '',
+                    publicPath: '..',
+                    postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+                }
+            },
+        ]
+    }
+};
+
+module.exports = [config, verificationWebview, simulationWebview];

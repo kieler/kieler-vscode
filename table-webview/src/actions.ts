@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /*
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
@@ -35,7 +36,7 @@ export namespace AddRowAction {
         values: string[]
     ): AddRowAction {
         return {
-            kind: KIND,
+            kind: AddRowAction.KIND,
             rowId,
             values
         };
@@ -64,7 +65,7 @@ export namespace UpdateCellAction {
         value: string
     ): UpdateCellAction {
         return {
-            kind: KIND,
+            kind: UpdateCellAction.KIND,
             rowId,
             columnId,
             value
@@ -87,7 +88,7 @@ export namespace ResetTableAction {
 
     export function create(): ResetTableAction {
         return {
-            kind: KIND
+            kind: ResetTableAction.KIND
         };
     }
 

@@ -11,16 +11,17 @@
  * This code is provided under the terms of the Eclipse Public License (EPL).
  */
 
-import * as vscode from 'vscode'
-import { LanguageClient, ServerOptions, LanguageClientOptions, StreamInfo } from 'vscode-languageclient'
 import { connect, NetConnectOpts, Socket } from 'net'
-import { KeithErrorHandler } from './error-handler'
-import { performActionKind, handlePerformAction } from './perform-action-handler'
-import { CompilationDataProvider } from './kico/compilation-data-provider'
-import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
-import { SettingsService } from './settings'
+import * as vscode from 'vscode'
+import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from 'vscode-languageclient'
 import { Settings, settingsKey } from './constants'
-import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider';
+import { KeithErrorHandler } from './error-handler'
+import { CompilationDataProvider } from './kico/compilation-data-provider'
+import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
+import { handlePerformAction, performActionKind } from './perform-action-handler'
+import { SettingsService } from './settings'
+import { SimulationTableDataProvider } from './simulation/simulation-table-data-provider'
+import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
 // import 'simulation/index.css'
 
 /** Command identifiers that are provided by klighd-vscode. */
@@ -149,24 +150,33 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         treeDataProvider: compilationDataProvider,
     })
 
-    const simulationTreeDataProvider = new SimulationTreeDataProvider(
+    // const simulationTreeDataProvider = new SimulationTreeDataProvider(
+    //     lsClient,
+    //     compilationDataProvider,
+    //     context,
+    //     settingsService
+    // )
+    // // Register and start simulation tree view
+    // vscode.window.registerTreeDataProvider('kieler-simulation-tree', simulationTreeDataProvider)
+    // vscode.window.createTreeView('kieler-simulation-tree', {
+    //     treeDataProvider: simulationTreeDataProvider,
+    // })
+
+    // Register and start simulation table view
+    const simulationDataProvider: SimulationTableDataProvider = new SimulationTableDataProvider(
         lsClient,
         compilationDataProvider,
         context,
         settingsService
     )
-    // Register and start simulation tree view
-    vscode.window.registerTreeDataProvider('kieler-simulation-tree', simulationTreeDataProvider)
-    vscode.window.createTreeView('kieler-simulation-tree', {
-        treeDataProvider: simulationTreeDataProvider,
-    })
+    vscode.window.registerWebviewViewProvider('kieler-simulation-table', simulationDataProvider)
 
     // Register and start model checker view
     const modelCheckerDataProvider: vscode.WebviewViewProvider = new ModelCheckerDataProvider(
         lsClient,
         compilationDataProvider,
         context,
-        simulationTreeDataProvider
+        simulationDataProvider
     )
     vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
 

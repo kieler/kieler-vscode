@@ -32,9 +32,8 @@ export function rowSelection(event: MouseEvent) {
             lastSelected.classList.remove("focused");
         }
         lastSelected = owner;
-        const action = { kind: SelectedRowAction.KIND, rowId: owner.id } as SelectedRowAction;
         owner.classList.add("focused");
-        return action;
+        return SelectedRowAction.create(owner.id);
     }
     return undefined;
 }

@@ -113,7 +113,7 @@ export class TableWebview {
      * @param values The values of the row in correct ordering.
      * @param rowId Id of the row to add.
      */
-    async addRow(values: string[], rowId: string) {
+    async addRow(rowId: string, ...values: string[]) {
         await this.ready();
         const action = { kind: AddRowAction.KIND, rowId, values } as AddRowAction
         this.sendToWebview({ action });
@@ -169,8 +169,7 @@ export class TableWebview {
      * Handles messages from the webview.
      * @param message The message received from the webview.
      */
-    protected async receiveFromWebview(message: any) {
-        console.log('Received from template webview')
+    protected async receiveFromWebview(message: any): Promise<void> {
         if (message.readyMessage) {
             this.resolveWebviewReady();
             this.sendTableIdentifier();
