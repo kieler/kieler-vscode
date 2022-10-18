@@ -15,7 +15,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
-import { TableWebview } from 'table-webview/lib/table-webview';
+import { TableWebview } from '@kieler/table-webview/lib/table-webview';
 import { CompilationDataProvider } from '../kico/compilation-data-provider';
 import { COMPILE_AND_SIMULATE } from '../simulation/commands';
 import { SimulationTreeDataProvider } from '../simulation/simulation-tree-data-provider';

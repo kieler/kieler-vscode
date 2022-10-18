@@ -16,6 +16,6 @@
  */
 
 import '../css/index.css';
-import { Table } from 'table-webview/lib/table';
+import { Table } from '@kieler/table-webview/lib/table';
 
 new Table();

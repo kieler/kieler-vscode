@@ -640,6 +640,6 @@
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
     "vscode-uri": "^3.0.2",
-    "table-webview": "^0.0.1"
+    "@kieler/table-webview": "^0.0.1"
   }
 }

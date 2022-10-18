@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "reflect-metadata": "^0.1.13",
-    "table-webview": "^0.0.1"
+    "@kieler/table-webview": "^0.0.1"
   },
   "devDependencies": {
     "css-loader": "^6.5.1",
