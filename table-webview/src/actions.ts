@@ -118,22 +118,3 @@ export namespace SelectedRowAction {
         return action.kind === SelectedRowAction.KIND;
     }
 }
-
-/** Adds the mouselistener for selecting a row in the table */
-export interface AddRowListenerAction extends Action {
-    kind: typeof AddRowListenerAction.KIND;
-}
-
-export namespace AddRowListenerAction {
-    export const KIND = "addRowListener";
-
-    export function create(): AddRowListenerAction {
-        return {
-            kind: KIND
-        };
-    }
-
-    export function isThisAction(action: Action): action is AddRowListenerAction {
-        return action.kind === AddRowListenerAction.KIND;
-    }
-}

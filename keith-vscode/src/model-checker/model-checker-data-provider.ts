@@ -80,6 +80,8 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
     protected props: SmallVerificationProperty[];
 
+    protected selectedRow: string
+
     constructor(
         private lsClient: LanguageClient,
         kico: CompilationDataProvider,
@@ -107,7 +109,6 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RELOAD_PROPERTIES_VERIFICATION.command, async () => {
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri);
-                this.webview.addRowListener();
             })
         );
 
@@ -121,7 +122,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_COUNTEREXAMPLE_VERIFICATION.command, async () => {
                 vscode.commands.executeCommand(COMPILE_AND_SIMULATE.command);
-                const p = this.props.find(prop => prop.id === this.webview.getSelectedRow())
+                const p = this.props.find(prop => prop.id === this.selectedRow)
                 kico.compilationFinished((success) => {
                     if (typeof success !== 'undefined' && success && p) {
                         const uri = vscode.Uri.parse(p.counterexampleUri)
@@ -132,6 +133,10 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
             })
         );
         
+    }
+
+    clickedRow(rowId: string): void {
+        this.selectedRow = rowId
     }
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {
@@ -160,6 +165,14 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Formula', 'Result']);
         // tWebview.addRowListener();
         this.webview = tWebview;
+
+        this.context.subscriptions.push(
+            this.webview.rowClicked((rowId: string | undefined ) => {
+                if (rowId) {
+                    this.clickedRow(rowId)
+                }
+            })
+        )
     }
 
     getExtensionFileUri(...segments: string[]): vscode.Uri {

@@ -23,7 +23,11 @@ import { SettingsService } from '../settings';
 import { Tuple } from '../util';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SET_SIMULATION_STEP_DELAY, SET_SIMULATION_TYPE_TO, SHOW_INTERNAL_VARIABLES, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
 import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
-import { externalStepMessageType, externalStopMessageType, SimulationTreeData, startedSimulationMessageType, valuesForNextStepMessageType } from './simulation-tree-data-provider';
+
+export const externalStepMessageType = 'keith/simulation/didStep'
+export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep'
+export const externalStopMessageType = 'keith/simulation/externalStop'
+export const startedSimulationMessageType = 'keith/simulation/started'
 
 export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     public readonly newSimulationDataEmitter = new vscode.EventEmitter<this>()
@@ -111,6 +115,8 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
 
     protected table: TableWebview;
 
+    protected disposables: vscode.Disposable[] = [];
+
     constructor(
         lsClient: LanguageClient,
         kico: CompilationDataProvider,
@@ -124,7 +130,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         this.lsClient = lsClient
         this.kico = kico
         this.simulationStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
-        // TODO this.simulationStatus.command = TODO reveal view on command
         this.context.subscriptions.push(this.simulationStatus)
 
         // Push context variables for conditional menu items
@@ -132,24 +137,26 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         vscode.commands.executeCommand('setContext', 'keith.vscode:play', this.play)
 
         // Bind to events
-        kico.newSimulationCommands((systems) => {
+        this.disposables.push(kico.newSimulationCommands((systems) => {
             if (typeof systems !== 'undefined') {
                 this.registerSimulationCommands(systems)
             }
             // Else case is that important enough to alert the user
-        })
-        kico.compilationStarted(() => {
+        }))
+        this.disposables.push(kico.compilationStarted(() => {
             this.compilationStarted()
-        })
-        kico.compilationFinished((success) => {
+        }))
+        this.disposables.push(kico.compilationFinished((success) => {
             if (typeof success !== 'undefined') {
                 this.compilationFinished(success)
             }
             // Else case is that important enough to alert the user
-        })
-        kico.compilationFinished.bind((successful: boolean) => {
-            this.compilationFinished(successful)
-        })
+        }))
+        this.disposables.push(kico.compilationFinished((successful) => {
+            if (successful !== undefined) {
+                this.compilationFinished(successful)
+            }
+        }))
 
         // Bind to LSP messages
         lsClient.onReady().then(() => {
@@ -344,6 +351,25 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories']);
         this.table = tWebview;
+        this.context.subscriptions.push(
+            this.table.rowClicked((rowId: string | undefined ) => {
+                if (rowId) {
+                    this.clickedRow(rowId)
+                }
+            })
+        )
+    }
+
+    clickedRow(rowId: string): void {
+        const data = this.simulationData.get(rowId)
+        if (data && data.input) {
+            this.newInputValue(data)
+        }
+    }
+
+    dispose() {
+        this.disposables.forEach(d => d.dispose())
+        this.table.dispose()
     }
 
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
@@ -414,7 +440,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    async newInputValue(simulationData: SimulationTreeData): Promise<void> {
+    async newInputValue(simulationData: SimulationData): Promise<void> {
         const result = await vscode.window.showInputBox({
             value: JSON.stringify(simulationData.data[simulationData.data.length - 1]),
             placeHolder: `Input value for ${simulationData.id}`,
@@ -435,9 +461,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             },
         })
         if (result) {
-            this.valuesForNextStep.set(simulationData.id, JSON.parse(result))
-            this.changedValuesForNextStep.set(simulationData.id, JSON.parse(result))
-            this.update()
+            const parsedResult = JSON.parse(result)
+            this.valuesForNextStep.set(simulationData.id, parsedResult)
+            this.changedValuesForNextStep.set(simulationData.id, parsedResult)
+            this.table.updateCell(simulationData.id, 'Input', parsedResult)
         }
     }
 
@@ -535,7 +562,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         // Transform the input map to an object since this is the format the LS supports
         const jsonObject = strMapToObj(this.changedValuesForNextStep)
         lClient.sendNotification('keith/simulation/step', [jsonObject, 'Manual'])
-        // TODO Update data to indicate that a step is in process
         this.update()
     }
 
@@ -676,11 +702,11 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 } else {
                     // This should not happen. An unexpected value was send by the server.
                     this.stopSimulation()
-                    // TODO this.messageService.error("Unexpected value for " + key + "in simulation data, stopping simulation")
+                    this.output.appendLine('[ERROR]\tUnexpected value for " + key + "in simulation data, stopping simulation.')
                 }
             })
         } else {
-            // TODO this.messageService.error('Simulation data values are undefined') TODO
+            this.output.appendLine('[ERROR]\tSimulation data values are undefined.')
         }
         if (!this.simulationRunning) {
             return false
@@ -720,7 +746,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     initializeTable() {
         // Initialize table
         this.table.reset()
-        console.log("Reset table")
         this.simulationData.forEach(entry => {
             this.table.addRow(entry.id, entry.label, entry.input? this.valuesForNextStep.get(entry.id) : '', entry.data.toString(), entry.categories.toString())
         })
@@ -729,7 +754,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     update(): void {
         if (this.simulationRunning) {
             this.simulationData.forEach(entry => {
-                this.table.updateCell(entry.id, 'History', entry.data.toString())
+                this.table.updateCell(entry.id, 'History', entry.data.reverse().toString())
             })
         }
     }

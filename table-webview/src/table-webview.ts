@@ -16,7 +16,7 @@
  */
 
 import * as vscode from 'vscode';
-import { AddRowAction, AddRowListenerAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
+import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
 
 export class TableWebview {
 
@@ -43,6 +43,10 @@ export class TableWebview {
     private readonly webviewReady = new Promise<void>((resolve) => (this.resolveWebviewReady = resolve))
 
     protected selectedRow: string;
+
+    public readonly rowClickedEmitter = new vscode.EventEmitter<string | undefined>()
+
+    public readonly rowClicked: vscode.Event<string | undefined> = this.rowClickedEmitter.event
 
     constructor(identifier: string, localResourceRoots: vscode.Uri[], scriptUri: vscode.Uri) {
         this.identifier = identifier;
@@ -75,6 +79,9 @@ export class TableWebview {
         });
         this.initializeWebview(diagramPanel.webview, title, headers);
         this.diagramPanel = diagramPanel;
+        this.diagramPanel.onDidDispose(() => {
+            this.disposables.forEach(d => d.dispose())
+        })
     }
 
     /**
@@ -115,8 +122,7 @@ export class TableWebview {
      */
     async addRow(rowId: string, ...values: string[]) {
         await this.ready();
-        const action = { kind: AddRowAction.KIND, rowId, values } as AddRowAction
-        this.sendToWebview({ action });
+        this.sendToWebview({ action: AddRowAction.create(rowId, values) });
     }
 
     /**
@@ -127,8 +133,7 @@ export class TableWebview {
      */
     async updateCell(rowId: string, columnId: string, value: string) {
         await this.ready();
-        const action = { kind: UpdateCellAction.KIND, rowId, columnId, value } as UpdateCellAction;
-        this.sendToWebview({ action });
+        this.sendToWebview({ action: UpdateCellAction.create(rowId, columnId, value) });
     }
 
     /**
@@ -136,17 +141,7 @@ export class TableWebview {
      */
     async reset() {
         await this.ready();
-        const action = { kind: ResetTableAction.KIND } as ResetTableAction;
-        this.sendToWebview({ action });
-    }
-
-    /**
-     * Adds a mouselistener for the selection of rows.
-     */
-    async addRowListener() {
-        await this.ready();
-        const action = { kind: AddRowListenerAction.KIND } as AddRowListenerAction;
-        this.sendToWebview({ action });
+        this.sendToWebview({ action: ResetTableAction.create() });
     }
 
     /**
@@ -176,6 +171,7 @@ export class TableWebview {
         } else if (message.action) {
             if (SelectedRowAction.isThisAction(message.action)) {
                 this.selectedRow = message.action.rowId
+                this.rowClickedEmitter.fire(this.selectedRow)
             }
         }
     }
@@ -186,6 +182,11 @@ export class TableWebview {
      */
     sendToWebview(message: any) {
         this.webview.postMessage(message);
+    }
+
+    dispose() {
+        this.diagramPanel.dispose()
+        this.disposables.forEach(d => d.dispose())
     }
 
 }

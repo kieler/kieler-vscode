@@ -21,7 +21,6 @@ import { ModelCheckerDataProvider } from './model-checker/model-checker-data-pro
 import { handlePerformAction, performActionKind } from './perform-action-handler'
 import { SettingsService } from './settings'
 import { SimulationTableDataProvider } from './simulation/simulation-table-data-provider'
-import { SimulationTreeDataProvider } from './simulation/simulation-tree-data-provider'
 // import 'simulation/index.css'
 
 /** Command identifiers that are provided by klighd-vscode. */
@@ -149,18 +148,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.createTreeView('kieler-kico', {
         treeDataProvider: compilationDataProvider,
     })
-
-    // const simulationTreeDataProvider = new SimulationTreeDataProvider(
-    //     lsClient,
-    //     compilationDataProvider,
-    //     context,
-    //     settingsService
-    // )
-    // // Register and start simulation tree view
-    // vscode.window.registerTreeDataProvider('kieler-simulation-tree', simulationTreeDataProvider)
-    // vscode.window.createTreeView('kieler-simulation-tree', {
-    //     treeDataProvider: simulationTreeDataProvider,
-    // })
 
     // Register and start simulation table view
     const simulationDataProvider: SimulationTableDataProvider = new SimulationTableDataProvider(

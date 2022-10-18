@@ -59,9 +59,6 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     quickpickSystems: vscode.QuickPickItem[] = []
 
-    kicoCommands: vscode.Disposable[] = []
-    // TODO collect all listeners and commands here and dispose this on dispose of this provider
-
     startTime = 0
 
     endTime = 0

@@ -15,9 +15,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { AddRowAction, AddRowListenerAction, ResetTableAction, UpdateCellAction } from './actions';
+import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
-import { rowSelection } from './mouse-listener';
 
 interface vscode {
     postMessage(message: any): void;
@@ -26,6 +25,7 @@ declare const vscode: vscode;
 
 export class Table {
 
+    lastSelected: HTMLElement;
     protected identifier: string;
     protected headers: string[];
 
@@ -36,6 +36,20 @@ export class Table {
             this.handleMessages(message);
         };
         window.addEventListener('message', eventListener);
+
+        document.addEventListener('click', event => {
+            const node = event.target;
+            const owner = (node as HTMLElement).parentElement;
+            if (owner) {
+                if (this.lastSelected) {
+                    this.lastSelected.classList.remove("focused");
+                }
+                this.lastSelected = owner;
+                owner.classList.add("focused");
+                const action = SelectedRowAction.create(owner.id)
+                vscode.postMessage({ action: action });
+            }
+        });
     }
 
     /**
@@ -48,32 +62,15 @@ export class Table {
         } else if (message.data.action) {
             const action = message.data.action;
             if (AddRowAction.isThisAction(action)) {
-                console.log("Handle add row")
                 this.handleAddRow(action as AddRowAction);
             } else if (UpdateCellAction.isThisAction(action)) {
-                console.log("Handle updatecell")
                 this.handleUpdateCell(action as UpdateCellAction);
             } else if (ResetTableAction.isThisAction(action)) {
                 this.handleResetTable();
-                console.log("Handle reset")
-            } else if (AddRowListenerAction.isThisAction(action)) {
-                this.addRowListener();
             }
         } else {
             console.log("Message not supported: ", message);
         }
-    }
-
-    /** 
-     * Adds a mouse listener that sends the client the selected row.
-     */
-    protected addRowListener(): void {
-        document.addEventListener('click', event => {
-            const action = rowSelection(event);
-            if (action) {
-                vscode.postMessage({ action: action });
-            }
-        });
     }
 
     /**
@@ -97,7 +94,6 @@ export class Table {
      * @param action AddRowAction that determines the values and Id of the new row.
      */
     protected handleAddRow(action: AddRowAction): void {
-        console.log("Addrow", action)
         const table = document.getElementById(this.identifier + '_table');
         if (table) {
             const rowPlaceholder = document.createElement("tr");
