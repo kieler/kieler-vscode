@@ -22,7 +22,7 @@ import { PerformActionAction } from '../perform-action-handler';
 import { SettingsService } from '../settings';
 import { Tuple } from '../util';
 import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SET_SIMULATION_STEP_DELAY, SET_SIMULATION_TYPE_TO, SHOW_INTERNAL_VARIABLES, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
-import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
+import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationDataBlackList, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 
 export const externalStepMessageType = 'keith/simulation/didStep'
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep'
@@ -325,6 +325,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 quickPick.onDidChangeSelection((selection) => {
                     if (selection[0]) {
                         this.settings.set('showInternalVariables.enabled', selection[0]?.label === 'true')
+                        this.initializeTable()
                     }
                     quickPick.hide()
                 })
@@ -496,7 +497,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
      * Start simulation after server successfully started it.
      */
     async handleSimulationStarted(startMessage: SimulationStartedMessage): Promise<void> {
-        console.log('handle simulation started')
         this.endTime = Date.now()
         if (!startMessage.successful) {
             this.startTime = Date.now()
@@ -532,7 +532,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             })
             const newData: SimulationData = {
                 id: key,
-                label: key + JSON.stringify([]),
+                label: key,
                 data: [],
                 input: inputs.includes(key),
                 output: outputs.includes(key),
@@ -545,7 +545,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             }
         })
         this.controlsEnabled = true
-        console.log("Initialize table")
         this.initializeTable()
         this.simulationRunning = true
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
@@ -747,14 +746,29 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         // Initialize table
         this.table.reset()
         this.simulationData.forEach(entry => {
-            this.table.addRow(entry.id, entry.label, entry.input? this.valuesForNextStep.get(entry.id) : '', entry.data.toString(), entry.categories.toString())
+            if (!(
+                SimulationDataBlackList.includes(entry.id) ||
+                entry.id.includes('_tickCounter') ||
+                entry.id.startsWith('_') ||
+                entry.id.startsWith('#')
+            ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
+                console.log("Label", entry.label, entry)
+                this.table.addRow(entry.id, entry.label, entry.input? this.valuesForNextStep.get(entry.id) : '', entry.data.toString(), entry.categories.toString())
+            }
         })
     }
 
     update(): void {
         if (this.simulationRunning) {
             this.simulationData.forEach(entry => {
-                this.table.updateCell(entry.id, 'History', entry.data.reverse().toString())
+                if (!(
+                    SimulationDataBlackList.includes(entry.id) ||
+                    entry.id.includes('_tickCounter') ||
+                    entry.id.startsWith('_') ||
+                    entry.id.startsWith('#')
+                ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
+                    this.table.updateCell(entry.id, 'History', entry.data.reverse().toString())
+                }
             })
         }
     }
