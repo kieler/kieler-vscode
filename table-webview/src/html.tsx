@@ -63,6 +63,6 @@ export function createRow(id: string, values: string[]): VNode {
  * @param value The value of the cell.
  * @returns a cell of a table as VNode.
  */
-export function createCell(value: string): VNode {
-    return <td>{value}</td>
+export function createCell(id: string, value: string): VNode {
+    return <td attrs={{ id: id }}>{value}</td>
 }

@@ -19,20 +19,19 @@ import './style/index.css'
 import { Table } from '@kieler/table-webview/lib/table'
 
 class CustomTable extends Table {
-
-    lastSelected: HTMLElement;
+    lastSelected: HTMLElement
 
     constructor() {
         super()
-        document.addEventListener('click', event => {
+        document.addEventListener('click', (event) => {
             const node = event.target
             const owner = (node as HTMLElement).parentElement
             if (owner) {
                 if (this.lastSelected) {
-                    this.lastSelected.classList.remove("focused")
+                    this.lastSelected.classList.remove('focused')
                 }
                 this.lastSelected = owner
-                owner.classList.add("focused")
+                owner.classList.add('focused')
             }
         })
     }

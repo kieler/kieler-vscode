@@ -40,21 +40,8 @@ export class Table {
             const node = event.target;
             const owner = (node as HTMLElement).parentElement;
             if (owner) {
-                let columnId = -1
-                for (let i =0; i < owner.children.length; i++) {
-                    const child = owner.children[i]
-                    console.log(child.childNodes[0].nodeValue)
-                    console.log((node as HTMLElement).childNodes[0].nodeValue)
-                    if (child.childNodes[0].nodeValue === (node as HTMLElement).childNodes[0].nodeValue) {
-                        columnId = i
-                    }
-                }
-                if (columnId !== -1) {
-                    const action = SelectedCellAction.create(owner.id, this.headers[columnId])
-                    vscode.postMessage({ action: action });
-                } else {
-                    console.log("Could not identify the column of the selected cell")
-                }
+                const action = SelectedCellAction.create(owner.id, (node as HTMLElement).id)
+                vscode.postMessage({ action: action });
             }
         });
     }
@@ -117,7 +104,7 @@ export class Table {
     protected handleUpdateCell(action: UpdateCellAction): void {
         const row = document.getElementById(action.rowId);
         const column = this.headers.indexOf(action.columnId);
-        const newCell = createCell(action.value);
+        const newCell = createCell(action.columnId, action.value);
         if (row) {
             if (column < row.children.length) {
                 // cell exists already

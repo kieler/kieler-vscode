@@ -176,7 +176,6 @@ export class TableWebview {
             if (SelectedCellAction.isThisAction(message.action)) {
                 this.selectedCell = {rowId: message.action.rowId, columnId: message.action.columnId}
                 this.cellClickedEmitter.fire(this.selectedCell)
-                console.log("action received")
             }
         }
     }

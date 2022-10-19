@@ -446,7 +446,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
 
     async newInputValue(simulationData: SimulationData): Promise<void> {
         const result = await vscode.window.showInputBox({
-            value: JSON.stringify(simulationData.data[simulationData.data.length - 1]),
+            value: JSON.stringify(this.valuesForNextStep.get(simulationData.id)),
             placeHolder: `Input value for ${simulationData.id}`,
             title: `New value for ${simulationData.id}`,
             validateInput: (text) => {
@@ -468,7 +468,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             const parsedResult = JSON.parse(result)
             this.valuesForNextStep.set(simulationData.id, parsedResult)
             this.changedValuesForNextStep.set(simulationData.id, parsedResult)
-            this.table.updateCell(simulationData.id, 'Input', parsedResult)
+            this.table.updateCell(simulationData.id, 'Input', JSON.stringify(parsedResult))
         }
     }
 
@@ -755,7 +755,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 entry.id.startsWith('_') ||
                 entry.id.startsWith('#')
             ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                this.table.addRow(entry.id, entry.label, entry.input? this.valuesForNextStep.get(entry.id) : '', entry.data.toString(), entry.categories.toString())
+                this.table.addRow(entry.id, entry.label, entry.input? JSON.stringify(this.valuesForNextStep.get(entry.id)) : '', entry.data.toString(), entry.categories.toString())
             }
         })
     }
