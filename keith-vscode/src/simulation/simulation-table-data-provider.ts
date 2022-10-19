@@ -21,7 +21,22 @@ import { CompilationDataProvider, CompilationSystem, CompilationSystemsMessage }
 import { PerformActionAction } from '../perform-action-handler';
 import { SettingsService } from '../settings';
 import { Tuple } from '../util';
-import { ADD_CO_SIMULATION, COMPILE_AND_SIMULATE, COMPILE_AND_SIMULATE_SNAPSHOT, LOAD_TRACE, NEW_VALUE_SIMULATION, OPEN_EXTERNAL_KVIZ_VIEW, PAUSE_SIMULATION, RUN_SIMULATION, SAVE_TRACE, SET_SIMULATION_STEP_DELAY, SET_SIMULATION_TYPE_TO, SHOW_INTERNAL_VARIABLES, SIMULATE, STEP_SIMULATION, STOP_SIMULATION } from './commands';
+import {
+    ADD_CO_SIMULATION,
+    COMPILE_AND_SIMULATE,
+    COMPILE_AND_SIMULATE_SNAPSHOT,
+    LOAD_TRACE, NEW_VALUE_SIMULATION,
+    OPEN_EXTERNAL_KVIZ_VIEW,
+    PAUSE_SIMULATION,
+    RUN_SIMULATION,
+    SAVE_TRACE,
+    SET_SIMULATION_STEP_DELAY,
+    SET_SIMULATION_TYPE_TO,
+    SHOW_INTERNAL_VARIABLES,
+    SIMULATE,
+    STEP_SIMULATION,
+    STOP_SIMULATION
+} from './commands';
 import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationDataBlackList, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
 
 export const externalStepMessageType = 'keith/simulation/didStep'
