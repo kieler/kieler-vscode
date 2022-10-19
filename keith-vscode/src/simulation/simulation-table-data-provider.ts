@@ -359,6 +359,9 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 }
             })
         )
+        this.table.initialized(() => {
+            this.initializeTable()
+        })
     }
 
     clickedRow(rowId: string): void {
@@ -752,7 +755,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 entry.id.startsWith('_') ||
                 entry.id.startsWith('#')
             ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                console.log("Label", entry.label, entry)
                 this.table.addRow(entry.id, entry.label, entry.input? this.valuesForNextStep.get(entry.id) : '', entry.data.toString(), entry.categories.toString())
             }
         })

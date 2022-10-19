@@ -48,6 +48,10 @@ export class TableWebview {
 
     public readonly rowClicked: vscode.Event<string | undefined> = this.rowClickedEmitter.event
 
+    public readonly initializedEmitter = new vscode.EventEmitter<void | undefined>()
+
+    public readonly initialized: vscode.Event<void | undefined> = this.initializedEmitter.event
+
     constructor(identifier: string, localResourceRoots: vscode.Uri[], scriptUri: vscode.Uri) {
         this.identifier = identifier;
         this.localResourceRoots = localResourceRoots;
@@ -74,8 +78,7 @@ export class TableWebview {
         const title = this.createTitle();
         const diagramPanel = vscode.window.createWebviewPanel('table', title, vscode.ViewColumn.Beside, {
             localResourceRoots: this.localResourceRoots,
-            enableScripts: true,
-            retainContextWhenHidden: true
+            enableScripts: true
         });
         this.initializeWebview(diagramPanel.webview, title, headers);
         this.diagramPanel = diagramPanel;
@@ -167,7 +170,8 @@ export class TableWebview {
     protected async receiveFromWebview(message: any): Promise<void> {
         if (message.readyMessage) {
             this.resolveWebviewReady();
-            this.sendTableIdentifier();
+            await this.sendTableIdentifier();
+            this.initializedEmitter.fire()
         } else if (message.action) {
             if (SelectedRowAction.isThisAction(message.action)) {
                 this.selectedRow = message.action.rowId
