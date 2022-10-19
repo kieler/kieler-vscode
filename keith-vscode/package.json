@@ -635,7 +635,6 @@
   "dependencies": {
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
-    "snabbdom-jsx": "^0.4.2",
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
     "vscode-uri": "^3.0.2",

@@ -140,11 +140,11 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {
         this.webview.reset()
-        props.forEach((prop) => this.webview.addRow(prop.id, prop.name, prop.formula))
+        props.forEach((prop) => this.webview.addRow(prop.id, { cssClass: 'model-checker-name', value: prop.name }, {cssClass: 'model-checker-formula', value: prop.formula }))
     }
 
     private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
-        this.webview.updateCell(id, "Result", statusToString(status))
+        this.webview.updateCell(id, 'Result', { cssClass: 'model-checker-result', value: statusToString(status) })
     }
 
     resolveWebviewView(

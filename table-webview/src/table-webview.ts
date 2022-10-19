@@ -17,6 +17,7 @@
 
 import * as vscode from 'vscode';
 import { AddRowAction, ResetTableAction, SelectedCellAction, UpdateCellAction } from './actions';
+import { Cell } from './helper';
 
 export class TableWebview {
 
@@ -123,7 +124,7 @@ export class TableWebview {
      * @param values The values of the row in correct ordering.
      * @param rowId Id of the row to add.
      */
-    async addRow(rowId: string, ...values: string[]) {
+    async addRow(rowId: string, ...values: Cell[]) {
         await this.ready();
         this.sendToWebview({ action: AddRowAction.create(rowId, values) });
     }
@@ -134,7 +135,7 @@ export class TableWebview {
      * @param columnId The id of the column of the cell.
      * @param value The new value for the cell.
      */
-    async updateCell(rowId: string, columnId: string, value: string) {
+    async updateCell(rowId: string, columnId: string, value: Cell) {
         await this.ready();
         this.sendToWebview({ action: UpdateCellAction.create(rowId, columnId, value) });
     }

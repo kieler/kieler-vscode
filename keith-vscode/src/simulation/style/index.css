@@ -180,3 +180,22 @@ table, th, td {
 .focused {
     background-color: var(--vscode-inputOption-hoverBackground);
 }
+
+.simulation-table-input {
+    cursor: text;
+    background: var(--vscode-input-background);
+}
+
+.simulation-table-label {
+    cursor: default;
+}
+
+.simulation-table-history {
+    cursor: default;
+}
+
+.simulation-table-categories {
+    cursor: default;
+}
+
+

@@ -5493,13 +5493,6 @@ smart-buffer@^4.1.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.1.0.tgz#91605c25d91652f4661ea69ccf45f1b331ca21ba"
   integrity sha512-iVICrxOzCynf/SNaBQCw34eM9jROU/s5rzIhpOvzhzuYHfJR/DhZfDkXiZSgKXfgv26HT3Yni3AV/DGw0cGnnw==
 
-snabbdom-jsx@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/snabbdom-jsx/-/snabbdom-jsx-0.4.2.tgz#e580682d60b4cc1da9898c6a0bacfcd062a0cffc"
-  integrity sha512-6akqPyuossD3niO3RCgaqAIrQ6ylBI+shzUKukIwqkNOybCmgst81khJ48BHYtEamQ7ltlFaEKjvKi3N0NPNVw==
-  dependencies:
-    snabbdom "^0.7.0"
-
 snabbdom-to-html@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/snabbdom-to-html/-/snabbdom-to-html-7.0.0.tgz#9c4913c6b583cfedffc440b900454274b2c76cdf"
@@ -5512,11 +5505,6 @@ snabbdom-to-html@^7.0.0:
     lodash.uniq "^4.5.0"
     object-assign "^4.1.0"
     parse-sel "^1.0.0"
-
-snabbdom@^0.7.0:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-0.7.4.tgz#817f07e8d3fb870960c3763b8da56f1ba982d31a"
-  integrity sha512-nnN+7uZ2NTIiu7EPMNwSDhmrYXqwlfCP/j72RdzvDPujXyvQxOW7Jl9yuLayzxMHDNWQR7FM6Pcn4wnDpKRe6Q==
 
 snabbdom@^3.5.1:
   version "3.5.1"

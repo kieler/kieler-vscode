@@ -483,7 +483,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             const parsedResult = JSON.parse(result)
             this.valuesForNextStep.set(simulationData.id, parsedResult)
             this.changedValuesForNextStep.set(simulationData.id, parsedResult)
-            this.table.updateCell(simulationData.id, 'Input', JSON.stringify(parsedResult))
+            this.table.updateCell(simulationData.id, 'Input', { cssClass: 'simulation-table-input', value: JSON.stringify(parsedResult) })
         }
     }
 
@@ -770,7 +770,12 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 entry.id.startsWith('_') ||
                 entry.id.startsWith('#')
             ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                this.table.addRow(entry.id, entry.label, entry.input? JSON.stringify(this.valuesForNextStep.get(entry.id)) : '', entry.data.toString(), entry.categories.toString())
+                this.table.addRow(entry.id,
+                    { cssClass: 'simulation-table-label', value: entry.label },
+                    entry.input? { cssClass: 'simulation-table-input', value: JSON.stringify(this.valuesForNextStep.get(entry.id)) } : { cssClass: 'simulation-table-cell', value: '' },
+                    { cssClass: 'simulation-table-history', value: entry.data.toString() },
+                    { cssClass: 'simulation-table-categories', value: entry.categories.toString() }
+                )
             }
         })
     }
@@ -784,7 +789,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                     entry.id.startsWith('_') ||
                     entry.id.startsWith('#')
                 ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                    this.table.updateCell(entry.id, 'History', entry.data.reverse().toString())
+                    this.table.updateCell(entry.id, 'History', { cssClass: 'simulation-table-history', value: entry.data.reverse().toString() })
                 }
             })
         }

@@ -15,7 +15,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { attributesModule, classModule, eventListenersModule, init, jsx, propsModule, styleModule, VNode } from 'snabbdom';
+import { attributesModule, Classes, classModule, eventListenersModule, init, jsx, propsModule, styleModule, VNode } from 'snabbdom';
+import { Cell } from './helper'
 
 /** Needed to update the html document */
 export const patch = init([
@@ -49,10 +50,12 @@ export function createTable(id: string, headers: string[]): VNode {
  * @param values The values of the row in the correct ordering.
  * @returns a row of a table as VNode.
  */
-export function createRow(id: string, values: string[]): VNode {
+export function createRow(id: string, values: Cell[]): VNode {
     const children: VNode[] = [];
     for (const val of values) {
-        children.push(<td>{val}</td>);
+        const classes: Classes =  {}
+        classes[val.cssClass] = true
+        children.push(<td class={classes}>{val.value}</td>);
     }
     const row = <tr attrs={{ id: id }}>{children}</tr>;
     return row;
@@ -63,6 +66,8 @@ export function createRow(id: string, values: string[]): VNode {
  * @param value The value of the cell.
  * @returns a cell of a table as VNode.
  */
-export function createCell(id: string, value: string): VNode {
-    return <td attrs={{ id: id }}>{value}</td>
+export function createCell(id: string, value: Cell): VNode {
+    const classes: Classes =  {}
+    classes[value.cssClass] = true
+    return <td class={classes} attrs={{ id: id }}>{value.value}</td>
 }

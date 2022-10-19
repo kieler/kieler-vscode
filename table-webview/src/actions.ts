@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import { Cell } from "./helper";
+
 interface Action {
     kind: string;
 }
@@ -24,7 +26,7 @@ interface Action {
 export interface AddRowAction extends Action {
     kind: typeof AddRowAction.KIND;
     rowId: string;
-    values: string[];
+    values: Cell[];
 }
 
 
@@ -33,7 +35,7 @@ export namespace AddRowAction {
 
     export function create(
         rowId: string,
-        values: string[]
+        values: Cell[]
     ): AddRowAction {
         return {
             kind: AddRowAction.KIND,
@@ -52,7 +54,7 @@ export interface UpdateCellAction extends Action {
     kind: typeof UpdateCellAction.KIND;
     rowId: string;
     columnId: string;
-    value: string;
+    value: Cell;
 }
 
 
@@ -62,7 +64,7 @@ export namespace UpdateCellAction {
     export function create(
         rowId: string,
         columnId: string,
-        value: string
+        value: Cell
     ): UpdateCellAction {
         return {
             kind: UpdateCellAction.KIND,
