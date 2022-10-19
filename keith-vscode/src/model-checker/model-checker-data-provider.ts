@@ -144,6 +144,10 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
     }
 
     private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
+        const prop = this.props.find(prop => prop.id === id)
+        if (prop) {
+            prop.status = status
+        }
         this.webview.updateCell(id, 'Result', { cssClass: 'model-checker-result', value: statusToString(status) })
     }
 
@@ -173,6 +177,22 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
                 }
             })
         )
+        
+        this.webview.initialized(() => {
+            this.initializeTable()
+        })
+    }
+
+    initializeTable() {
+        // Initialize table
+        this.webview.reset()
+        this.props.forEach(entry => {
+            this.webview.addRow(entry.id,
+                { cssClass: 'model-checker-name', value: entry.name },
+                {cssClass: 'model-checker-formula', value: entry.formula },
+                { cssClass: 'model-checker-result', value: statusToString(entry.status)}
+            )
+        })
     }
 
     getExtensionFileUri(...segments: string[]): vscode.Uri {
