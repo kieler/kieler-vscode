@@ -109,6 +109,12 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RELOAD_PROPERTIES_VERIFICATION.command, async () => {
+                await kico.compile(
+                    'de.cau.cs.kieler.sccharts.verification.nuxmv',
+                    true,
+                    false,
+                    false
+                )
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri)
             })
         )
