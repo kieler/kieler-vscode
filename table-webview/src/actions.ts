@@ -98,23 +98,25 @@ export namespace ResetTableAction {
 }
 
 /** Sends the Id of the selected row to the client */
-export interface SelectedRowAction extends Action {
-    kind: typeof SelectedRowAction.KIND;
+export interface SelectedCellAction extends Action {
+    kind: typeof SelectedCellAction.KIND;
     rowId: string;
+    columnId: string;
 }
 
 
-export namespace SelectedRowAction {
+export namespace SelectedCellAction {
     export const KIND = "selectRow";
 
-    export function create(rowId: string): SelectedRowAction {
+    export function create(rowId: string, columnId: string): SelectedCellAction {
         return {
             kind: KIND,
-            rowId: rowId
+            rowId: rowId,
+            columnId: columnId
         };
     }
 
-    export function isThisAction(action: Action): action is SelectedRowAction {
-        return action.kind === SelectedRowAction.KIND;
+    export function isThisAction(action: Action): action is SelectedCellAction {
+        return action.kind === SelectedCellAction.KIND;
     }
 }

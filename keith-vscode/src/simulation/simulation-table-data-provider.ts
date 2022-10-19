@@ -353,9 +353,9 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories']);
         this.table = tWebview;
         this.context.subscriptions.push(
-            this.table.rowClicked((rowId: string | undefined ) => {
-                if (rowId) {
-                    this.clickedRow(rowId)
+            this.table.cellClicked((cell: {rowId: string, columnId: string} | undefined ) => {
+                if (cell && cell.rowId) {
+                    this.clickedRow(cell.rowId)
                 }
             })
         )

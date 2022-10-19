@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
+import { AddRowAction, ResetTableAction, SelectedCellAction, UpdateCellAction } from './actions';
 import { createCell, createRow, createTable, patch } from './html';
 
 interface vscode {
@@ -25,7 +25,6 @@ declare const vscode: vscode;
 
 export class Table {
 
-    lastSelected: HTMLElement;
     protected identifier: string;
     protected headers: string[];
 
@@ -41,13 +40,21 @@ export class Table {
             const node = event.target;
             const owner = (node as HTMLElement).parentElement;
             if (owner) {
-                if (this.lastSelected) {
-                    this.lastSelected.classList.remove("focused");
+                let columnId = -1
+                for (let i =0; i < owner.children.length; i++) {
+                    const child = owner.children[i]
+                    console.log(child.childNodes[0].nodeValue)
+                    console.log((node as HTMLElement).childNodes[0].nodeValue)
+                    if (child.childNodes[0].nodeValue === (node as HTMLElement).childNodes[0].nodeValue) {
+                        columnId = i
+                    }
                 }
-                this.lastSelected = owner;
-                owner.classList.add("focused");
-                const action = SelectedRowAction.create(owner.id)
-                vscode.postMessage({ action: action });
+                if (columnId !== -1) {
+                    const action = SelectedCellAction.create(owner.id, this.headers[columnId])
+                    vscode.postMessage({ action: action });
+                } else {
+                    console.log("Could not identify the column of the selected cell")
+                }
             }
         });
     }

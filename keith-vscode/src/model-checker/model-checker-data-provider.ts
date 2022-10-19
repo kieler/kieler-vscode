@@ -118,18 +118,17 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
             })
         );
 
-        // TODO: check if a row is selected, otherwise show a notification to the user
+        // TODO: only show run counterexample if prop is selected (see "simulationRunning")
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RUN_COUNTEREXAMPLE_VERIFICATION.command, async () => {
                 vscode.commands.executeCommand(COMPILE_AND_SIMULATE.command);
-                const p = this.props.find(prop => prop.id === this.selectedRow)
+                const selectedProp = this.props.find(prop => prop.id === this.selectedRow)
                 kico.compilationFinished((success) => {
-                    if (typeof success !== 'undefined' && success && p) {
-                        const uri = vscode.Uri.parse(p.counterexampleUri)
+                    if (typeof success !== 'undefined' && success && selectedProp) {
+                        const uri = vscode.Uri.parse(selectedProp.counterexampleUri)
                         simulation.loadTraceFromUri(uri)
                     }
                 })
-                // this.lsClient.sendNotification(runCounterexampleMessageType, [this.kico.lastCompiledUri, this.webview.getSelectedRow()]);
             })
         );
         
@@ -163,13 +162,12 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
         const title = tWebview.createTitle();
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Formula', 'Result']);
-        // tWebview.addRowListener();
         this.webview = tWebview;
 
         this.context.subscriptions.push(
-            this.webview.rowClicked((rowId: string | undefined ) => {
-                if (rowId) {
-                    this.clickedRow(rowId)
+            this.webview.cellClicked((cell: {rowId: string, columnId: string} | undefined ) => {
+                if (cell && cell.rowId) {
+                    this.clickedRow(cell.rowId)
                 }
             })
         )

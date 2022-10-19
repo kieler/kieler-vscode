@@ -16,7 +16,7 @@
  */
 
 import * as vscode from 'vscode';
-import { AddRowAction, ResetTableAction, SelectedRowAction, UpdateCellAction } from './actions';
+import { AddRowAction, ResetTableAction, SelectedCellAction, UpdateCellAction } from './actions';
 
 export class TableWebview {
 
@@ -42,11 +42,11 @@ export class TableWebview {
 
     private readonly webviewReady = new Promise<void>((resolve) => (this.resolveWebviewReady = resolve))
 
-    protected selectedRow: string;
+    protected selectedCell: {rowId: string, columnId: string};
 
-    public readonly rowClickedEmitter = new vscode.EventEmitter<string | undefined>()
+    public readonly cellClickedEmitter = new vscode.EventEmitter<{rowId: string, columnId: string} | undefined>()
 
-    public readonly rowClicked: vscode.Event<string | undefined> = this.rowClickedEmitter.event
+    public readonly cellClicked: vscode.Event<{rowId: string, columnId: string} | undefined> = this.cellClickedEmitter.event
 
     constructor(identifier: string, localResourceRoots: vscode.Uri[], scriptUri: vscode.Uri) {
         this.identifier = identifier;
@@ -63,7 +63,7 @@ export class TableWebview {
     }
 
     getSelectedRow() {
-        return this.selectedRow
+        return this.selectedCell
     }
 
     /**
@@ -169,9 +169,10 @@ export class TableWebview {
             this.resolveWebviewReady();
             this.sendTableIdentifier();
         } else if (message.action) {
-            if (SelectedRowAction.isThisAction(message.action)) {
-                this.selectedRow = message.action.rowId
-                this.rowClickedEmitter.fire(this.selectedRow)
+            if (SelectedCellAction.isThisAction(message.action)) {
+                this.selectedCell = {rowId: message.action.rowId, columnId: message.action.columnId}
+                this.cellClickedEmitter.fire(this.selectedCell)
+                console.log("action received")
             }
         }
     }
