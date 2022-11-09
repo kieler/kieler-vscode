@@ -45,7 +45,6 @@ function statusToString(status: VerificationPropertyStatus) {
     }
 }
 
-
 export class SmallVerificationProperty {
     id: string
 
@@ -109,12 +108,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand(RELOAD_PROPERTIES_VERIFICATION.command, async () => {
-                await kico.compile(
-                    'de.cau.cs.kieler.sccharts.verification.nuxmv',
-                    true,
-                    false,
-                    false
-                )
+                await kico.compile('de.cau.cs.kieler.sccharts.verification.nuxmv', true, false, false)
                 this.lsClient.sendNotification(webviewLoadPropsMessageType, this.kico.lastCompiledUri)
             })
         )
@@ -146,11 +140,17 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
 
     private handlePropertiesMessage(props: SmallVerificationProperty[]) {
         this.webview.reset()
-        props.forEach((prop) => this.webview.addRow(prop.id, { cssClass: 'model-checker-name', value: prop.name }, {cssClass: 'model-checker-formula', value: prop.formula }))
+        props.forEach((prop) =>
+            this.webview.addRow(
+                prop.id,
+                { cssClass: 'model-checker-name', value: prop.name },
+                { cssClass: 'model-checker-formula', value: prop.formula }
+            )
+        )
     }
 
     private handleUpdatePropertyStatus(id: string, status: VerificationPropertyStatus) {
-        const prop = this.props.find(prop => prop.id === id)
+        const prop = this.props.find((p) => p.id === id)
         if (prop) {
             prop.status = status
         }
@@ -183,7 +183,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
                 }
             })
         )
-        
+
         this.webview.initialized(() => {
             this.initializeTable()
         })
@@ -192,11 +192,12 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
     initializeTable() {
         // Initialize table
         this.webview.reset()
-        this.props.forEach(entry => {
-            this.webview.addRow(entry.id,
+        this.props.forEach((entry) => {
+            this.webview.addRow(
+                entry.id,
                 { cssClass: 'model-checker-name', value: entry.name },
-                {cssClass: 'model-checker-formula', value: entry.formula },
-                { cssClass: 'model-checker-result', value: statusToString(entry.status)}
+                { cssClass: 'model-checker-formula', value: entry.formula },
+                { cssClass: 'model-checker-result', value: statusToString(entry.status) }
             )
         })
     }
@@ -204,5 +205,4 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
     getExtensionFileUri(...segments: string[]): vscode.Uri {
         return vscode.Uri.file(path.join(this.context.extensionPath, ...segments))
     }
-
 }
