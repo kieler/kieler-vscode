@@ -17,6 +17,7 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from
 import { Settings, settingsKey } from './constants'
 import { KeithErrorHandler } from './error-handler'
 import { CompilationDataProvider } from './kico/compilation-data-provider'
+import { LayoutPropertyDataProvider } from './layout-properties/layout-properties-data-provider'
 import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
 import { handlePerformAction, performActionKind } from './perform-action-handler'
 import { SettingsService } from './settings'
@@ -166,6 +167,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         simulationDataProvider
     )
     vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
+
+    // Register and start layout property view
+    const layoutPropertiesProvider: LayoutPropertyDataProvider = new LayoutPropertyDataProvider(
+        lsClient,
+        context,
+        settingsService
+    )
+    vscode.window.registerWebviewViewProvider(LayoutPropertyDataProvider.viewType, layoutPropertiesProvider)
 
     console.debug('Starting Language Server...')
     lsClient.start()
