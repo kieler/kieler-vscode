@@ -501,12 +501,13 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 }
                 try {
                     valid =
-                        simulationData.data.length === 0 ||
+                        (simulationData.data.length === 0 &&
+                            typeof JSON.parse(text) === typeof this.valuesForNextStep.get(simulationData.id)) ||
                         typeof JSON.parse(text) === typeof simulationData.data[simulationData.data.length - 1]
                 } catch (e) {
                     // We do not care but we also do not set valid
                 }
-                return valid ? '' : `Input is not type of ${typeof simulationData.data[simulationData.data.length - 1]}`
+                return valid ? '' : `Input is not type of ${typeof this.valuesForNextStep.get(simulationData.id)}`
             },
         })
         if (result) {
