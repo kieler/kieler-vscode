@@ -18,7 +18,10 @@
 import './style/index.css'
 import { Table } from '@kieler/table-webview/lib/table'
 
-class CustomTable extends Table {
+/**
+ * Custom table for the model checker view.
+ */
+class ModelCheckerTable extends Table {
     lastSelected: HTMLElement
 
     constructor() {
@@ -37,4 +40,5 @@ class CustomTable extends Table {
     }
 }
 
-new CustomTable()
+// eslint-disable-next-line no-new
+new ModelCheckerTable()

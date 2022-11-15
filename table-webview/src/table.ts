@@ -92,7 +92,7 @@ export class Table {
         if (table) {
             const rowPlaceholder = document.createElement("tr");
             table.appendChild(rowPlaceholder);
-            const row = createRow(action.rowId, action.values);
+            const row = createRow(action.rowId, action.values, this.headers);
             patch(rowPlaceholder, row);
         }
     }

@@ -38,7 +38,7 @@ export const patch = init([
 export function createTable(id: string, headers: string[]): VNode {
     const children: VNode[] = [];
     for (const head of headers) {
-        children.push(<th>{head}</th>);
+        children.push(<th attr={{ id: head }}>{head}</th>);
     }
     const table = <table attrs={{ id: id + "_table" }} ><tr attrs={{ id: "headers" }}>{children}</tr></table>;
     return table;
@@ -50,12 +50,14 @@ export function createTable(id: string, headers: string[]): VNode {
  * @param values The values of the row in the correct ordering.
  * @returns a row of a table as VNode.
  */
-export function createRow(id: string, values: Cell[]): VNode {
+export function createRow(id: string, values: Cell[], headers: string[]): VNode {
     const children: VNode[] = [];
+    let i = 0;
     for (const val of values) {
         const classes: Classes =  {}
         classes[val.cssClass] = true
-        children.push(<td class={classes}>{val.value}</td>);
+        children.push(<td class={classes} attrs={{ id: headers[i] }}>{val.value}</td>);
+        i++;
     }
     const row = <tr attrs={{ id: id }}>{children}</tr>;
     return row;

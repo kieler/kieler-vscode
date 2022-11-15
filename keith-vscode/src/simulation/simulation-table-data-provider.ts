@@ -4,7 +4,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2022 by
+ * Copyright 2021 - 2022 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -352,6 +352,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
+        // Initialize webview
         const tWebview = new TableWebview(
             "KIELER Simulation",
             [
@@ -363,13 +364,15 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         tWebview.webview.options = {
             enableScripts: true
         };
-        const title = tWebview.createTitle();
+        const title = tWebview.getTitle();
         webviewView.title = title;
         tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories']);
         this.table = tWebview;
+
+        // Subscriptions
         this.context.subscriptions.push(
             this.table.cellClicked((cell: {rowId: string, columnId: string} | undefined ) => {
-                if (cell && cell.rowId) {
+                if (cell && cell.rowId && cell.columnId === 'Input') {
                     this.clickedRow(cell.rowId)
                 }
             })

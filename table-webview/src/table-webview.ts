@@ -19,6 +19,9 @@ import * as vscode from 'vscode';
 import { AddRowAction, ResetTableAction, SelectedCellAction, UpdateCellAction } from './actions';
 import { Cell } from './helper';
 
+/**
+ * Generic table view which provides a cellClicked event to be able to build interaction with the webview.
+ */
 export class TableWebview {
 
     protected disposables: vscode.Disposable[] = [];
@@ -63,7 +66,7 @@ export class TableWebview {
         return this.webviewReady;
     }
 
-    createTitle(): string {
+    getTitle(): string {
         return this.identifier;
     }
 
@@ -76,7 +79,7 @@ export class TableWebview {
      * @param headers Headers of the table.
      */
     protected createWebviewPanel(headers: string[]): void {
-        const title = this.createTitle();
+        const title = this.getTitle();
         const diagramPanel = vscode.window.createWebviewPanel('table', title, vscode.ViewColumn.Beside, {
             localResourceRoots: this.localResourceRoots,
             enableScripts: true
