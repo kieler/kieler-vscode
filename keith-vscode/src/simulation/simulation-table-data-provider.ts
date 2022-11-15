@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * KIELER - Kiel Integrated Environment for Layout Eclipse RichClient
  *
@@ -9,23 +8,32 @@
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
  *
- * This code is provided under the terms of the Eclipse Public License (EPL).
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 
-import { TableWebview } from '@kieler/table-webview/lib/table-webview';
-import * as path from 'path';
-import * as vscode from 'vscode';
-import { LanguageClient } from 'vscode-languageclient';
-import { Settings, SimulationType } from '../constants';
-import { CompilationDataProvider, CompilationSystem, CompilationSystemsMessage } from '../kico/compilation-data-provider';
-import { PerformActionAction } from '../perform-action-handler';
-import { SettingsService } from '../settings';
-import { Tuple } from '../util';
+import { TableWebview } from '@kieler/table-webview/lib/table-webview'
+import * as path from 'path'
+import * as vscode from 'vscode'
+import { LanguageClient } from 'vscode-languageclient'
+import { Settings, SimulationType } from '../constants'
+import {
+    CompilationDataProvider,
+    CompilationSystem,
+    CompilationSystemsMessage,
+} from '../kico/compilation-data-provider'
+import { PerformActionAction } from '../perform-action-handler'
+import { SettingsService } from '../settings'
+import { Tuple } from '../util'
 import {
     ADD_CO_SIMULATION,
     COMPILE_AND_SIMULATE,
     COMPILE_AND_SIMULATE_SNAPSHOT,
-    LOAD_TRACE, NEW_VALUE_SIMULATION,
+    LOAD_TRACE,
+    NEW_VALUE_SIMULATION,
     OPEN_EXTERNAL_KVIZ_VIEW,
     PAUSE_SIMULATION,
     RUN_SIMULATION,
@@ -35,9 +43,19 @@ import {
     SHOW_INTERNAL_VARIABLES,
     SIMULATE,
     STEP_SIMULATION,
-    STOP_SIMULATION
-} from './commands';
-import { delay, LoadedTraceMessage, SavedTraceMessage, SimulationDataBlackList, SimulationStartedMessage, SimulationStepMessage, SimulationStoppedMessage, strMapToObj, Trace } from './helper';
+    STOP_SIMULATION,
+} from './commands'
+import {
+    delay,
+    LoadedTraceMessage,
+    SavedTraceMessage,
+    SimulationDataBlackList,
+    SimulationStartedMessage,
+    SimulationStepMessage,
+    SimulationStoppedMessage,
+    strMapToObj,
+    Trace,
+} from './helper'
 
 export const externalStepMessageType = 'keith/simulation/didStep'
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep'
@@ -128,9 +146,9 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
 
     private simulationStatus: vscode.StatusBarItem
 
-    protected table: TableWebview;
+    protected table: TableWebview
 
-    protected disposables: vscode.Disposable[] = [];
+    protected disposables: vscode.Disposable[] = []
 
     constructor(
         lsClient: LanguageClient,
@@ -152,26 +170,34 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         vscode.commands.executeCommand('setContext', 'keith.vscode:play', this.play)
 
         // Bind to events
-        this.disposables.push(kico.newSimulationCommands((systems) => {
-            if (typeof systems !== 'undefined') {
-                this.registerSimulationCommands(systems)
-            }
-            // Else case is that important enough to alert the user
-        }))
-        this.disposables.push(kico.compilationStarted(() => {
-            this.compilationStarted()
-        }))
-        this.disposables.push(kico.compilationFinished((success) => {
-            if (typeof success !== 'undefined') {
-                this.compilationFinished(success)
-            }
-            // Else case is that important enough to alert the user
-        }))
-        this.disposables.push(kico.compilationFinished((successful) => {
-            if (successful !== undefined) {
-                this.compilationFinished(successful)
-            }
-        }))
+        this.disposables.push(
+            kico.newSimulationCommands((systems) => {
+                if (typeof systems !== 'undefined') {
+                    this.registerSimulationCommands(systems)
+                }
+                // Else case is that important enough to alert the user
+            })
+        )
+        this.disposables.push(
+            kico.compilationStarted(() => {
+                this.compilationStarted()
+            })
+        )
+        this.disposables.push(
+            kico.compilationFinished((success) => {
+                if (typeof success !== 'undefined') {
+                    this.compilationFinished(success)
+                }
+                // Else case is that important enough to alert the user
+            })
+        )
+        this.disposables.push(
+            kico.compilationFinished((successful) => {
+                if (successful !== undefined) {
+                    this.compilationFinished(successful)
+                }
+            })
+        )
 
         // Bind to LSP messages
         lsClient.onReady().then(() => {
@@ -348,30 +374,31 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 quickPick.show()
             })
         )
-        
     }
 
-    resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
+    resolveWebviewView(
+        webviewView: vscode.WebviewView,
+        context: vscode.WebviewViewResolveContext<unknown>,
+        token: vscode.CancellationToken
+    ): void | Thenable<void> {
         // Initialize webview
         const tWebview = new TableWebview(
-            "KIELER Simulation",
-            [
-                this.getExtensionFileUri('dist')
-            ],
-            this.getExtensionFileUri('dist', 'simulation-webview.js'),
-        );
-        tWebview.webview = webviewView.webview;
+            'KIELER Simulation',
+            [this.getExtensionFileUri('dist')],
+            this.getExtensionFileUri('dist', 'simulation-webview.js')
+        )
+        tWebview.webview = webviewView.webview
         tWebview.webview.options = {
-            enableScripts: true
-        };
-        const title = tWebview.getTitle();
-        webviewView.title = title;
-        tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories']);
-        this.table = tWebview;
+            enableScripts: true,
+        }
+        const title = tWebview.getTitle()
+        webviewView.title = title
+        tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories'])
+        this.table = tWebview
 
         // Subscriptions
         this.context.subscriptions.push(
-            this.table.cellClicked((cell: {rowId: string, columnId: string} | undefined ) => {
+            this.table.cellClicked((cell: { rowId: string; columnId: string } | undefined) => {
                 if (cell && cell.rowId && cell.columnId === 'Input') {
                     this.clickedRow(cell.rowId)
                 }
@@ -390,7 +417,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     }
 
     dispose() {
-        this.disposables.forEach(d => d.dispose())
+        this.disposables.forEach((d) => d.dispose())
         this.table.dispose()
     }
 
@@ -486,7 +513,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             const parsedResult = JSON.parse(result)
             this.valuesForNextStep.set(simulationData.id, parsedResult)
             this.changedValuesForNextStep.set(simulationData.id, parsedResult)
-            this.table.updateCell(simulationData.id, 'Input', { cssClass: 'simulation-table-input', value: JSON.stringify(parsedResult) })
+            this.table.updateCell(simulationData.id, 'Input', {
+                cssClass: 'simulation-table-input',
+                value: JSON.stringify(parsedResult),
+            })
         }
     }
 
@@ -722,7 +752,9 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 } else {
                     // This should not happen. An unexpected value was send by the server.
                     this.stopSimulation()
-                    this.output.appendLine('[ERROR]\tUnexpected value for " + key + "in simulation data, stopping simulation.')
+                    this.output.appendLine(
+                        '[ERROR]\tUnexpected value for " + key + "in simulation data, stopping simulation.'
+                    )
                 }
             })
         } else {
@@ -744,7 +776,9 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleExternalStop(message: string): void {
-        this.output.appendLine('[ERROR]\tStopped simulation because of exception on LS. You might want to reload the window.')
+        this.output.appendLine(
+            '[ERROR]\tStopped simulation because of exception on LS. You might want to reload the window.'
+        )
         // this.messageService.error(message)
         this.setValuesToStopSimulation()
     }
@@ -766,16 +800,25 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     initializeTable() {
         // Initialize table
         this.table.reset()
-        this.simulationData.forEach(entry => {
-            if (!(
-                SimulationDataBlackList.includes(entry.id) ||
-                entry.id.includes('_tickCounter') ||
-                entry.id.startsWith('_') ||
-                entry.id.startsWith('#')
-            ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                this.table.addRow(entry.id,
+        this.simulationData.forEach((entry) => {
+            if (
+                !(
+                    SimulationDataBlackList.includes(entry.id) ||
+                    entry.id.includes('_tickCounter') ||
+                    entry.id.startsWith('_') ||
+                    entry.id.startsWith('#')
+                ) ||
+                (this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id))
+            ) {
+                this.table.addRow(
+                    entry.id,
                     { cssClass: 'simulation-table-label', value: entry.label },
-                    entry.input? { cssClass: 'simulation-table-input', value: JSON.stringify(this.valuesForNextStep.get(entry.id)) } : { cssClass: 'simulation-table-cell', value: '' },
+                    entry.input
+                        ? {
+                              cssClass: 'simulation-table-input',
+                              value: JSON.stringify(this.valuesForNextStep.get(entry.id)),
+                          }
+                        : { cssClass: 'simulation-table-cell', value: '' },
                     { cssClass: 'simulation-table-history', value: entry.data.toString() },
                     { cssClass: 'simulation-table-categories', value: entry.categories.toString() }
                 )
@@ -785,14 +828,20 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
 
     update(): void {
         if (this.simulationRunning) {
-            this.simulationData.forEach(entry => {
-                if (!(
-                    SimulationDataBlackList.includes(entry.id) ||
-                    entry.id.includes('_tickCounter') ||
-                    entry.id.startsWith('_') ||
-                    entry.id.startsWith('#')
-                ) || this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id)) {
-                    this.table.updateCell(entry.id, 'History', { cssClass: 'simulation-table-history', value: entry.data.reverse().toString() })
+            this.simulationData.forEach((entry) => {
+                if (
+                    !(
+                        SimulationDataBlackList.includes(entry.id) ||
+                        entry.id.includes('_tickCounter') ||
+                        entry.id.startsWith('_') ||
+                        entry.id.startsWith('#')
+                    ) ||
+                    (this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id))
+                ) {
+                    this.table.updateCell(entry.id, 'History', {
+                        cssClass: 'simulation-table-history',
+                        value: entry.data.reverse().toString(),
+                    })
                 }
             })
         }
@@ -807,6 +856,5 @@ export class SimulationData {
         public input: boolean,
         public output: boolean,
         public categories: string[]
-    ) {
-    }
+    ) {}
 }
