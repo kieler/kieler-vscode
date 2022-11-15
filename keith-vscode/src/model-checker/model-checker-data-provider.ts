@@ -236,14 +236,16 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
     initializeTable() {
         // Initialize table
         this.webview.reset()
-        this.props.forEach((entry) => {
-            this.webview.addRow(
-                entry.id,
-                { cssClass: 'model-checker-name', value: entry.name },
-                { cssClass: 'model-checker-formula', value: entry.formula },
-                { cssClass: 'model-checker-result', value: statusToString(entry.status) }
-            )
-        })
+        if (this.props) {
+            this.props.forEach((entry) => {
+                this.webview.addRow(
+                    entry.id,
+                    { cssClass: 'model-checker-name', value: entry.name },
+                    { cssClass: 'model-checker-formula', value: entry.formula },
+                    { cssClass: 'model-checker-result', value: statusToString(entry.status) }
+                )
+            })
+        }
     }
 
     /**
