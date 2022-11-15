@@ -841,7 +841,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 ) {
                     this.table.updateCell(entry.id, 'History', {
                         cssClass: 'simulation-table-history',
-                        value: entry.data.reverse().toString(),
+                        value: entry.data
+                            .reverse()
+                            .map((d, index) => `${index > 0 ? ' ' : ''}${JSON.stringify(d)}`)
+                            .toString(),
                     })
                 }
             })
