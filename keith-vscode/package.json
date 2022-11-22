@@ -305,6 +305,24 @@
         "command": "keith-vscode.show-internal-variables",
         "title": "Set display internal variables to ...",
         "category": "Simulation"
+      },
+      {
+        "command": "keith-vscode.verification-load-properties",
+        "title": "Reload Properties",
+        "category": "Verificaiton",
+        "icon": "$(repo-sync)"
+      },
+      {
+        "command": "keith-vscode.verification-run-checker",
+        "title": "Start Verification",
+        "category": "Verification",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "keith-vscode.verification-run-counterexample",
+        "title": "Start Counterexample",
+        "category": "Verification",
+        "icon": "$(debug-alt)"
       }
     ],
     "menus": {
@@ -398,6 +416,15 @@
         {
           "command": "keith-vscode.open-kviz-external",
           "when": "keith.vscode:simulationRunning"
+        },
+        {
+          "command": "keith-vscode.verification-load-properties"
+        },
+        {
+          "command": "keith-vscode.verification-run-checker"
+        },
+        {
+          "command": "keith-vscode.verification-run-counterexample"
         }
       ],
       "editor/title": [
@@ -434,38 +461,53 @@
       "view/title": [
         {
           "command": "keith-vscode.simulation-step",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "navigation@1"
         },
         {
           "command": "keith-vscode.simulation-stop",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "navigation@3"
         },
         {
           "command": "keith-vscode.simulation-run",
-          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && !keith.vscode:play && view == kieler-simulation-table",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.simulation-pause",
-          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && keith.vscode:play && view == kieler-simulation-table",
           "group": "navigation@2"
         },
         {
           "command": "keith-vscode.open-kviz-external",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "1_simulation-visualization"
         },
         {
           "command": "keith-vscode.simulation-save-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "2_simulation-trace@1"
         },
         {
           "command": "keith-vscode.simulation-load-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-tree",
+          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
           "group": "2_simulation-trace@2"
+        },
+        {
+          "command": "keith-vscode.verification-load-properties",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@1"
+        },
+        {
+          "command": "keith-vscode.verification-run-checker",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@2"
+        },
+        {
+          "command": "keith-vscode.verification-run-counterexample",
+          "when": "view == kieler-model-checker",
+          "group": "navigation@3"
         }
       ]
     },
@@ -486,9 +528,14 @@
           "name": "KIELER Compiler"
         },
         {
-          "type": "tree",
-          "id": "kieler-simulation-tree",
-          "name": "KIELER Simulation Tree"
+          "type": "webview",
+          "id": "kieler-model-checker",
+          "name": "KIELER Model Checker"
+        },
+        {
+          "type": "webview",
+          "id": "kieler-simulation-table",
+          "name": "KIELER Simulation"
         }
       ]
     },
@@ -588,9 +635,9 @@
   "dependencies": {
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
-    "snabbdom-jsx": "^0.4.2",
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
-    "vscode-uri": "^3.0.2"
+    "vscode-uri": "^3.0.2",
+    "@kieler/table-webview": "^0.0.1"
   }
 }

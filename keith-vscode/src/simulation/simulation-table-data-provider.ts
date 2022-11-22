@@ -3,22 +3,31 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021 by
+ * Copyright 2021 - 2022 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
  *
- * This code is provided under the terms of the Eclipse Public License (EPL).
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 
-import * as vscode from 'vscode'
+import { TableWebview } from '@kieler/table-webview/lib/table-webview'
 import * as path from 'path'
+import * as vscode from 'vscode'
 import { LanguageClient } from 'vscode-languageclient'
+import { Settings, SimulationType } from '../constants'
 import {
     CompilationDataProvider,
     CompilationSystem,
     CompilationSystemsMessage,
 } from '../kico/compilation-data-provider'
+import { PerformActionAction } from '../perform-action-handler'
+import { SettingsService } from '../settings'
+import { Tuple } from '../util'
 import {
     ADD_CO_SIMULATION,
     COMPILE_AND_SIMULATE,
@@ -38,28 +47,22 @@ import {
 } from './commands'
 import {
     delay,
-    reverse,
-    SimulationDataBlackList,
     LoadedTraceMessage,
     SavedTraceMessage,
+    SimulationDataBlackList,
     SimulationStartedMessage,
     SimulationStepMessage,
     SimulationStoppedMessage,
     strMapToObj,
     Trace,
 } from './helper'
-import { PerformActionAction } from '../perform-action-handler'
-import { SettingsService } from '../settings'
-import { Settings, SimulationType } from '../constants'
-import { Tuple } from '../util'
 
 export const externalStepMessageType = 'keith/simulation/didStep'
 export const valuesForNextStepMessageType = 'keith/simulation/valuesForNextStep'
 export const externalStopMessageType = 'keith/simulation/externalStop'
 export const startedSimulationMessageType = 'keith/simulation/started'
 
-// TODO lme: Maybe match naming with CompilationDataProvider
-export class SimulationTreeDataProvider implements vscode.TreeDataProvider<SimulationTreeData> {
+export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     public readonly newSimulationDataEmitter = new vscode.EventEmitter<this>()
 
     public readonly newSimulationData: vscode.Event<this> = this.newSimulationDataEmitter.event
@@ -73,7 +76,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     /**
      * Trace for each symbol.
      */
-    public simulationData: Map<string, SimulationTreeData> = new Map()
+    public simulationData: Map<string, SimulationData> = new Map()
     /**
      * Trace for each symbol.
      */
@@ -109,7 +112,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
      * Indicates whether a simulation is currently running.
      * TODO this might not be needed since simulationRunning already expresses this
      */
-    public simulationRunning = false
+    simulationRunning = false
 
     /**
      * Categories of variables with their respective members.
@@ -131,7 +134,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
     endTime = 0
 
-    public static readonly viewType = 'kieler-simulation-tree'
+    public static readonly viewType = 'kieler-simulation-table'
 
     public kico: CompilationDataProvider
 
@@ -143,11 +146,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
     private simulationStatus: vscode.StatusBarItem
 
-    private _onDidChangeTreeData: vscode.EventEmitter<SimulationTreeData | undefined | null | void> =
-        new vscode.EventEmitter<SimulationTreeData | undefined | null | void>()
+    protected table: TableWebview
 
-    readonly onDidChangeTreeData: vscode.Event<SimulationTreeData | undefined | null | void> =
-        this._onDidChangeTreeData.event
+    protected disposables: vscode.Disposable[] = []
 
     constructor(
         lsClient: LanguageClient,
@@ -155,40 +156,48 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         readonly context: vscode.ExtensionContext,
         private readonly settings: SettingsService<Settings>
     ) {
-        console.log('Simulation view tree is created')
-        // TODO
+        // Output channel
+        this.output = vscode.window.createOutputChannel('KIELER Simulation')
+        this.output.appendLine(`[INFO]\t${'Simulation view is created'}`)
+
         this.lsClient = lsClient
         this.kico = kico
         this.simulationStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left)
-        // TODO this.simulationStatus.command = TODO reveal view on command
         this.context.subscriptions.push(this.simulationStatus)
-
-        // Output channel
-        this.output = vscode.window.createOutputChannel('KIELER Simulation')
 
         // Push context variables for conditional menu items
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
         vscode.commands.executeCommand('setContext', 'keith.vscode:play', this.play)
 
         // Bind to events
-        kico.newSimulationCommands((systems) => {
-            if (typeof systems !== 'undefined') {
-                this.registerSimulationCommands(systems)
-            }
-            // Else case is that important enough to alert the user
-        })
-        kico.compilationStarted(() => {
-            this.compilationStarted()
-        })
-        kico.compilationFinished((success) => {
-            if (typeof success !== 'undefined') {
-                this.compilationFinished(success)
-            }
-            // Else case is that important enough to alert the user
-        })
-        kico.compilationFinished.bind((successful: boolean) => {
-            this.compilationFinished(successful)
-        })
+        this.disposables.push(
+            kico.newSimulationCommands((systems) => {
+                if (typeof systems !== 'undefined') {
+                    this.registerSimulationCommands(systems)
+                }
+                // Else case is not important enough to alert the user
+            })
+        )
+        this.disposables.push(
+            kico.compilationStarted(() => {
+                this.compilationStarted()
+            })
+        )
+        this.disposables.push(
+            kico.compilationFinished((success) => {
+                if (typeof success !== 'undefined') {
+                    this.compilationFinished(success)
+                }
+                // Else case is not important enough to alert the user
+            })
+        )
+        this.disposables.push(
+            kico.compilationFinished((successful) => {
+                if (successful !== undefined) {
+                    this.compilationFinished(successful)
+                }
+            })
+        )
 
         // Bind to LSP messages
         lsClient.onReady().then(() => {
@@ -206,7 +215,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             })
         })
 
-        // TODO Create commands
+        // Create commands
         this.context.subscriptions.push(
             vscode.commands.registerCommand(SIMULATE.command, async () => {
                 this.simulate()
@@ -357,6 +366,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
                 quickPick.onDidChangeSelection((selection) => {
                     if (selection[0]) {
                         this.settings.set('showInternalVariables.enabled', selection[0]?.label === 'true')
+                        this.initializeTable()
                     }
                     quickPick.hide()
                 })
@@ -366,74 +376,49 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         )
     }
 
-    // BUILD VIEW
-
-    getTreeItem(element: SimulationTreeData): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        if (element.contextValue?.startsWith('simulation:data')) {
-            element.label = element.id
-            const newValue = this.valuesForNextStep.get(element.id)
-            if (newValue) {
-                element.description = JSON.stringify(newValue)
-            } else {
-                element.description = JSON.stringify(element.data[element.data.length - 1])
-            }
-            // FIXME can this be removed? element.contextValue
-            return element
+    resolveWebviewView(
+        webviewView: vscode.WebviewView,
+        context: vscode.WebviewViewResolveContext<unknown>,
+        token: vscode.CancellationToken
+    ): void | Thenable<void> {
+        // Initialize webview
+        const tWebview = new TableWebview(
+            'KIELER Simulation',
+            [this.getExtensionFileUri('dist')],
+            this.getExtensionFileUri('dist', 'simulation-webview.js')
+        )
+        tWebview.webview = webviewView.webview
+        tWebview.webview.options = {
+            enableScripts: true,
         }
-        if (element.contextValue?.startsWith('simulation:history')) {
-            return element
-        }
-        throw new Error('Tree item is not defined.')
-    }
+        const title = tWebview.getTitle()
+        webviewView.title = title
+        tWebview.initializeWebview(webviewView.webview, title, ['Name', 'Input', 'History', 'Categories'])
+        this.table = tWebview
 
-    getChildren(element?: SimulationTreeData): vscode.ProviderResult<SimulationTreeData[]> {
-        if (this.simulationData) {
-            if (element === undefined) {
-                const result: SimulationTreeData[] = []
-                this.simulationData.forEach((treeData: SimulationTreeData) => {
-                    if (
-                        !(
-                            SimulationDataBlackList.includes(treeData.id) ||
-                            treeData.id.includes('_tickCounter') ||
-                            treeData.id.startsWith('_') ||
-                            treeData.id.startsWith('#')
-                        )
-                    ) {
-                        treeData.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
-                        treeData.contextValue = `simulation:data${treeData.input ? ':input' : ''}`
-                        result.push(treeData)
-                    }
-                })
-                return result
-            }
-            if (element.contextValue?.startsWith('simulation:data')) {
-                const history = new SimulationTreeData(
-                    JSON.stringify(reverse(element.data)),
-                    `${element.id}history`,
-                    vscode.TreeItemCollapsibleState.None,
-                    element.data,
-                    element.input,
-                    element.output,
-                    element.categories
-                )
-                history.contextValue = `simulation:history${element.input ? ':input' : ''}`
-                if (history.input) {
-                    history.command = {
-                        title: NEW_VALUE_SIMULATION.title,
-                        command: NEW_VALUE_SIMULATION.command,
-                        arguments: [element],
-                    }
+        // Subscriptions
+        this.context.subscriptions.push(
+            this.table.cellClicked((cell: { rowId: string; columnId: string } | undefined) => {
+                if (cell && cell.rowId && cell.columnId === 'Input') {
+                    this.clickedRow(cell.rowId)
                 }
-                return [history]
-            }
-            // No element other than the root element with its children is shown
-        }
-        return null // FIXME Is null really something we want to return here?
+            })
+        )
+        this.table.initialized(() => {
+            this.initializeTable()
+        })
     }
 
-    public update(): void {
-        this._onDidChangeTreeData.fire(null)
-        // TODO not necessary since TreeView automatically updates an change
+    clickedRow(rowId: string): void {
+        const data = this.simulationData.get(rowId)
+        if (data && data.input) {
+            this.newInputValue(data)
+        }
+    }
+
+    dispose() {
+        this.disposables.forEach((d) => d.dispose())
+        this.table.dispose()
     }
 
     createQuickPick(systems: CompilationSystem[]): vscode.QuickPickItem[] {
@@ -504,9 +489,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         }
     }
 
-    async newInputValue(simulationData: SimulationTreeData): Promise<void> {
+    async newInputValue(simulationData: SimulationData): Promise<void> {
         const result = await vscode.window.showInputBox({
-            value: JSON.stringify(simulationData.data[simulationData.data.length - 1]),
+            value: JSON.stringify(this.valuesForNextStep.get(simulationData.id)),
             placeHolder: `Input value for ${simulationData.id}`,
             title: `New value for ${simulationData.id}`,
             validateInput: (text) => {
@@ -516,18 +501,23 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
                 }
                 try {
                     valid =
-                        simulationData.data.length === 0 ||
+                        (simulationData.data.length === 0 &&
+                            typeof JSON.parse(text) === typeof this.valuesForNextStep.get(simulationData.id)) ||
                         typeof JSON.parse(text) === typeof simulationData.data[simulationData.data.length - 1]
                 } catch (e) {
                     // We do not care but we also do not set valid
                 }
-                return valid ? '' : `Input is not type of ${typeof simulationData.data[simulationData.data.length - 1]}`
+                return valid ? '' : `Input is not type of ${typeof this.valuesForNextStep.get(simulationData.id)}`
             },
         })
         if (result) {
-            this.valuesForNextStep.set(simulationData.id, JSON.parse(result))
-            this.changedValuesForNextStep.set(simulationData.id, JSON.parse(result))
-            this.update()
+            const parsedResult = JSON.parse(result)
+            this.valuesForNextStep.set(simulationData.id, parsedResult)
+            this.changedValuesForNextStep.set(simulationData.id, parsedResult)
+            this.table.updateCell(simulationData.id, 'Input', {
+                cssClass: 'simulation-table-input',
+                value: JSON.stringify(parsedResult),
+            })
         }
     }
 
@@ -567,7 +557,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             )}ms) Simulation could not be started`
             this.simulationStatus.tooltip = 'Did not simulate.'
             this.simulationStatus.show()
-            // TODO this.messageService.error(startMessage.error) TODO
+            this.output.appendLine(`[ERROR]\t${startMessage.error}`)
             return
         }
         this.simulationStatus.text = `$(check) (${(this.endTime - this.startTime).toPrecision(3)}ms) Simulating...`
@@ -582,8 +572,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         inputs = inputs === undefined ? [] : inputs
         let outputs: string[] = propertySet.get('output')
         outputs = outputs === undefined ? [] : outputs
-        propertySet.delete('input')
-        propertySet.delete('output')
         // Construct list of all categories
         this.categories = Array.from(propertySet.keys())
         pool.forEach((value, key) => {
@@ -594,28 +582,26 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
                     categoriesList.push(propertyKey)
                 }
             })
-            const newData: SimulationTreeData = {
+            const newData: SimulationData = {
                 id: key,
-                label: key + JSON.stringify([]),
-                collapsibleState: vscode.TreeItemCollapsibleState.None,
+                label: key,
                 data: [],
                 input: inputs.includes(key),
                 output: outputs.includes(key),
                 categories: categoriesList,
             }
             this.simulationData.set(key, newData)
-            // this.simulationTreeData.push(newData)
             // Set the value for which will be set for the next step for inputs
             if (inputs.includes(key)) {
                 this.valuesForNextStep.set(key, value)
             }
-            this.controlsEnabled = true
-            // Update view
         })
+        this.controlsEnabled = true
+        this.initializeTable()
         this.simulationRunning = true
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
         this.simulationStep = 0
-        // TODO show simulation view
+        // Show simulation view
         this.update()
     }
 
@@ -627,7 +613,6 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
         // Transform the input map to an object since this is the format the LS supports
         const jsonObject = strMapToObj(this.changedValuesForNextStep)
         lClient.sendNotification('keith/simulation/step', [jsonObject, 'Manual'])
-        // TODO Update data to indicate that a step is in process
         this.update()
     }
 
@@ -644,7 +629,7 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             'keith/simulation/stop'
         )) as SimulationStoppedMessage
         if (!message.successful) {
-            // TODO this.messageService.error(message.message) TODO
+            this.output.appendLine(`[ERROR]\t${message.message}`)
         }
         this.update()
         this.simulationStatus.text = 'Stopped simulation'
@@ -718,10 +703,13 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
             // The user did not pick any file to load.
             return
         }
+        this.loadTraceFromUri(uris[0])
+    }
 
+    async loadTraceFromUri(uri: vscode.Uri): Promise<void> {
         // Send the trace file uri to the server to convert it into a Trace model and to load it.
         const lClient = await this.lsClient
-        const message = (await lClient.sendRequest('keith/simulation/loadTrace', uris[0].path)) as LoadedTraceMessage
+        const message = (await lClient.sendRequest('keith/simulation/loadTrace', uri.path)) as LoadedTraceMessage
 
         if (!message.successful) {
             const errorMessage = `could not load trace: ${message.reason}`
@@ -765,11 +753,13 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
                 } else {
                     // This should not happen. An unexpected value was send by the server.
                     this.stopSimulation()
-                    // TODO this.messageService.error("Unexpected value for " + key + "in simulation data, stopping simulation")
+                    this.output.appendLine(
+                        '[ERROR]\tUnexpected value for " + key + "in simulation data, stopping simulation.'
+                    )
                 }
             })
         } else {
-            // TODO this.messageService.error('Simulation data values are undefined') TODO
+            this.output.appendLine('[ERROR]\tSimulation data values are undefined.')
         }
         if (!this.simulationRunning) {
             return false
@@ -787,7 +777,9 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleExternalStop(message: string): void {
-        // TODO this.messageService.error('Stopped simulation because of exception on LS. You might want to reload the window.') TODO
+        this.output.appendLine(
+            '[ERROR]\tStopped simulation because of exception on LS. You might want to reload the window.'
+        )
         // this.messageService.error(message)
         this.setValuesToStopSimulation()
     }
@@ -805,19 +797,68 @@ export class SimulationTreeDataProvider implements vscode.TreeDataProvider<Simul
     getExtensionFileUri(...segments: string[]): vscode.Uri {
         return vscode.Uri.file(path.join(this.context.extensionPath, ...segments))
     }
+
+    initializeTable() {
+        // Initialize table
+        this.table.reset()
+        this.simulationData.forEach((entry) => {
+            if (
+                !(
+                    SimulationDataBlackList.includes(entry.id) ||
+                    entry.id.includes('_tickCounter') ||
+                    entry.id.startsWith('_') ||
+                    entry.id.startsWith('#')
+                ) ||
+                (this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id))
+            ) {
+                this.table.addRow(
+                    entry.id,
+                    { cssClass: 'simulation-table-label', value: entry.label },
+                    entry.input
+                        ? {
+                              cssClass: 'simulation-table-input',
+                              value: JSON.stringify(this.valuesForNextStep.get(entry.id)),
+                          }
+                        : { cssClass: 'simulation-table-cell', value: '' },
+                    { cssClass: 'simulation-table-history', value: entry.data.toString() },
+                    { cssClass: 'simulation-table-categories', value: entry.categories.toString() }
+                )
+            }
+        })
+    }
+
+    update(): void {
+        if (this.simulationRunning) {
+            this.simulationData.forEach((entry) => {
+                if (
+                    !(
+                        SimulationDataBlackList.includes(entry.id) ||
+                        entry.id.includes('_tickCounter') ||
+                        entry.id.startsWith('_') ||
+                        entry.id.startsWith('#')
+                    ) ||
+                    (this.settings.get('showInternalVariables.enabled') && !SimulationDataBlackList.includes(entry.id))
+                ) {
+                    this.table.updateCell(entry.id, 'History', {
+                        cssClass: 'simulation-table-history',
+                        value: entry.data
+                            .reverse()
+                            .map((d, index) => `${index > 0 ? ' ' : ''}${JSON.stringify(d)}`)
+                            .toString(),
+                    })
+                }
+            })
+        }
+    }
 }
 
-export class SimulationTreeData extends vscode.TreeItem {
+export class SimulationData {
     constructor(
         public label: string,
         public id: string,
-        public collapsibleState: vscode.TreeItemCollapsibleState,
         public data: any[],
         public input: boolean,
         public output: boolean,
         public categories: string[]
-    ) {
-        super(label, collapsibleState)
-        this.tooltip = `Set ${this.label} to...`
-    }
+    ) {}
 }
