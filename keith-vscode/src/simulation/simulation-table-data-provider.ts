@@ -175,7 +175,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 if (typeof systems !== 'undefined') {
                     this.registerSimulationCommands(systems)
                 }
-                // Else case is that important enough to alert the user
+                // Else case is not important enough to alert the user
             })
         )
         this.disposables.push(
@@ -188,7 +188,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 if (typeof success !== 'undefined') {
                     this.compilationFinished(success)
                 }
-                // Else case is that important enough to alert the user
+                // Else case is not important enough to alert the user
             })
         )
         this.disposables.push(
