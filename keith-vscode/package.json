@@ -161,6 +161,11 @@
     ],
     "commands": [
       {
+        "command": "keith-vscode.import-stpa-ltl",
+        "title": "Import LTL from STPA",
+        "category": "STPA"
+      },
+      {
         "command": "keith-vscode.compile",
         "title": "Compile current model with...",
         "icon": "$(server-process)",
@@ -338,6 +343,10 @@
       ],
       "commandPalette": [
         {
+          "command": "keith-vscode.import-stpa-ltl",
+          "when": "resourceLangId == sctx"
+        },
+        {
           "command": "keith-vscode.show",
           "when": "false"
         },
@@ -448,6 +457,11 @@
         {
           "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
+          "group": "navigation"
+        },
+        {
+          "command": "keith-vscode.import-stpa-ltl",
+          "when": "resourceLangId == sctx",
           "group": "navigation"
         }
       ],
