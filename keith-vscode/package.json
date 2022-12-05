@@ -2,7 +2,7 @@
   "name": "keith-vscode",
   "displayName": "KIELER VS Code",
   "description": "KIELER Visual Studio Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "kieler",
   "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
   "icon": "icon.png",
@@ -633,11 +633,11 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "@kieler/table-webview": "^0.0.1",
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
-    "vscode-uri": "^3.0.2",
-    "@kieler/table-webview": "^0.0.1"
+    "vscode-uri": "^3.0.2"
   }
 }
