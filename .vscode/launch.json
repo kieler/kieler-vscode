@@ -41,7 +41,7 @@
             ],
         },
         {
-            "name": "Launch VS Code Extension (STPA)",
+            "name": "Launch VS Code Extension (PASTA)",
             "type": "pwa-extensionHost",
             "request": "launch",
             "args": [
