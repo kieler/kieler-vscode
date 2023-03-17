@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021 by
+ * Copyright 2021-2023 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -22,6 +22,7 @@ import { Settings, settingsKey } from './constants'
 import { KeithErrorHandler } from './error-handler'
 import { CompilationDataProvider } from './kico/compilation-data-provider'
 import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
+import { registerStpaCommands } from './pasta/stpa-interaction';
 import { handlePerformAction, performActionKind } from './perform-action-handler'
 import { SettingsService } from './settings'
 import { SimulationTableDataProvider } from './simulation/simulation-table-data-provider'
@@ -106,6 +107,9 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
 
 // this method is called when your extension is activated
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+
+    registerStpaCommands(context)
+    
     const serverOptions: ServerOptions = createServerOptions(context)
 
     const clientOptions: LanguageClientOptions = {

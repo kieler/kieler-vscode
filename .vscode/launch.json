@@ -41,6 +41,33 @@
             ],
         },
         {
+            "name": "Launch VS Code Extension (PASTA) (Socket)",
+            "type": "pwa-extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
+				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode",
+				"--extensionDevelopmentPath=${workspaceFolder}/../stpa/extension"
+            ],
+            "env": {
+                "KEITH_LS_PORT": "5007"
+            },
+            "skipFiles": [
+              "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "smartStep": true,
+            "sourceMapPathOverrides": {
+                "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+                "webpack://?:*/*": "${workspaceFolder}/keith-vscode/*"
+            },
+            "outFiles": [
+                "${workspaceFolder}/keith-vscode/dist/**/*.js",
+				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/dist/**/*.js",
+				"${workspaceFolder}/../stpa/extension/pack/**/*.js"
+            ],
+        },
+        {
             "name": "Launch VS Code Extension (Socket) Disabled Extensions",
             "type": "pwa-extensionHost",
             "request": "launch",
