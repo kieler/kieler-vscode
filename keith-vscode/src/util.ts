@@ -56,7 +56,6 @@ export async function handleWorkSpaceEdit(uri: string, text: string, position: v
     }
 
     if (editor) {
-        // TODO: endPos is not completly correct. maybe \n must be counted too?
         // reveal the range of the inserted text
         const endPos = textDocument.positionAt(textDocument.offsetAt(position) + text.length);
         editor.selection = new vscode.Selection(position, endPos);
