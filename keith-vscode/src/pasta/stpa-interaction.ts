@@ -20,8 +20,7 @@ import { handleWorkSpaceEdit } from '../util';
 
 /** Command identifiers that are provided by pasta. */
 const pastaCommands = {
-    getLTL: 'pasta.getLTLFormula',
-    // sendModelCheckerResult: 'pasta.sendModelCheckerResult'
+    getLTL: 'pasta.getLTLFormula'
 };
 
 /**
@@ -30,53 +29,53 @@ const pastaCommands = {
  */
 export function registerStpaCommands(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
-        vscode.commands.registerCommand('keith-vscode.import-stpa-ltl', async (...commandArgs: any[]) => {
-            importStpaLTL(commandArgs[0]);
+        vscode.commands.registerCommand('keith-vscode.import-stpa-ltl', async (uri: vscode.Uri) => {
+            importStpaLTL(uri);
         })
     );
 }
 
 /**
-* Imports LTL formulas into the scchart given by {@code currentUri}. 
+* Imports LTL formulas into the SCChart given by {@code currentUri}. 
 * @param currentUri The uri of the scchart in which the LTL should be imported.
 */
 async function importStpaLTL(currentUri: vscode.Uri): Promise<void> {
     const pastaExtension = vscode.extensions.getExtension('kieler.pasta');
-    if (pastaExtension) {
-        // list of all available stpa files
-        const options: vscode.QuickPickItem[] = [];
-        const uris = await vscode.workspace.findFiles('**/*.stpa');
-        const displays = uris.map(uri => vscode.workspace.asRelativePath(uri));
-        uris.forEach((uri, i) => {
-            options.push({ label: displays[i], description: uri.toString() });
-        });
-        // user must select the stpa file from which LTL formulas should be imported
-        const quickPick = vscode.window.createQuickPick();
-        quickPick.items = options;
-        quickPick.onDidChangeSelection(async (selection) => {
-            if (selection[0]) {
-                // get the ltl formulas from the pasta extension
-                const ltlFormulas = await vscode.commands.executeCommand<{ formula: string, text: string, ucaId: string; }[]>(
-                    pastaCommands.getLTL,
-                    selection[0].description
-                );
-                if (ltlFormulas) {
-                    // translate the formulas to annotations for sccharts
-                    let formulas = "";
-                    ltlFormulas.forEach((ltlFormula) => {
-                        formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text);
-                    });
-                    // add the annotations to the currently open scchart
-                    handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0));
-                }
-            }
-            quickPick.hide();
-        });
-        quickPick.onDidHide(() => quickPick.dispose());
-        quickPick.show();
-    } else {
+    if (!pastaExtension) {
         vscode.window.showErrorMessage("PASTA Extension not found.");
+        return;
     }
+    // list of all available stpa files
+    const options: vscode.QuickPickItem[] = [];
+    const uris = await vscode.workspace.findFiles('**/*.stpa');
+    const displays = uris.map(uri => vscode.workspace.asRelativePath(uri));
+    uris.forEach((uri, i) => {
+        options.push({ label: displays[i], description: uri.toString() });
+    });
+    // user must select the stpa file from which LTL formulas should be imported
+    const quickPick = vscode.window.createQuickPick();
+    quickPick.items = options;
+    quickPick.onDidChangeSelection(async (selection) => {
+        if (selection[0]) {
+            // get the ltl formulas from the pasta extension
+            const ltlFormulas = await vscode.commands.executeCommand<{ formula: string, text: string, ucaId: string; }[]>(
+                pastaCommands.getLTL,
+                selection[0].description
+            );
+            if (ltlFormulas) {
+                // translate the formulas to annotations for sccharts
+                let formulas = "";
+                ltlFormulas.forEach((ltlFormula) => {
+                    formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text);
+                });
+                // add the annotations at the top of the currently open scchart
+                handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0));
+            }
+        }
+        quickPick.hide();
+    });
+    quickPick.onDidHide(() => quickPick.dispose());
+    quickPick.show();
 }
 
 /**

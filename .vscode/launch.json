@@ -41,7 +41,7 @@
             ],
         },
         {
-            "name": "Launch VS Code Extension (PASTA)",
+            "name": "Launch VS Code Extension (PASTA) (Socket)",
             "type": "pwa-extensionHost",
             "request": "launch",
             "args": [
@@ -64,7 +64,7 @@
             "outFiles": [
                 "${workspaceFolder}/keith-vscode/dist/**/*.js",
 				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/dist/**/*.js",
-				"${workspaceFolder}/../stpa/extension/klighd-vscode/pack/**/*.js"
+				"${workspaceFolder}/../stpa/extension/pack/**/*.js"
             ],
         },
         {

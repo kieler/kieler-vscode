@@ -17,7 +17,7 @@
 
 import * as vscode from 'vscode';
 
-type UnionToIntersection<U> = (U extends never ? never : (arg: U) => never) extends (arg: infer I) => void ? I : never
+type UnionToIntersection<U> = (U extends never ? never : (arg: U) => never) extends (arg: infer I) => void ? I : never;
 
 /**
  * Helper type to construct a tuple from a union.
@@ -25,20 +25,20 @@ type UnionToIntersection<U> = (U extends never ? never : (arg: U) => never) exte
  */
 export type Tuple<T> = UnionToIntersection<T extends never ? never : (t: T) => T> extends (_: never) => infer W
     ? [...Tuple<Exclude<T, W>>, W]
-    : []
+    : [];
 
-    /**
- * Applys a workspaceedit to the document defined by {@code uri}, at the position {@code position} with the given {@code text}.
- * @param uri URI of the document where the edit should be applied.
- * @param text The text to insert in the document.
- * @param position The position in the document where the text should be inserted.
- */
+/**
+* Applys a workspaceedit to the document defined by {@code uri}, at the position {@code position} with the given {@code text}.
+* @param uri URI of the document where the edit should be applied.
+* @param text The text to insert in the document.
+* @param position The position in the document where the text should be inserted.
+*/
 export async function handleWorkSpaceEdit(uri: string, text: string, position: vscode.Position): Promise<void> {
     // get the desired editor and document
     const editor = vscode.window.visibleTextEditors.find(visibleEditor => visibleEditor.document.uri.toString() === uri);
     const textDocument = editor?.document;
     if (!textDocument) {
-        console.error(
+        vscode.window.showErrorMessage(
             `Server requested a text edit but the requested uri was not found among the known documents: ${uri}`
         );
         return;
@@ -51,7 +51,7 @@ export async function handleWorkSpaceEdit(uri: string, text: string, position: v
     // Apply and save the edit. Report possible failures.
     const edited = await vscode.workspace.applyEdit(workSpaceEdit);
     if (!edited) {
-        console.error("Workspace edit could not be applied!");
+        vscode.window.showErrorMessage("Workspace edit could not be applied!");
         return;
     }
 
