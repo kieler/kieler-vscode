@@ -24,13 +24,13 @@
   "devDependencies": {
     "css-loader": "^6.5.1",
     "file-loader": "^6.2.0",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.4.0",
     "source-map-loader": "^3.0.0",
     "style-loader": "^1.2.1",
     "ts-loader": "^9.2.6"
   },
   "scripts": {
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib",
     "lint": "eslint .",
     "build": "tsc",
     "watch": "tsc -w",

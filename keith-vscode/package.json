@@ -618,7 +618,7 @@
     "kieler.klighd-vscode"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "lint": "eslint .",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
@@ -641,6 +641,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "2.5.1",
+    "rimraf": "^4.4.0",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
