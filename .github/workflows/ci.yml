@@ -26,7 +26,7 @@ jobs:
               with:
                   node-version: 14.x
             - run: yarn
-            - run: yarn build
+            - run: yarn package
             - run: yarn lint
 
             - name: Attach KIELER VS Code Extension (no server)
