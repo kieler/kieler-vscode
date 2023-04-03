@@ -26,8 +26,8 @@ jobs:
               with:
                   node-version: 14.x
             - run: yarn
-            - run: yarn lint
             - run: yarn build
+            - run: yarn lint
 
             - name: Attach KIELER VS Code Extension (no server)
               uses: actions/upload-artifact@v2
