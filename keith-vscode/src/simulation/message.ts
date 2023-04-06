@@ -23,24 +23,21 @@ export interface WebviewReadyMessage {
     readyMessage: string
 }
 
-export function isWebviewReadyMessage(object: any): object is WebviewReadyMessage {
-    /* eslint no-prototype-builtins: "off" */
-    return object !== undefined && object.hasOwnProperty('readyMessage')
-}
-
 export interface SimulationTableData {
     key: string
     data: Map<string, SimulationData>
     inputOutputColumnEnabled: boolean
-    valuesForNextStep: Map<string, any>
+    valuesForNextStep: Map<string, unknown>
 }
 
-export function isSimulationData(object: any): object is SimulationTableData {
+export function isSimulationData(object: unknown): object is SimulationTableData {
     return (
+        typeof object === 'object' &&
         object !== undefined &&
-        object.hasOwnProperty('key') &&
-        object.hasOwnProperty('data') &&
-        object.hasOwnProperty('inputOutputColumnEnabled') &&
-        object.hasOwnProperty('valuesForNextStep')
+        object !== null &&
+        'key' in object &&
+        'data' in object &&
+        'inputOutputColumnEnabled' in object &&
+        'valuesForNextStep' in object
     ) // TODO really check the type if needed
 }

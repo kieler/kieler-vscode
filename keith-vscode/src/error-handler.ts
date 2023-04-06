@@ -27,6 +27,7 @@ export class KeithErrorHandler implements ErrorHandler {
 
     error(error: Error, message: Message, count: number): ErrorAction {
         window.showErrorMessage('Connection to KIELER Language Server produced an error!')
+        // eslint-disable-next-line no-console
         console.error(error)
 
         return this.defaultHandler.error(error, message, count)

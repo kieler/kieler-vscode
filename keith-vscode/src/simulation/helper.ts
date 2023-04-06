@@ -23,7 +23,7 @@ export function delay(ms: number): Promise<unknown> {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export function strMapToObj(strMap: Map<string, any>): any {
+export function strMapToObj(strMap: Map<string, unknown>): unknown {
     const obj = Object.create(null)
     strMap.forEach((v, k) => {
         obj[k] = v
@@ -31,7 +31,7 @@ export function strMapToObj(strMap: Map<string, any>): any {
     return obj
 }
 
-export function strMapToJson(strMap: Map<string, any>): string {
+export function strMapToJson(strMap: Map<string, unknown>): string {
     return JSON.stringify(strMapToObj(strMap))
 }
 
@@ -44,7 +44,7 @@ export function isInternal(data: SimulationData): boolean {
     )
 }
 
-export function reverse(array: any[]): any[] {
+export function reverse(array: unknown[]): unknown[] {
     return array.map((item, idx) => array[array.length - 1 - idx])
 }
 
@@ -61,7 +61,7 @@ export function getNonce(): string {
  * Internal data structure to save all data required to display a simulation in the siulation view.
  */
 export class SimulationData {
-    constructor(public data: any[], public input: boolean, public output: boolean, public categories: string[]) {}
+    constructor(public data: unknown[], public input: boolean, public output: boolean, public categories: string[]) {}
 }
 
 /**

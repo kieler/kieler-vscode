@@ -25,7 +25,6 @@ import {
     CompilationSystem,
     CompilationSystemsMessage,
 } from '../kico/compilation-data-provider'
-import { PerformActionAction } from '../perform-action-handler'
 import { SettingsService } from '../settings'
 import { Tuple } from '../util'
 import {
@@ -85,12 +84,12 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     /**
      * Holds the value that is set in the next tick. Holds only the inputs of the simulation
      */
-    public valuesForNextStep: Map<string, any> = new Map()
+    public valuesForNextStep: Map<string, unknown> = new Map()
 
     /**
      * Indicates whether an input value should be sent to the server.
      */
-    public changedValuesForNextStep: Map<string, any> = new Map()
+    public changedValuesForNextStep: Map<string, unknown> = new Map()
 
     /**
      * Map which holds wether a event listener is registered for a symbol
@@ -376,11 +375,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         )
     }
 
-    resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext<unknown>,
-        token: vscode.CancellationToken
-    ): void | Thenable<void> {
+    resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
         // Initialize webview
         const tWebview = new TableWebview(
             'KIELER Simulation',
@@ -472,7 +467,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    async handleAddCoSimulation(action: PerformActionAction): Promise<void> {
+    async handleAddCoSimulation(): Promise<void> {
         // TODO Uri of simulation file
         const executableUri = await vscode.window.showOpenDialog({
             title: 'Select CoSimulation executable',
@@ -565,12 +560,12 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         this.simulationStatus.show()
 
         // Get the start configuration for the simulation
-        const pool: Map<string, any> = new Map(Object.entries(startMessage.dataPool))
-        const propertySet: Map<string, any> = new Map(Object.entries(startMessage.propertySet))
+        const pool: Map<string, unknown> = new Map(Object.entries(startMessage.dataPool))
+        const propertySet: Map<string, string[]> = new Map(Object.entries(startMessage.propertySet))
         // Inputs and outputs are handled separately
-        let inputs: string[] = propertySet.get('input')
+        let inputs: string[] | undefined = propertySet.get('input')
         inputs = inputs === undefined ? [] : inputs
-        let outputs: string[] = propertySet.get('output')
+        let outputs: string[] | undefined = propertySet.get('output')
         outputs = outputs === undefined ? [] : outputs
         // Construct list of all categories
         this.categories = Array.from(propertySet.keys())
@@ -586,13 +581,13 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 id: key,
                 label: key,
                 data: [],
-                input: inputs.includes(key),
-                output: outputs.includes(key),
+                input: inputs?.includes(key) ?? false,
+                output: outputs?.includes(key) ?? false,
                 categories: categoriesList,
             }
             this.simulationData.set(key, newData)
             // Set the value for which will be set for the next step for inputs
-            if (inputs.includes(key)) {
+            if (inputs?.includes(key)) {
                 this.valuesForNextStep.set(key, value)
             }
         })
@@ -737,7 +732,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
      * @param message data of step, includes new values.
      */
     handleStepMessage(message: SimulationStepMessage): boolean {
-        const pool: Map<string, any> = new Map(Object.entries(message.values))
+        const pool: Map<string, unknown> = new Map(Object.entries(message.values))
         if (pool) {
             pool.forEach((value, key) => {
                 // push value in history and set new input value
@@ -771,6 +766,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     }
 
     handleExternalNewUserValue(values: unknown): void {
+        // eslint-disable-next-line no-console
         console.log('external value', values)
         // this.messageService.warn('External new user values are not implemented')
     }
@@ -856,7 +852,7 @@ export class SimulationData {
     constructor(
         public label: string,
         public id: string,
-        public data: any[],
+        public data: unknown[],
         public input: boolean,
         public output: boolean,
         public categories: string[]

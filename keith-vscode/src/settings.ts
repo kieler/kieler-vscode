@@ -30,7 +30,7 @@ export class SettingsService<S> {
     /**
      * Cache for settings, so no calls to API are needed upon requests for values of settings.
      */
-    private readonly cache: Map<string, any>
+    private readonly cache: Map<string, unknown>
 
     /**
      * Initialize a new wrapper around the settings API of VSC for a specific configuration with built-in caching.
@@ -69,7 +69,7 @@ export class SettingsService<S> {
      * @returns current value of the setting
      */
     public get<K extends Extract<keyof S, string>>(key: K): S[K] {
-        return this.cache.get(key)
+        return this.cache.get(key) as S[K]
     }
 
     /**

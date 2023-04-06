@@ -15,6 +15,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { attributesModule, Classes, classModule, eventListenersModule, init, jsx, propsModule, styleModule, VNode } from 'snabbdom';
 import { Cell } from './helper'
 
