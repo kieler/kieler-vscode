@@ -45,37 +45,34 @@ async function importStpaLTL(currentUri: vscode.Uri): Promise<void> {
         vscode.window.showErrorMessage('PASTA Extension not found.')
         return
     }
-    // list of all available stpa files
-    const options: vscode.QuickPickItem[] = []
-    const uris = await vscode.workspace.findFiles('**/*.stpa')
-    const displays = uris.map((uri) => vscode.workspace.asRelativePath(uri))
-    uris.forEach((uri, i) => {
-        options.push({ label: displays[i], description: uri.toString() })
-    })
-    // user must select the stpa file from which LTL formulas should be imported
-    const quickPick = vscode.window.createQuickPick()
-    quickPick.items = options
-    quickPick.onDidChangeSelection(async (selection) => {
-        if (selection[0]) {
-            // get the ltl formulas from the pasta extension
-            const ltlFormulas = await vscode.commands.executeCommand<
-                { formula: string; text: string; ucaId: string }[]
-            >(pastaCommands.getLTL, selection[0].description)
-            if (ltlFormulas) {
-                // translate the formulas to annotations for sccharts
-                let formulas = ''
-                ltlFormulas.forEach((ltlFormula) => {
-                    formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text)
-                })
-                // add the annotations at the top of the currently open scchart
-                handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0))
-            }
-        }
-        quickPick.hide()
-    })
-    quickPick.onDidHide(() => quickPick.dispose())
-    quickPick.show()
+
+    // Loading the stpa file.
+    const uris = await vscode.window.showOpenDialog({
+        canSelectMany: false,
+        filters: { STPA: ['stpa'] },
+    });
+    if (uris === undefined) {
+        // The user did not pick any file to load.
+        return;
+    }
+
+    // get the ltl formulas from the pasta extension
+    const ltlFormulas = await vscode.commands.executeCommand<{ formula: string, text: string, ucaId: string; }[]>(
+        pastaCommands.getLTL,
+        uris[0].toString()
+    );
+    if (ltlFormulas) {
+        // translate the formulas to annotations for sccharts
+        let formulas = "";
+        ltlFormulas.forEach((ltlFormula) => {
+            formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text);
+        });
+        // add the annotations at the top of the currently open scchart
+        handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0));
+    }
+
 }
+
 
 /**
  * An SCChart LTL annotation.
