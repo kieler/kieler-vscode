@@ -2,7 +2,7 @@
   "name": "keith-vscode",
   "displayName": "KIELER VS Code",
   "description": "KIELER Visual Studio Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "kieler",
   "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
   "icon": "icon.png",
@@ -24,6 +24,7 @@
     "onLanguage:sctx",
     "onLanguage:scl",
     "onLanguage:elkt",
+    "onLanguage:elkj",
     "onLanguage:kgt",
     "onLanguage:kgx",
     "onLanguage:kviz",
@@ -65,6 +66,16 @@
           "elkt"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "elkj",
+        "aliases": [
+          "Elk Graph",
+          "elkj"
+        ],
+        "extensions": [
+          "elkj"
+        ]
       },
       {
         "id": "strl",
@@ -351,11 +362,11 @@
           "when": "false"
         },
         {
-          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
+          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt  || keith.vscode:compilationReady && resourceLangId == elkj || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
           "command": "keith-vscode.compile"
         },
         {
-          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
+          "when": "keith.vscode:compilationReady && resourceLangId == sctx || keith.vscode:compilationReady && resourceLangId == elkt || keith.vscode:compilationReady && resourceLangId == elkj || keith.vscode:compilationReady && resourceLangId == kgt || keith.vscode:compilationReady && resourceLangId == kgx || keith.vscode:compilationReady && resourceLangId == kviz || keith.vscode:compilationReady && resourceLangId == strl || keith.vscode:compilationReady && resourceLangId == lus",
           "command": "keith-vscode.compile-snapshot"
         },
         {
@@ -448,14 +459,14 @@
           "group": "navigation@2"
         },
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == elkj || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation@300000"
         }
       ],
       "editor/context": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == elkj || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         },
@@ -467,7 +478,7 @@
       ],
       "explorer/context": [
         {
-          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
+          "when": "resourceLangId == sctx || resourceLangId == elkt || resourceLangId == elkj || resourceLangId == kgt || resourceLangId == kgx || resourceLangId == kviz || resourceLangId == strl || resourceLangId == lus",
           "command": "klighd-vscode.diagram.open",
           "group": "navigation"
         }
@@ -618,7 +629,7 @@
     "kieler.klighd-vscode"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "lint": "eslint .",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
@@ -641,17 +652,18 @@
     "eslint-plugin-prettier": "^4.0.0",
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "2.5.1",
+    "rimraf": "^4.4.0",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "@kieler/table-webview": "^0.0.1",
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
     "snabbdom-to-html": "^7.0.0",
     "vscode-languageclient": "^5.2.1",
-    "vscode-uri": "^3.0.2",
-    "@kieler/table-webview": "^0.0.1"
+    "vscode-uri": "^3.0.2"
   }
 }

@@ -16,7 +16,7 @@ module.exports = {
         'no-plusplus': 0,
         'import/prefer-default-export': 0,
         'no-useless-constructor': 0,
-        'no-restricted-syntax': 1,
+        'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
         'max-classes-per-file': 0,
         'no-use-before-define': 0,
         'no-underscore-dangle': 0,

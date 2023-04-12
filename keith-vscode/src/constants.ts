@@ -33,7 +33,7 @@ export const views = {
     checker: {
         id: 'kieler-model-checker',
         name: 'KIELER Model Checker',
-    }
+    },
 }
 
 /**

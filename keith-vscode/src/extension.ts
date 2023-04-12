@@ -22,7 +22,7 @@ import { Settings, settingsKey } from './constants'
 import { KeithErrorHandler } from './error-handler'
 import { CompilationDataProvider } from './kico/compilation-data-provider'
 import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
-import { registerStpaCommands } from './pasta/stpa-interaction';
+import { registerStpaCommands } from './pasta/stpa-interaction'
 import { handlePerformAction, performActionKind } from './perform-action-handler'
 import { SettingsService } from './settings'
 import { SimulationTableDataProvider } from './simulation/simulation-table-data-provider'
@@ -40,7 +40,7 @@ const klighdCommands = {
  * The file ending should also be the language id, since it is also used to
  * register document selectors in the language client.
  */
-const supportedFileEndings = ['sctx', 'scl', 'elkt', 'kgt', 'kgx', 'kviz', 'strl', 'lus']
+const supportedFileEndings = ['sctx', 'scl', 'elkt', 'elkj', 'kgt', 'kgx', 'kviz', 'strl', 'lus']
 
 let lsClient: LanguageClient
 let socket: Socket
@@ -85,6 +85,7 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
         const connectionInfo: NetConnectOpts = {
             port: parseInt(process.env.KEITH_LS_PORT, 10),
         }
+        // eslint-disable-next-line no-console
         console.log('Connecting to language server on port: ', connectionInfo.port)
 
         return async () => {
@@ -96,6 +97,7 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
             return result
         }
     }
+    // eslint-disable-next-line no-console
     console.log('Spawning the language server as a process.')
     const lsPath = context.asAbsolutePath(`server/kieler-language-server.${getPlattformType()}.jar`)
 
@@ -107,9 +109,8 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
 
 // this method is called when your extension is activated
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-
     registerStpaCommands(context)
-    
+
     const serverOptions: ServerOptions = createServerOptions(context)
 
     const clientOptions: LanguageClientOptions = {
@@ -175,6 +176,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     )
     vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
 
+    // eslint-disable-next-line no-console
     console.debug('Starting Language Server...')
     lsClient.start()
 

@@ -196,11 +196,7 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
      * @param context The context.
      * @param token The cancellation token.
      */
-    resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext<unknown>,
-        token: vscode.CancellationToken
-    ): void | Thenable<void> {
+    resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
         // Initialize webview
         const tWebview = new TableWebview(
             'Model Checker Table',
