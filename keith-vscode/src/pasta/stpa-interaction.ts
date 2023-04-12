@@ -50,29 +50,27 @@ async function importStpaLTL(currentUri: vscode.Uri): Promise<void> {
     const uris = await vscode.window.showOpenDialog({
         canSelectMany: false,
         filters: { STPA: ['stpa'] },
-    });
+    })
     if (uris === undefined) {
         // The user did not pick any file to load.
-        return;
+        return
     }
 
     // get the ltl formulas from the pasta extension
-    const ltlFormulas = await vscode.commands.executeCommand<{ formula: string, text: string, ucaId: string; }[]>(
+    const ltlFormulas = await vscode.commands.executeCommand<{ formula: string; text: string; ucaId: string }[]>(
         pastaCommands.getLTL,
         uris[0].toString()
-    );
+    )
     if (ltlFormulas) {
         // translate the formulas to annotations for sccharts
-        let formulas = "";
+        let formulas = ''
         ltlFormulas.forEach((ltlFormula) => {
-            formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text);
-        });
+            formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text)
+        })
         // add the annotations at the top of the currently open scchart
-        handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0));
+        handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0))
     }
-
 }
-
 
 /**
  * An SCChart LTL annotation.
