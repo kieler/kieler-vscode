@@ -749,7 +749,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                     // This should not happen. An unexpected value was send by the server.
                     this.stopSimulation()
                     this.output.appendLine(
-                        '[ERROR]\tUnexpected value for " + key + "in simulation data, stopping simulation.'
+                        `[ERROR]\tUnexpected value for ${key} in simulation data, stopping simulation.`
                     )
                 }
             })
