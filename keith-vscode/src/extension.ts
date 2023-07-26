@@ -21,6 +21,7 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from
 import { Settings, settingsKey } from './constants'
 import { KeithErrorHandler } from './error-handler'
 import { CompilationDataProvider } from './kico/compilation-data-provider'
+import { GraphPropertiesDataProvider } from './graph-properties-view/graph-properties-data-provider'
 import { ModelCheckerDataProvider } from './model-checker/model-checker-data-provider'
 import { registerStpaCommands } from './pasta/stpa-interaction'
 import { handlePerformAction, performActionKind } from './perform-action-handler'
@@ -176,6 +177,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     )
     vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
 
+    // Register and start model checker view
+    const graphPropertiesDataProvider: vscode.WebviewViewProvider = new GraphPropertiesDataProvider(lsClient, context)
+    vscode.window.registerWebviewViewProvider('kieler-graph-properties', graphPropertiesDataProvider)
     // eslint-disable-next-line no-console
     console.debug('Starting Language Server...')
     lsClient.start()
