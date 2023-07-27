@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "description": "KIEL Environment Integrated in Theia",
-    "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
+    "author": "KIELER <kieler@rtsys.informatik.uni-kiel.de>",
     "license": "EPL-2.0",
     "bugs": {
         "url": "https://rtsys.informatik.uni-kiel.de/jira"
