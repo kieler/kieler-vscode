@@ -652,6 +652,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "2.5.1",
+    "source-map-loader": "^3.0.0",
+    "style-loader": "^1.2.1",
     "rimraf": "^4.4.0",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
@@ -659,7 +661,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@kieler/table-webview": "^0.0.1",
+    "@kieler/table-webview": "/home/mka/git/JutilS/table-webview",
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
     "snabbdom-to-html": "^7.0.0",
