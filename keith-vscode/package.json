@@ -559,11 +559,6 @@
         },
         {
           "type": "webview",
-          "id": "kieler-graph-properties",
-          "name": "KIELER Property View"
-        },
-        {
-          "type": "webview",
           "id": "kieler-simulation-table",
           "name": "KIELER Simulation"
         }
@@ -658,13 +653,15 @@
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "2.5.1",
     "rimraf": "^4.4.0",
+    "source-map-loader": "^4.0.1",
+    "style-loader": "^3.3.3",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@kieler/table-webview": "^0.0.2",
+    "@kieler/table-webview": "/home/mka/git/JutilS/table-webview",
     "es6-shim": "^0.35.6",
     "react": "^17.0.2",
     "snabbdom-to-html": "^7.0.0",

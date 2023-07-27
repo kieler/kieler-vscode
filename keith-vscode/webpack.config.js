@@ -83,42 +83,6 @@ const verificationWebview = {
 };
 
 /**@type {import('webpack').Configuration}*/
-const graphPropertiesWebview = {
-    target: 'web',
-    mode: "none", // Leave source code as close as possible. Only set to production during distribution.
-
-
-    entry: path.resolve(__dirname, 'src/graph-properties-view/graph-properties.ts'),
-    output: {
-		filename: 'graph-properties-webview.js',
-        path: path.resolve(__dirname, "dist"),
-    },
-    devtool: "nosources-source-map",
-
-    resolve: {
-        extensions: ['.ts', '.tsx', '.js']
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: ['ts-loader']
-            },
-            {
-                test: /\.js$/,
-                use: ['source-map-loader'],
-                enforce: 'pre'
-            },
-            {
-                test: /\.css$/,
-                exclude: /\.useable\.css$/,
-                use: ['style-loader', 'css-loader']
-            },
-        ]
-    }
-};
-
-/**@type {import('webpack').Configuration}*/
 const simulationWebview = {
     target: 'web',
     mode: "none", // Leave source code as close as possible. Only set to production during distribution.
@@ -154,4 +118,4 @@ const simulationWebview = {
     }
 };
 
-module.exports = [config, verificationWebview, graphPropertiesWebview, simulationWebview];
+module.exports = [config, verificationWebview, simulationWebview];
