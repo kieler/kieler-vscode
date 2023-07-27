@@ -559,11 +559,6 @@
         },
         {
           "type": "webview",
-          "id": "kieler-graph-properties",
-          "name": "KIELER Property View"
-        },
-        {
-          "type": "webview",
           "id": "kieler-simulation-table",
           "name": "KIELER Simulation"
         }
