@@ -16,7 +16,7 @@
  */
 
 import './style/index.css'
-import { Table } from '@kieler/table-webview'
+import { Table } from '@kieler/table-webview/lib/table'
 
 /**
  * Custom table for the simulation view.
