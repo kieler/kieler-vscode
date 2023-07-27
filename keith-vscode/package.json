@@ -653,8 +653,6 @@
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "2.5.1",
     "rimraf": "^4.4.0",
-    "source-map-loader": "^4.0.1",
-    "style-loader": "^3.3.3",
     "ts-loader": "^9.2.3",
     "vsce": "1.88.0",
     "webpack": "^5.39.1",
