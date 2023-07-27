@@ -16,7 +16,7 @@
  */
 
 import './style/index.css'
-import { Table } from '@kieler/table-webview/lib/table'
+import { Table } from '@kieler/table-webview'
 
 /**
  * Custom table for the model checker view.

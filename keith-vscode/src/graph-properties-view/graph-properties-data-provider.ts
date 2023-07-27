@@ -1,4 +1,4 @@
-import { TableWebview } from '@kieler/table-webview/lib/table-webview'
+import { TableWebview } from '@kieler/table-webview'
 import * as path from 'path'
 import * as vscode from 'vscode'
 

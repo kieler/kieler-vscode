@@ -57,10 +57,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@kieler/table-webview@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@kieler/table-webview/-/table-webview-0.0.1.tgz#b91c174e4ad23cd7db0bcb93b9594a9a98cb2d50"
-  integrity sha512-25y6DxcxGabQGhJ3uGwllZ3ZT5MI06gMQ4Imce4l7/94v+awu5xvLz37/bsO1IfdN/iNl8q71+ct8TpvKKyMBw==
+"@kieler/table-webview@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@kieler/table-webview/-/table-webview-0.0.2.tgz#be7a69facfcfd5f3781d78a6e7959acee39cf967"
+  integrity sha512-PkXvfe9YrH1Yj5Pz5oN5cA7ZkJVTFLk8ZNZbqOAsW/P0CuIazTF5OIsjzluZMlMEZslsC1Eg1/Ff9PTwzfYiQg==
   dependencies:
     "@types/vscode" "^1.80.0"
     snabbdom "^3.5.1"
