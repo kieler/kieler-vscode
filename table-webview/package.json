@@ -2,7 +2,7 @@
   "name": "@kieler/table-webview",
   "version": "0.0.1",
   "description": "Table as Webview",
-  "author": "Kiel University <rt-kieler-devel@informatik.uni-kiel.de>",
+  "author": "KIELER <kieler@rtsys.informatik.uni-kiel.de>",
   "license": "EPL-2.0",
   "keywords": [
     "vscode"
