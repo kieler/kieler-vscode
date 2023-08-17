@@ -46,7 +46,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
             ],
             "env": {
-                "KEITH_LS_PORT": "10200"
+                "KEITH_LS_PORT": "5007"
             },
             "skipFiles": [
               "<node_internals>/**"
