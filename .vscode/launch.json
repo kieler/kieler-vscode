@@ -16,6 +16,28 @@
             "outFiles": ["${workspaceFolder}/keith-vscode/dist/**/*.js"],
         },
         {
+            "name": "Launch VS Code Extension with Klighd-vscode",
+            "type": "pwa-extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/keith-vscode",
+                "--extensionDevelopmentPath=${workspaceFolder}/../klighd-vscode/applications/klighd-vscode"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "smartStep": true,
+            "sourceMapPathOverrides": {
+                "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+                "webpack://?:*/*": "${workspaceFolder}/keith-vscode/*"
+            },
+            "outFiles": [
+                "${workspaceFolder}/keith-vscode/dist/**/*.js",
+				"${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/dist/**/*.js"
+            ],
+        },
+        {
             "name": "Launch VS Code Extension (Socket)",
             "type": "pwa-extensionHost",
             "request": "launch",

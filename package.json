@@ -14,8 +14,7 @@
         "yarn": "^1.22.10"
     },
     "workspaces": [
-        "keith-vscode",
-        "table-webview"
+        "keith-vscode"
     ],
     "scripts": {
         "clean": "lerna run clean --parallel",
