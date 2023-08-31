@@ -176,6 +176,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     )
     vscode.window.registerWebviewViewProvider('kieler-model-checker', modelCheckerDataProvider)
 
+    // eslint-disable-next-line no-console
     console.debug('Starting Language Server...')
     lsClient.start()
 
