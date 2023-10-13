@@ -111,6 +111,9 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     registerStpaCommands(context)
 
+    // Create context key of supported languages
+    vscode.commands.executeCommand('setContext', 'keith-vscode.languages', supportedFileEndings)
+
     const serverOptions: ServerOptions = createServerOptions(context)
 
     const clientOptions: LanguageClientOptions = {
