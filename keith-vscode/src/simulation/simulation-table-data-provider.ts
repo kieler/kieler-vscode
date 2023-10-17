@@ -592,10 +592,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             }
         })
         this.controlsEnabled = true
-        this.initializeTable()
         this.simulationRunning = true
         vscode.commands.executeCommand('setContext', 'keith.vscode:simulationRunning', this.simulationRunning)
         this.simulationStep = 0
+        this.initializeTable()
         // Show simulation view
         this.update()
     }
@@ -651,7 +651,6 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
     async startOrPauseSimulation(): Promise<void> {
         this.play = !this.play
         vscode.commands.executeCommand('setContext', 'keith.vscode:play', this.play)
-        // this.update()
         if (this.play) {
             await this.waitForNextStep()
         }
@@ -821,6 +820,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
                 )
             }
         })
+        this.update()
     }
 
     update(): void {
