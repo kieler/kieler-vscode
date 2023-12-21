@@ -133,13 +133,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     lsClient.clientOptions.errorHandler = new KeithErrorHandler(defaultErrorHandler)
 
     // Inform the KLighD extension about the LS client and supported file endings.
-    const refId = await vscode.commands.executeCommand<string>(
-        klighdCommands.setLanguageClient,
-        lsClient,
-        supportedFileEndings
-    )
+    await vscode.commands.executeCommand<string>(klighdCommands.setLanguageClient, lsClient, supportedFileEndings)
     // Intercept PerformActionActions from klighd diagrams.
-    vscode.commands.executeCommand(klighdCommands.addActionHandler, refId, performActionKind, handlePerformAction)
+    vscode.commands.executeCommand(klighdCommands.addActionHandler, performActionKind, handlePerformAction)
 
     // create SettingsService with list of setting-keys to manage
     settingsService = new SettingsService<Settings>(settingsKey, [
