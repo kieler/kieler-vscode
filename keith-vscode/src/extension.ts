@@ -59,20 +59,6 @@ export function deactivate(): Promise<void> {
     })
 }
 
-/** Returns the codename used by KIELER for current OS plattform. */
-function getPlattformType(): 'linux' | 'win' | 'osx' {
-    switch (process.platform) {
-        case 'linux':
-            return 'linux'
-        case 'win32':
-            return 'win'
-        case 'darwin':
-            return 'osx'
-        default:
-            throw new Error(`Unknown plattform "${process.platform}".`)
-    }
-}
-
 /**
  * Depending on the launch configuration, returns {@link ServerOptions} that either
  * connect to a socket or start the LS as a process. It uses a socket if the
@@ -99,7 +85,7 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
     }
     // eslint-disable-next-line no-console
     console.log('Spawning the language server as a process.')
-    const lsPath = context.asAbsolutePath(`server/kieler-language-server.${getPlattformType()}.jar`)
+    const lsPath = context.asAbsolutePath(`server/kieler-language-server.jar`)
 
     return {
         run: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },
