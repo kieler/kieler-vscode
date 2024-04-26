@@ -15,7 +15,7 @@ const config = {
     entry: path.resolve(__dirname, "src/extension.ts"), // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
     output: {
         // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "pack"),
         filename: "extension.js",
         libraryTarget: "commonjs2"
     },
@@ -55,7 +55,7 @@ const verificationWebview = {
     entry: path.resolve(__dirname, 'src/model-checker/main.ts'),
     output: {
 		filename: 'verification-webview.js',
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "pack"),
     },
     devtool: "nosources-source-map",
 
@@ -91,7 +91,7 @@ const simulationWebview = {
     entry: path.resolve(__dirname, 'src/simulation/main.ts'),
     output: {
 		filename: 'simulation-webview.js',
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "pack"),
     },
     devtool: 'nosources-source-map',
 

@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021 by
+ * Copyright 2021-2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -16,7 +16,7 @@
  */
 
 import * as vscode from 'vscode'
-import { LanguageClient } from 'vscode-languageclient'
+import { LanguageClient } from 'vscode-languageclient/node'
 import { Utils } from 'vscode-uri'
 import { Settings } from '../constants'
 import { SettingsService } from '../settings'
@@ -151,7 +151,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         this.context.subscriptions.push(this.compilation)
 
         // Bind notifications to receive
-        lsClient.onReady().then(() => {
+        lsClient.start().then(() => {
             lsClient.onNotification(
                 compilationSystemsMessageType,
                 (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
@@ -444,7 +444,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     async onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): Promise<void> {
         if (editor && editor.document.uri.scheme === 'file') {
-            this.lsClient.onReady().then(() => {
+            this.lsClient.start().then(() => {
                 this.editor = editor
                 this.requestSystemDescriptions()
             })
@@ -476,7 +476,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.requestedSystems = true
             const uri = this.editor.document.uri.toString()
             // Check if language client was already initialized and wait till it is
-            this.lsClient.onReady().then(async () => {
+            this.lsClient.start().then(async () => {
                 await this.lsClient.sendNotification(GET_SYSTEMS, uri)
             })
         } else {
@@ -490,7 +490,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      * @param index index of snapshot
      */
     public show(uri: string, index: number): void {
-        this.lsClient.onReady().then(async () => {
+        this.lsClient.start().then(async () => {
             this.indexMap.set(uri, index)
             this.lsClient.sendRequest(SHOW, [uri, `${diagramType}_sprotty`, index])
             // original model must not fire this emitter.
@@ -532,7 +532,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             // TODO too much information? Test this for visual clutter
             vscode.window.showInformationMessage(`Compiling ${uri} with ${command}`)
         }
-        this.lsClient.onReady().then(() => {
+        this.lsClient.start().then(() => {
             this.lsClient.sendNotification(COMPILE, [
                 uri,
                 `${diagramType}_sprotty`,
@@ -631,7 +631,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      * Notifies the LS to cancel the compilation.
      */
     public async requestCancelCompilation(): Promise<void> {
-        this.lsClient.onReady().then(() => {
+        this.lsClient.start().then(() => {
             this.cancellingCompilation = true
             this.lsClient.sendNotification(CANCEL_COMPILATION)
             this.compilationFinishedEmitter.fire(false)
@@ -842,10 +842,10 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                         parentElement.iconPath = error
                             ? new vscode.ThemeIcon('error')
                             : warn
-                            ? new vscode.ThemeIcon('warning')
-                            : info
-                            ? new vscode.ThemeIcon('info')
-                            : ''
+                              ? new vscode.ThemeIcon('warning')
+                              : info
+                                ? new vscode.ThemeIcon('info')
+                                : ''
                         if (info || warn || error) {
                             parentElement.tooltip = 'Check the KIELER Compiler output channel for details'
                         }
