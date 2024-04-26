@@ -24,6 +24,17 @@ const pastaCommands = {
 }
 
 /**
+ * Respresents an LTL formula.
+ */
+class LTLFormula {
+    formula: string
+
+    description: string
+
+    ucaId: string
+}
+
+/**
  * Registers commands that interact with PASTA
  * @param context The extension context.
  */
@@ -57,15 +68,54 @@ async function importStpaLTL(currentUri: vscode.Uri): Promise<void> {
     }
 
     // get the ltl formulas from the pasta extension
-    const ltlFormulas = await vscode.commands.executeCommand<{ formula: string; text: string; ucaId: string }[]>(
-        pastaCommands.getLTL,
-        uris[0].toString()
-    )
+    const ltlFormulas = await vscode.commands.executeCommand<
+        Record<string, { formula: string; description: string; ucaId: string }[]>
+    >(pastaCommands.getLTL, uris[0].toString())
+    if (ltlFormulas && Object.keys(ltlFormulas).length !== 0) {
+        // user must choose for which controller ltl formulas should be imported
+        showQuickPick(ltlFormulas, currentUri)
+    }
+}
+
+/**
+ * Shows a quickpick menu with the controllers (keys) of {@code ltlFormulasMap}.
+ * @param ltlFormulasMap Map that contains the ltlformulas for each controller.
+ * @param currentUri The uri of the scchart in which the LTL should be imported.
+ */
+function showQuickPick(ltlFormulasMap: Record<string, LTLFormula[]>, currentUri: vscode.Uri): void {
+    // create a list with the controller names
+    const quickPick = vscode.window.createQuickPick()
+    const itemList = []
+    for (const key of Object.keys(ltlFormulasMap)) {
+        itemList.push({ label: key })
+    }
+    quickPick.items = itemList
+
+    // show quickpick
+    quickPick.onDidChangeSelection((selection) => {
+        if (selection[0]) {
+            // add ltl formulas for selected controller
+            addLTLToFile(ltlFormulasMap, selection[0].label, currentUri)
+        }
+        quickPick.hide()
+    })
+    quickPick.onDidHide(() => quickPick.dispose())
+    quickPick.show()
+}
+
+/**
+ * Adds LTL formulas for the given {@code controller}.
+ * @param ltlFormulasMap Map containing the ltl formulas for each controller.
+ * @param controller The controller which ltl fomrulas should be imported.
+ * @param currentUri The uri of the scchart in which the LTL should be imported.
+ */
+function addLTLToFile(ltlFormulasMap: Record<string, LTLFormula[]>, controller: string, currentUri: vscode.Uri): void {
+    const ltlFormulas = ltlFormulasMap[controller]
     if (ltlFormulas) {
         // translate the formulas to annotations for sccharts
         let formulas = ''
         ltlFormulas.forEach((ltlFormula) => {
-            formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.text)
+            formulas += ltlAnnotation(ltlFormula.formula, ltlFormula.description, ltlFormula.ucaId)
         })
         // add the annotations at the top of the currently open scchart
         handleWorkSpaceEdit(currentUri.toString(), formulas, new vscode.Position(0, 0))
@@ -78,4 +128,5 @@ async function importStpaLTL(currentUri: vscode.Uri): Promise<void> {
  * @param description The description for the annotation,
  * @returns the SCChart LTL annotation for the given arguments.
  */
-const ltlAnnotation = (formula: string, description: string): string => `@LTL "${formula}", "${description}" \n`
+const ltlAnnotation = (formula: string, description: string, ucaID: string): string =>
+    `@LTL "${formula}", "${description}", "${ucaID}" \n`
