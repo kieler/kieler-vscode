@@ -22,6 +22,7 @@ module.exports = {
         'no-underscore-dangle': 0,
         'no-nested-ternary': 0,
         'no-param-reassign': 0,
+        'no-empty-function': 0, // messes up "empty" constructors
         'class-methods-use-this': 0,
     },
     settings: {

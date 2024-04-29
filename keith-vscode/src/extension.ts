@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021-2023 by
+ * Copyright 2021-2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -17,7 +17,7 @@
 
 import { connect, NetConnectOpts, Socket } from 'net'
 import * as vscode from 'vscode'
-import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from 'vscode-languageclient'
+import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from 'vscode-languageclient/node'
 import { Settings, settingsKey } from './constants'
 import { KeithErrorHandler } from './error-handler'
 import { CompilationDataProvider } from './kico/compilation-data-provider'
@@ -59,25 +59,11 @@ export function deactivate(): Promise<void> {
     })
 }
 
-/** Returns the codename used by KIELER for current OS plattform. */
-function getPlattformType(): 'linux' | 'win' | 'osx' {
-    switch (process.platform) {
-        case 'linux':
-            return 'linux'
-        case 'win32':
-            return 'win'
-        case 'darwin':
-            return 'osx'
-        default:
-            throw new Error(`Unknown plattform "${process.platform}".`)
-    }
-}
-
 /**
  * Depending on the launch configuration, returns {@link ServerOptions} that either
  * connect to a socket or start the LS as a process. It uses a socket if the
  * environment variable `KEITH_LS_PORT` is present. Otherwise it runs the jar located
- * at `server/kieler-language-server.{platform}.jar`.
+ * at `server/kieler-language-server.jar`.
  */
 function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
     // Connect to language server via socket if a port is specified as an env variable
@@ -99,7 +85,7 @@ function createServerOptions(context: vscode.ExtensionContext): ServerOptions {
     }
     // eslint-disable-next-line no-console
     console.log('Spawning the language server as a process.')
-    const lsPath = context.asAbsolutePath(`server/kieler-language-server.${getPlattformType()}.jar`)
+    const lsPath = context.asAbsolutePath(`server/kieler-language-server.jar`)
 
     return {
         run: { command: 'java', args: ['-Djava.awt.headless=true', '-jar', lsPath] },

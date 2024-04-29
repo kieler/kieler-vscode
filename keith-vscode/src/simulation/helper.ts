@@ -61,7 +61,12 @@ export function getNonce(): string {
  * Internal data structure to save all data required to display a simulation in the siulation view.
  */
 export class SimulationData {
-    constructor(public data: unknown[], public input: boolean, public output: boolean, public categories: string[]) {}
+    constructor(
+        public data: unknown[],
+        public input: boolean,
+        public output: boolean,
+        public categories: string[]
+    ) {}
 }
 
 /**
@@ -77,7 +82,10 @@ export class SimulationStartedMessage {
 }
 
 export class Category {
-    constructor(public name: string, public symbols: string[]) {}
+    constructor(
+        public name: string,
+        public symbols: string[]
+    ) {}
 }
 
 /**
@@ -91,7 +99,10 @@ export class SimulationStepMessage {
  * Message send by the LS whenever a simulation is stopped.
  */
 export class SimulationStoppedMessage {
-    constructor(public successful: boolean, public message: string) {}
+    constructor(
+        public successful: boolean,
+        public message: string
+    ) {}
 }
 
 export const SimulationDataBlackList: string[] = ['#interface']

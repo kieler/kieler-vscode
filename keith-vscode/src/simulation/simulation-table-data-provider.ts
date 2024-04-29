@@ -18,7 +18,7 @@
 import { TableWebview } from '@kieler/table-webview/lib/table-webview'
 import * as path from 'path'
 import * as vscode from 'vscode'
-import { LanguageClient } from 'vscode-languageclient'
+import { LanguageClient } from 'vscode-languageclient/node'
 import { Settings, SimulationType } from '../constants'
 import {
     CompilationDataProvider,
@@ -199,7 +199,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         )
 
         // Bind to LSP messages
-        lsClient.onReady().then(() => {
+        lsClient.start().then(() => {
             lsClient.onNotification(externalStepMessageType, (message: SimulationStepMessage) => {
                 this.handleStepMessage(message)
             })
@@ -525,7 +525,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         if (this.kico.editor && !this.simulationRunning) {
             // The uri of the current editor is needed to identify the already compiled snapshot that is used to start the simulation.
             const uri = this.kico.lastCompiledUri
-            this.lsClient.onReady().then(() => {
+            this.lsClient.start().then(() => {
                 this.lsClient.sendNotification('keith/simulation/start', [uri, this.settings.get('simulationType')])
             })
             this.simulationStatus.text = '$(spinner) Starting simulation...'
@@ -783,7 +783,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
      * Start the simulation visualization socket server and opens a browser window.
      */
     openExternalKVizView(): void {
-        this.lsClient.onReady().then(() => {
+        this.lsClient.start().then(() => {
             this.lsClient.sendNotification('keith/simulation/startVisualizationServer')
         })
         vscode.env.openExternal(vscode.Uri.parse('http://localhost:5010/visualization'))

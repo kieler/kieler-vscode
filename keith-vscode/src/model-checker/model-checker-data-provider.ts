@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2022 by
+ * Copyright 2022-2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -18,7 +18,7 @@
 import { TableWebview } from '@kieler/table-webview/lib/table-webview'
 import * as path from 'path'
 import * as vscode from 'vscode'
-import { LanguageClient } from 'vscode-languageclient'
+import { LanguageClient } from 'vscode-languageclient/node'
 import { CompilationDataProvider } from '../kico/compilation-data-provider'
 import { COMPILE_AND_SIMULATE } from '../simulation/commands'
 
@@ -103,13 +103,13 @@ export class ModelCheckerDataProvider implements vscode.WebviewViewProvider {
     ) {
         this.compiler = compiler
         // Bind to LSP messages
-        lsClient.onReady().then(() => {
+        lsClient.start().then(() => {
             lsClient.onNotification(propertiesMessageType, (propertyMsg) => {
                 this.props = propertyMsg.properties
                 this.handlePropertiesMessage(this.props)
             })
         })
-        lsClient.onReady().then(() => {
+        lsClient.start().then(() => {
             lsClient.onNotification(
                 updatePropertyStatusMessageType,
                 (id: string, status: VerificationPropertyStatus, counterexampleUri: string) => {

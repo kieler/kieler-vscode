@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021 by
+ * Copyright 2021-2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -16,7 +16,7 @@
  */
 
 import { window } from 'vscode'
-import { CloseAction, ErrorAction, ErrorHandler, Message } from 'vscode-languageclient'
+import { CloseHandlerResult, ErrorHandler, ErrorHandlerResult, Message } from 'vscode-languageclient'
 
 /**
  * Simple LS connection error handling that informs the user about encountered
@@ -25,7 +25,7 @@ import { CloseAction, ErrorAction, ErrorHandler, Message } from 'vscode-language
 export class KeithErrorHandler implements ErrorHandler {
     constructor(private defaultHandler: ErrorHandler) {}
 
-    error(error: Error, message: Message, count: number): ErrorAction {
+    error(error: Error, message: Message, count: number): ErrorHandlerResult | Promise<ErrorHandlerResult> {
         window.showErrorMessage('Connection to KIELER Language Server produced an error!')
         // eslint-disable-next-line no-console
         console.error(error)
@@ -33,7 +33,7 @@ export class KeithErrorHandler implements ErrorHandler {
         return this.defaultHandler.error(error, message, count)
     }
 
-    closed(): CloseAction {
+    closed(): CloseHandlerResult | Promise<CloseHandlerResult> {
         window.showErrorMessage('Connection to KIELER Language Server got closed!')
 
         return this.defaultHandler.closed()

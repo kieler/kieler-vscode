@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2022 by
+ * Copyright 2022-2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -39,7 +39,10 @@ export class SettingsService<S> {
      * @param settingKeys list of settings to manage. Note: This HAS to be an array containing
      *                    the keys of all settings passed as the class generic.
      */
-    constructor(private readonly configurationKey: string, settingKeys: SettingList<S>) {
+    constructor(
+        private readonly configurationKey: string,
+        settingKeys: SettingList<S>
+    ) {
         this.cache = new Map()
 
         // read current settings into cache
