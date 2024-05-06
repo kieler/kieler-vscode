@@ -3,7 +3,7 @@
  *
  * http://rtsys.informatik.uni-kiel.de/kieler
  *
- * Copyright 2021 - 2022 by
+ * Copyright 2021 - 2024 by
  * + Kiel University
  *   + Department of Computer Science
  *     + Real-Time and Embedded Systems Group
@@ -477,10 +477,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         })
         if (executableUri) {
             const lClient = await this.lsClient
-            lClient.sendNotification('keith/simulation/addCoSimulation', [
-                'keith-diagram_sprotty',
-                executableUri[0].path.toString(),
-            ])
+            lClient.sendNotification('keith/simulation/addCoSimulation', {
+                clientId: 'keith-diagram_sprotty',
+                fileUri: executableUri[0].path.toString(),
+            })
         }
     }
 
@@ -526,7 +526,10 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
             // The uri of the current editor is needed to identify the already compiled snapshot that is used to start the simulation.
             const uri = this.kico.lastCompiledUri
             this.lsClient.start().then(() => {
-                this.lsClient.sendNotification('keith/simulation/start', [uri, this.settings.get('simulationType')])
+                this.lsClient.sendNotification('keith/simulation/start', {
+                    uri,
+                    simulationType: this.settings.get('simulationType'),
+                })
             })
             this.simulationStatus.text = '$(spinner) Starting simulation...'
             this.simulationStatus.tooltip = 'Starting simulation...'
@@ -607,7 +610,7 @@ export class SimulationTableDataProvider implements vscode.WebviewViewProvider {
         const lClient = await this.lsClient
         // Transform the input map to an object since this is the format the LS supports
         const jsonObject = strMapToObj(this.changedValuesForNextStep)
-        lClient.sendNotification('keith/simulation/step', [jsonObject, 'Manual'])
+        lClient.sendNotification('keith/simulation/step', { valuesForNextStep: jsonObject, simulationType: 'Manual' })
         this.update()
     }
 
