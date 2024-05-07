@@ -46,13 +46,13 @@ export const SHOW_PREVIOUS_KEYBINDING = 'alt+g'
 export const SHOW_NEXT_KEYBINDING = 'alt+j'
 
 export const EDITOR_UNDEFINED_MESSAGE = 'Editor is undefined'
-export const snapshotDescriptionMessageType = 'keith/kicool/compile'
+export const snapshotDescriptionMessageType = 'keith/kicool/didCompile'
 export const cancelCompilationMessageType = 'keith/kicool/cancel-compilation'
 export const compilationSystemsMessageType = 'keith/kicool/compilation-systems'
 
 export const diagramType = 'keith-diagram'
 
-export class CompilationDataProvider implements vscode.TreeDataProvider<CompilationData> {
+export class CompilationDataProvider implements vscode.TreeDataProvider<SnapshotDescription> {
     editor: vscode.TextEditor | undefined = undefined
 
     requestedSystems = false
@@ -94,13 +94,13 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     /**
      * Snapshots that are currently shown in the view, created during compilation.
      */
-    snapshots: CodeContainer | undefined = undefined
+    snapshots: CompilationResults | undefined = undefined
 
     isCompiled: Map<string, boolean> = new Map()
 
     sourceURI: Map<string, string> = new Map()
 
-    resultMap: Map<string, CodeContainer> = new Map()
+    resultMap: Map<string, CompilationResults> = new Map()
 
     indexMap: Map<string, number> = new Map()
 
@@ -154,20 +154,26 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         lsClient.start().then(() => {
             lsClient.onNotification(
                 compilationSystemsMessageType,
-                (systems: CompilationSystem[], snapshotSystems: CompilationSystem[]) => {
-                    this.handleReceiveSystemDescriptions(systems, snapshotSystems)
+                (param: { systems: CompilationSystem[]; snapshotSystems: CompilationSystem[] }) => {
+                    this.handleReceiveSystemDescriptions(param.systems, param.snapshotSystems)
                 }
             )
             lsClient.onNotification(
                 snapshotDescriptionMessageType,
-                (
-                    snapshotsDescriptions: CodeContainer,
-                    uri: string,
-                    finished: boolean,
-                    currentIndex: number,
+                (params: {
+                    results: CompilationResults
+                    uri: string
+                    finished: boolean
+                    currentIndex: number
                     maxIndex: number
-                ) => {
-                    this.handleNewSnapshotDescriptions(snapshotsDescriptions, uri, finished, currentIndex, maxIndex)
+                }) => {
+                    this.handleNewSnapshotDescriptions(
+                        params.results,
+                        params.uri,
+                        params.finished,
+                        params.currentIndex,
+                        params.maxIndex
+                    )
                 }
             )
         })
@@ -492,7 +498,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     public show(uri: string, index: number): void {
         this.lsClient.start().then(async () => {
             this.indexMap.set(uri, index)
-            this.lsClient.sendRequest(SHOW, [uri, `${diagramType}_sprotty`, index])
+            this.lsClient.sendRequest(SHOW, { uri, clientId: `${diagramType}_sprotty`, index })
             // original model must not fire this emitter.
             if (index !== -1) {
                 this.showedNewSnapshotEmitter.fire('Success')
@@ -533,14 +539,14 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             vscode.window.showInformationMessage(`Compiling ${uri} with ${command}`)
         }
         this.lsClient.start().then(() => {
-            this.lsClient.sendNotification(COMPILE, [
+            this.lsClient.sendNotification(COMPILE, {
                 uri,
-                `${diagramType}_sprotty`,
+                clientId: `${diagramType}_sprotty`,
                 command,
                 inplace,
                 showResultingModel,
                 snapshot,
-            ])
+            })
             this.compilationStartedEmitter.fire(this)
         })
     }
@@ -549,7 +555,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
      * Handles the visualization of new snapshot descriptions send by the LS.
      */
     async handleNewSnapshotDescriptions(
-        snapshotsDescriptions: CodeContainer,
+        results: CompilationResults,
         uri: string,
         finished: boolean,
         currentIndex: number,
@@ -561,9 +567,9 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             this.registerShowPrevious()
         }
         this.isCompiled.set(uri as string, true)
-        this.resultMap.set(uri as string, snapshotsDescriptions)
-        this.snapshots = snapshotsDescriptions
-        const length = snapshotsDescriptions.files.reduce((previousSum, snapshots) => previousSum + snapshots.length, 0)
+        this.resultMap.set(uri as string, results)
+        this.snapshots = results
+        const length = results.files.reduce((previousSum, snapshots) => previousSum + snapshots.length, 0)
         this.lengthMap.set(uri as string, length)
         this.indexMap.set(uri as string, length - 1)
         if (finished) {
@@ -571,7 +577,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
             let errorOccurred = false
             this.compiling = false
             let errorString = ''
-            snapshotsDescriptions.files.forEach((array) => {
+            results.files.forEach((array) => {
                 array.forEach((e) => {
                     const element = e
                     if (element.infos && element.infos.length > 0) {
@@ -765,13 +771,13 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
 
     // private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>()
     // readonly onDidChangeTreeData = this._onDidChangeTreeData.event
-    private _onDidChangeTreeData: vscode.EventEmitter<CompilationData | undefined | null | void> =
-        new vscode.EventEmitter<CompilationData | undefined | null | void>()
+    private _onDidChangeTreeData: vscode.EventEmitter<SnapshotDescription | undefined | null | void> =
+        new vscode.EventEmitter<SnapshotDescription | undefined | null | void>()
 
-    readonly onDidChangeTreeData: vscode.Event<CompilationData | undefined | null | void> =
+    readonly onDidChangeTreeData: vscode.Event<SnapshotDescription | undefined | null | void> =
         this._onDidChangeTreeData.event
 
-    getTreeItem(element: CompilationData): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    getTreeItem(element: SnapshotDescription): vscode.TreeItem | Thenable<vscode.TreeItem> {
         if (element) {
             // Put context into element to show it in diagram
             element.id =
@@ -785,7 +791,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
         throw new Error('Method not implemented.')
     }
 
-    getChildren(element?: CompilationData): vscode.ProviderResult<CompilationData[]> {
+    getChildren(element?: SnapshotDescription): vscode.ProviderResult<SnapshotDescription[]> {
         // TODO somehow show the original model in there too
         if (this.snapshots) {
             if (element?.contextValue === 'parent') {
@@ -796,7 +802,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 })
                 return this.snapshots.files[index]
             }
-            const originalElement = new CompilationData(
+            const originalElement = new SnapshotDescription(
                 'Original',
                 '',
                 vscode.TreeItemCollapsibleState.None,
@@ -816,7 +822,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
                 this.snapshots.files.map((snapshots) => {
                     if (snapshots.length > 1) {
                         // TODO calculate or safe what was expanded and what collapsed for each compilation systems, maybe by their name?
-                        const parentElement = new CompilationData(
+                        const parentElement = new SnapshotDescription(
                             snapshots[0].name,
                             '',
                             vscode.TreeItemCollapsibleState.Collapsed,
@@ -860,7 +866,7 @@ export class CompilationDataProvider implements vscode.TreeDataProvider<Compilat
     }
 }
 
-export class CompilationData extends vscode.TreeItem {
+export class SnapshotDescription extends vscode.TreeItem {
     constructor(
         public label: string,
         private version: string,
@@ -934,10 +940,10 @@ export class CompilationSystemsMessage {
 }
 
 /**
- * Equivalent to CodeContainer send by LS
+ * Equivalent to CompilationResults sent by LS
  */
-export interface CodeContainer {
-    files: CompilationData[][]
+export interface CompilationResults {
+    files: SnapshotDescription[][]
 }
 
 export interface Code {
