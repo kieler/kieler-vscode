@@ -2,7 +2,7 @@
   "name": "keith-vscode",
   "displayName": "KIELER VS Code",
   "description": "KIELER Visual Studio Code",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "kieler",
   "author": "KIELER <kieler@rtsys.informatik.uni-kiel.de>",
   "icon": "icon.png",
