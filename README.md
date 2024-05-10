@@ -9,9 +9,9 @@ This monorepo is the home of the KIELER VS Code project. It mainly consists of a
 
 ## Requirements
 
-Development of this project requires [Node.js _v14.x_](https://nodejs.org) and
+Development of this project requires [Node.js _v16.x_](https://nodejs.org) and
 [yarn _v1.x_](https://classic.yarnpkg.com/). Further, language server jars, named
-`kieler-language-server.{os-id}.jar`, have to placed in the `keith-vscode/server` folder to develop
+`kieler-language-server.jar`, have to placed in the `keith-vscode/server` folder to develop
 the VS Code extension. The latest jars can be downloaded
 [here](https://rtsys.informatik.uni-kiel.de/~kieler/files/nightly/sccharts/ls/).
 
