@@ -506,18 +506,23 @@
         },
         {
           "command": "keith-vscode.open-kviz-external",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
+          "when": "view == kieler-simulation-table",
           "group": "1_simulation-visualization"
         },
         {
           "command": "keith-vscode.simulation-save-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
+          "when": "view == kieler-simulation-table",
           "group": "2_simulation-trace@1"
         },
         {
           "command": "keith-vscode.simulation-load-trace",
-          "when": "keith.vscode:simulationRunning && view == kieler-simulation-table",
+          "when": "view == kieler-simulation-table",
           "group": "2_simulation-trace@2"
+        },
+        {
+          "command": "keith-vscode.simulation-restart",
+          "when": "!keith.vscode:simulationRunning && view == kieler-simulation-table",
+          "group": "navigation@2"
         },
         {
           "command": "keith-vscode.verification-load-properties",
