@@ -636,6 +636,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint .",
+    "lint-fix": "eslint --fix .",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
     "package": "vsce package --yarn -o keith-vscode.vsix",
