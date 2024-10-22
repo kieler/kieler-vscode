@@ -56,6 +56,7 @@
             "sourceMapPathOverrides": {
                 "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
                 "webpack://?:*/*": "${workspaceFolder}/keith-vscode/*"
+                // "webpack://?:*/*": "${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/*" // Comment in this line and comment out the line above to debug the extension code of klighd-vscode instead.
             },
             "outFiles": [
                 "${workspaceFolder}/keith-vscode/dist/**/*.js",
@@ -109,6 +110,7 @@
             "sourceMapPathOverrides": {
                 "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
                 "webpack://?:*/*": "${workspaceFolder}/keith-vscode/*"
+                // "webpack://?:*/*": "${workspaceFolder}/../klighd-vscode/applications/klighd-vscode/*" // Comment in this line and comment out the line above to debug the extension code of klighd-vscode instead.
             },
             "outFiles": [
                 "${workspaceFolder}/keith-vscode/dist/**/*.js",
