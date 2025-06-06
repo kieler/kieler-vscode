@@ -86,7 +86,7 @@
         "extensions": [
           "strl"
         ],
-        "configuration": "./strl-language-configuration.json"
+        "configuration": "./configurations/strl-language-configuration.json"
       },
       {
         "id": "kviz",
