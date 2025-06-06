@@ -67,7 +67,7 @@
       "patterns": [
         {
           "name": "comment.block.strl",
-          "begin": "(/\\*)(?:\\s*((@)internal)(?\u003d\\s|(\\*/)))?",
+          "begin": "(%{)(?:\\s*((@)internal)(?\u003d\\s|(%})))?",
           "beginCaptures": {
             "1": {
               "name": "punctuation.whitespace.comment.leading.strl"
@@ -77,7 +77,7 @@
             },
             "3": {}
           },
-          "end": "\\*/",
+          "end": "}%",
           "endCaptures": {
             "0": {
               "name": "punctuation.whitespace.comment.leading.strl"
