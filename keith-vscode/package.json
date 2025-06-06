@@ -43,7 +43,7 @@
         "extensions": [
           "kgt"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "kgx",
@@ -54,7 +54,7 @@
         "extensions": [
           "kgx"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "elkt",
@@ -65,7 +65,7 @@
         "extensions": [
           "elkt"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "elkj",
@@ -86,7 +86,7 @@
         "extensions": [
           "strl"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/strl-language-configuration.json"
       },
       {
         "id": "kviz",
@@ -97,7 +97,7 @@
         "extensions": [
           "kviz"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "lus",
@@ -108,7 +108,7 @@
         "extensions": [
           "lus"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "sctx",
@@ -119,7 +119,7 @@
         "extensions": [
           "sctx"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       },
       {
         "id": "scl",
@@ -130,7 +130,7 @@
         "extensions": [
           "scl"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./configurations/language-configuration.json"
       }
     ],
     "grammars": [
