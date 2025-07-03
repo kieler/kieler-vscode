@@ -209,6 +209,9 @@ table, th, td {
 
 .simulation-table-history {
     cursor: default;
+    overflow-x: scroll;
+    white-space: nowrap;
+    max-width: 200px; /* Set a max-width for the history table, the concrete size is debatable */
 }
 
 .simulation-table-categories {
