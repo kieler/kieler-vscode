@@ -15,6 +15,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+:root {
+    --simulation-history-max-width: 200px; /* Set a max-width for the history table, the concrete size is debatable */
+}
+
 .simulation-widget {
     /* font-size: var(--vscode-font-size);
     color: var(--vscode-foreground); */
@@ -209,9 +213,9 @@ table, th, td {
 
 .simulation-table-history {
     cursor: default;
-    overflow-x: scroll;
+    overflow-x: auto;
     white-space: nowrap;
-    max-width: 200px; /* Set a max-width for the history table, the concrete size is debatable */
+    max-width: var(--simulation-history-max-width); /* Set a max-width for the history table, the concrete size is debatable */
 }
 
 .simulation-table-categories {
