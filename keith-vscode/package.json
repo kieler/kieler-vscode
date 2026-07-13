@@ -667,7 +667,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@kieler/table-webview": "^0.0.5",
+    "@kieler/table-webview": "^0.0.9",
     "es6-shim": "^0.35.8",
     "react": "^18.3.0",
     "snabbdom-to-html": "^7.0.0",
