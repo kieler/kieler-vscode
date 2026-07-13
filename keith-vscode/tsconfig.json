@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
+        "target": "es2025",
         "outDir": "dist",
-        "lib": ["es2017", "dom"],
+        "lib": ["es2025", "dom"],
         "jsx": "react",
         "sourceMap": true,
         "rootDir": "src",
