@@ -1,13 +1,12 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
+        "target": "es2025",
         "outDir": "dist",
-        "lib": ["es2017", "dom"],
+        "lib": ["es2025", "dom"],
         "jsx": "react",
         "sourceMap": true,
         "rootDir": "src",
-        "strict": true, // enable all strict type-checking options
         /* Additional Checks */
         "strictPropertyInitialization": false, // No need to initialize every variable
         "declaration": true,

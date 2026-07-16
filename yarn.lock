@@ -124,10 +124,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@kieler/table-webview@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@kieler/table-webview/-/table-webview-0.0.5.tgz#b8b0f32aed2ec36aa4efac63bcf14931a28b874c"
-  integrity sha512-vLVbwinjHGhcEPOnupcTWkhmhEvhDF3saZt7EJVbfPyAYiTMRmrT3LifPJ74K3Gie0HyVvCdt2qPuZf88asnog==
+"@kieler/table-webview@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@kieler/table-webview/-/table-webview-0.0.9.tgz#4a7638214e8e3fe8a0f4e6d80fa7589c42dd7963"
+  integrity sha512-aQZoc/jshDgbM/TSgj8EZBgHHr7jAQPJ7RqfYaBx0sTMJgX59SJHhXVA0rUka4nVvUxP3KfKPKeDyvkHPefOvQ==
   dependencies:
     "@types/vscode" "^1.85.0"
     reflect-metadata "^0.2.1"
@@ -6823,10 +6823,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^5.3.3:
-  version "5.4.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
-  integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
+typescript@^6.0.0:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-6.0.3.tgz#90251dc007916e972786cb94d74d15b185577d21"
+  integrity sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
