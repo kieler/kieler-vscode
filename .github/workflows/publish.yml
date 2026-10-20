@@ -1,0 +1,53 @@
+# Workflow that publishes the VS Code extension to the VS Marketplace and
+# Open VSX, and attaches assets to the new release.
+
+name: publish
+
+on:
+    release:
+        types: [published]
+jobs:
+    distribute:
+        name: "Distribute VSCode extension"
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
+
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/cache@v5
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: "24.x"
+                  registry-url: 'https://registry.npmjs.org'
+                  scope: '@kieler'
+            - run: yarn
+            - run: yarn distribute
+              env:
+                  VSCE_PAT: ${{ secrets.VSCE_PAT }}
+                  OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    release-assets:
+        name: "Add assets to release"
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: "24.x"
+            - run: yarn
+            - run: yarn package
+
+            - name: Upload release assets
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release upload ${{ github.event.release.tag_name }} \
+                    ./keith-vscode/keith-vscode.vsix \
+                    --clobber

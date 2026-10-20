@@ -5,7 +5,7 @@
 ## Features
 
 Adds language support for various languages that are part of the
-[KIELER project](https://rtsys.informatik.uni-kiel.de/kieler).
+[KIELER project](https://github.com/kieler).
 
 -   Support for SCCharts
 -   Support for Elk Graph
@@ -19,7 +19,7 @@ languages.
 
 ## Requirements
 
-This extension requires an installation of Java 11 to be available on your PATH.
+This extension requires an installation of Java 17 to be available on your PATH.
 
 ## Known Issues
 
