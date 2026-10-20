@@ -640,7 +640,10 @@
     "build": "webpack --mode production",
     "watch": "webpack --watch",
     "package": "vsce package --yarn -o keith-vscode.vsix",
-    "vscode:prepublish": "yarn run build"
+    "vscode:prepublish": "yarn run build",
+    "distribute": "yarn run distribute:vsce && yarn run distribute:ovsx",
+    "distribute:vsce": "vsce publish --yarn --packagePath keith-vscode.vsix",
+    "distribute:ovsx": "ovsx publish --yarn keith-vscode.vsix"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
