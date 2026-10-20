@@ -5,12 +5,12 @@ It mainly consists of a Visual Studio Code extension.
 
 ## Packages
 
-- [keith-vscode](./packages/keith-vscode): VS Code extension that adds support for multiple KIELER languages in VS Code.
+- [keith-vscode](./keith-vscode): VS Code extension that adds support for multiple KIELER languages in VS Code.
 
 ## Requirements
 
 Development of this project requires [Node.js _v24.x_](https://nodejs.org) and [yarn _v1.x_](https://classic.yarnpkg.com/).
-Furthermore, language server jars, named `kieler-language-server.jar`, have to placed in the `keith-vscode/server` folder to develop the VS Code extension.
+Furthermore, language server jars, named `kieler-language-server.jar`, have to be placed in the `keith-vscode/server` folder to develop the VS Code extension.
 The latest jars can be downloaded from the [semantics](https://github.com/kieler/semantics/releases) repository.
 
 The `keith-vscode` extension has a dependency on the [klighd-vscode](https://github.com/kieler/klighd-vscode) to add diagram support.
