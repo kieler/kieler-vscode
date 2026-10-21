@@ -1,23 +1,20 @@
 # KEITH
 
-This monorepo is the home of the KIELER VS Code project. It mainly consists of a Visual Studio Code extension.
+This monorepo is the home of the KIELER VS Code project.
+It mainly consists of a Visual Studio Code extension.
 
 ## Packages
 
--   [keith-vscode](./packages/keith-vscode): VS Code extension that adds support for multiple KIELER
-    languages in VS Code.
+- [keith-vscode](./keith-vscode): VS Code extension that adds support for multiple KIELER languages in VS Code.
 
 ## Requirements
 
-Development of this project requires [Node.js _v16.x_](https://nodejs.org) and
-[yarn _v1.x_](https://classic.yarnpkg.com/). Further, language server jars, named
-`kieler-language-server.jar`, have to placed in the `keith-vscode/server` folder to develop
-the VS Code extension. The latest jars can be downloaded
-[here](https://rtsys.informatik.uni-kiel.de/~kieler/files/nightly/sccharts/ls/).
+Development of this project requires [Node.js _v24.x_](https://nodejs.org) and [yarn _v1.x_](https://classic.yarnpkg.com/).
+Furthermore, language server jars, named `kieler-language-server.jar`, have to be placed in the `keith-vscode/server` folder to develop the VS Code extension.
+The latest jars can be downloaded from the [semantics](https://github.com/kieler/semantics/releases) repository.
 
-The `keith-vscode` extension has a dependency on the
-[klighd-vscode](https://github.com/kieler/klighd-vscode) to add diagram support. You have to install
-the extension locally if VS Code is not able to install the dependency automatically.
+The `keith-vscode` extension has a dependency on the [klighd-vscode](https://github.com/kieler/klighd-vscode) to add diagram support.
+You have to install the extension locally if VS Code is not able to install the dependency automatically.
 
 ## Scripts
 
@@ -37,8 +34,7 @@ We recommend VS Code to develop the VS Code extension to make use of the provide
 following steps are required to start developing.
 
 1. Fulfill the requirements above.
-1. Install all
-   [workspace recommended extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
+1. Install all [workspace recommended extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
 1. Run `yarn` in the monorepo root to install all dependencies (if not already done).
 1. Run the "Launch VS Code Extension" launch configuration. This also runs a task to watch all packages.
 1. A VS Code instance with the `keith-vscode` extension should be started.
