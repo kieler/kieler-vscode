@@ -19,7 +19,7 @@ languages.
 
 ## Requirements
 
-This extension requires an installation of Java 17 to be available on your PATH.
+This extension requires an installation of Java 21 to be available on your PATH.
 
 ## Known Issues
 
