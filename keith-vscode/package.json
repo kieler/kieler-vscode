@@ -641,9 +641,7 @@
     "watch": "webpack --watch",
     "package": "vsce package --yarn -o keith-vscode.vsix",
     "vscode:prepublish": "yarn run build",
-    "distribute": "yarn run distribute:vsce && yarn run distribute:ovsx",
-    "distribute:vsce": "vsce publish --yarn --packagePath keith-vscode.vsix",
-    "distribute:ovsx": "ovsx publish --yarn keith-vscode.vsix"
+    "distribute": "vsce publish --yarn --packagePath keith-vscode.vsix"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
@@ -661,7 +659,6 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.1.3",
     "mini-css-extract-plugin": "^2.7.6",
-    "ovsx": "^0.10.12",
     "prettier": "3.1.1",
     "rimraf": "^4.4.0",
     "source-map-loader": "^3.0.0",
