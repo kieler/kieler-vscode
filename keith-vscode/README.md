@@ -21,6 +21,16 @@ languages.
 
 This extension requires an installation of Java 21 to be available on your PATH.
 
+## Release maintenance
+
+Before every release, keep these files up to date:
+
+-   `package.json`: bump `version` to the new extension version.
+-   `CHANGELOG.md`: document all user-visible changes for the new version.
+-   `README.md`: update user-facing documentation whenever behavior, requirements, or workflow changed.
+
+For the full release process, see [RELEASE.md](./RELEASE.md).
+
 ## Known Issues
 
 -   `keith-vscode` has a dependency on `klighd-vscode` to support diagrams. However, currently only
