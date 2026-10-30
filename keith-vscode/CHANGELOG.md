@@ -6,4 +6,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Add a dedicated release guide in `RELEASE.md`.
+- Document release maintenance requirements in `README.md`.
 - Initial release
